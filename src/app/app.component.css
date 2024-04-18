@@ -1,0 +1,18 @@
+:host{
+    width: 100%;
+    display:grid;
+    grid-template-areas: 
+    "sidebar header"
+    "sidebar content"
+    "sidebar footer";
+    grid-template-columns: var(--sidebar-width) 1fr;
+  
+}
+/* la asignacion del valor de una variable
+   se hace con var(variable)    */
+.content{
+    display: block;
+    background-color: cyan;
+    grid-area: content;
+    height: 1500px;
+}
