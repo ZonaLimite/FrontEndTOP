@@ -2,4 +2,9 @@
     display: block;
     background-color: greenyellow;
     grid-area: header;
+    position: fixed;
+    width:100%;
+  
+    
+    
 }

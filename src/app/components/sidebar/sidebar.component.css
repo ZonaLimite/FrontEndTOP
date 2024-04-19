@@ -2,7 +2,13 @@
     display: block;
     background-color: red;
     grid-area: sidebar;
+    width: var(--sidebar-width);
     position: fixed;
-    height: 100%;
-    width: var(--sidebar-width)
+    margin-top: 55px;
+
+
+
+
+ 
+    
 }

@@ -1,7 +1,9 @@
 /*la notacion -- permite la definicion
   de variables css */
 :root{
-    --sidebar-width:200px;
+    --sidebar-width:120px;
+    --cabecera-height:40px;
+    --value-gap-layout: 5px;
 }
 
 
@@ -10,4 +12,8 @@ html,body{
     margin: 0;
     padding: 0;
     font-family: sans-serif;
+    background-color: black;
+    color: aliceblue;
+ 
+   
 }

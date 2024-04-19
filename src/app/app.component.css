@@ -1,12 +1,18 @@
 :host{
     width: 100%;
+    height:100%;
+    border: 5px;
+    border-style:double;
+    border-color: black;
     display:grid;
     grid-template-areas: 
-    "sidebar header"
+    "header header"
     "sidebar content"
-    "sidebar footer";
+    "footer footer";
     grid-template-columns: var(--sidebar-width) 1fr;
-  
+    grid-template-rows: 50px 1fr 50px;
+
+    gap:var(--value-gap-layout);
 }
 /* la asignacion del valor de una variable
    se hace con var(variable)    */
@@ -14,5 +20,5 @@
     display: block;
     background-color: cyan;
     grid-area: content;
-    height: 1500px;
+   
 }
