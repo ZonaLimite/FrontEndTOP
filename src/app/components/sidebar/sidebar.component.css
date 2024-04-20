@@ -2,10 +2,10 @@
     display: block;
     background-color: red;
     grid-area: sidebar;
-    width: var(--sidebar-width);
-    position: fixed;
-    margin-top: 55px;
+    
 
+   
+   
 
 
 

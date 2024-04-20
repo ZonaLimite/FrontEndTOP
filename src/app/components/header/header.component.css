@@ -1,9 +1,19 @@
 :host{
-    display: block;
+    display:block;
     background-color: greenyellow;
     grid-area: header;
-    position: fixed;
-    width:100%;
+    
+    border: 5px;
+    border-color: black;
+    border-style: solid;
+    position: fixed;    
+    width:  calc(100% - 10px);
+    left:0;
+    top:0;
+  
+   
+    
+  
   
     
     
