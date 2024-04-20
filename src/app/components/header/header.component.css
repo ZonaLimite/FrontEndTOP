@@ -3,13 +3,17 @@
     background-color: greenyellow;
     grid-area: header;
     
+    position: fixed;
+    /*width:  calc(100% - 5px);*/
+    width:100%;
     border: 5px;
     border-color: black;
     border-style: solid;
-    position: fixed;    
-    width:  calc(100% - 10px);
     left:0;
     top:0;
+   
+    /*left:0;
+    top:0;*/
   
    
     
