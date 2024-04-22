@@ -1,3 +1,4 @@
+/* :host hace referencia a el div virtual que envuelve al componente*/
 :host{
    border: 5px;
    border-color: black;
@@ -11,12 +12,13 @@
     "sidebar content"
     "footer footer";
     grid-template-columns: 0.20fr 1fr;
-    grid-template-rows:40px 1fr 0.10fr;
-  
+    grid-template-rows: 40px 1fr 40px;
+    
+    /* la asignacion del valor de una variable
+    se hace con var(variable)    */    
     gap:var(--value-gap-layout);
 }
-/* la asignacion del valor de una variable
-   se hace con var(variable)    */
+
 .content{
     display: block;
     background-color: cyan;
