@@ -1,0 +1,20 @@
+
+#scroller {
+  
+
+    height: 150px;
+    border: 1px solid black;
+    overflow-y: scroll; /* Add the ability to scroll */
+    background-color: black;
+  }
+  
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  #scroller::-webkit-scrollbar {
+      display: none;
+  }
+  
+  /* Hide scrollbar for IE, Edge and Firefox */
+  #scroller {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }

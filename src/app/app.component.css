@@ -9,10 +9,11 @@
     display:grid;
     grid-template-areas: 
     "header header"
+    "querier querier"
     "sidebar content"
     "footer footer";
-    grid-template-columns: 0.20fr 1fr;
-    grid-template-rows: 40px 1fr 40px;
+    grid-template-columns: 250px 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
     
     /* la asignacion del valor de una variable
     se hace con var(variable)    */    
@@ -23,7 +24,5 @@
     display: block;
     background-color: cyan;
     grid-area: content;
-    
-   
 }
   
