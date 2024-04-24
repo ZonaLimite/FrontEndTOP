@@ -2,8 +2,8 @@
 #scroller {
   
 
-    height: 150px;
-    border: 1px solid black;
+    height: 132px;
+    border: 2px solid black;
     overflow-y: scroll; /* Add the ability to scroll */
     background-color: black;
   }

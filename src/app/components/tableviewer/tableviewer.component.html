@@ -1,6 +1,6 @@
 
 <div>
-<h5>Sesiones maquina TOP 1</h5>    
+<h5>{{cabecera}}</h5>    
 <div class="table-responsive-md" id="scroller">
  
     
@@ -9,56 +9,21 @@
             <tr>
               <th scope="col">#</th>
               <th scope="col">Fecha</th>
+              <th scope="col">Hora</th>
               <th scope="col">Turno</th>
               <th scope="col">Programa</th>
             </tr>
           </thead>
+ 
           <tbody>
-            <tr class="table-active">
-              <th scope="row">1</th>
-              <td>14/04/2024</td>
-              <td>Mañana</td>
-              <td>Unico_Zonal.01E</td>
+            <!---<tr class="table-active">-->
+            <tr *ngFor="let item of rows; let i=index" [class.table-active]="i==0" >
+              <th scope="row">{{i}}</th>
+              <td>{{item.ddate}}</td>
+              <td>{{item.htime}}</td>
+              <td>{{item.sshift}}</td>
+              <td>{{item.sexploitationplan}}</td>
             </tr>
-            <tr>
-                <th scope="row">1</th>
-                <td>14/04/2024</td>
-                <td>Mañana</td>
-                <td>Unico_Zonal.01E</td>
-            </tr>
-            <tr>
-                <th scope="row">1</th>
-                <td>14/04/2024</td>
-                <td>Mañana</td>
-                <td>Unico_Zonal.01E</td>
-            </tr>
-            <tr>
-                <th scope="row">1</th>
-                <td>14/04/2024</td>
-                <td>Mañana</td>
-                <td>Unico_Zonal.01E</td>
-            </tr>
-            <tr>
-                <th scope="row">1</th>
-                <td>14/04/2024</td>
-                <td>Mañana</td>
-                <td>Unico_Zonal.01E</td>
-            </tr>
-            <tr>
-                <th scope="row">1</th>
-                <td>14/04/2024</td>
-                <td>Mañana</td>
-                <td>Unico_Zonal.01E</td>
-            </tr>
-            <tr>
-                <th scope="row">1</th>
-                <td>14/04/2024</td>
-                <td>Mañana</td>
-                <td>Unico_Zonal.01E</td>
-            </tr>
-
-    
-  
           </tbody>
     </table>
   </div>

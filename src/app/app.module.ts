@@ -3,6 +3,10 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { HttpClientModule } from '@angular/common/http';
+
+//services
+import { ResultsetService } from './services/resultset.service';
 
 //Componentes Layout
 import { HeaderComponent } from './components/header/header.component';
@@ -15,9 +19,6 @@ import { HomeComponent } from './pages/home/home.component';
 import { FallosComponent } from './pages/fallos/fallos.component';
 import { EstadisticasComponent } from './pages/estadisticas/estadisticas.component';
 import { TableviewerComponent } from './components/tableviewer/tableviewer.component';
-
-
-
 
 @NgModule({
   declarations: [
@@ -34,9 +35,10 @@ import { TableviewerComponent } from './components/tableviewer/tableviewer.compo
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule
   ],
-  providers: [],
+  providers: [ResultsetService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
