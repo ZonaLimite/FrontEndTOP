@@ -1,17 +1,7 @@
 :host{
-    display:block;
+    display:block; 
     text-align: center;
     grid-area: querier;
-    
-    /*position: fixed;*/
-    /*width:  calc(100% - 5px);*/
-   
-    
-    /*border: 5px;
-    border-color: black;
-    border-style: solid;
-    left:0;
-    top:0;*/
     background-color: blue;
     color: white;
   

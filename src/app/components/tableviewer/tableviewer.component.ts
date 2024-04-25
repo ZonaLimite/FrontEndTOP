@@ -25,11 +25,11 @@ export class TableviewerComponent {
     this.resultsetService.resultsetFromRest(this.url).subscribe(
       result => {
         this.rows = result;
-        console.log(this.rows);
+        //console.log(this.rows);
       },
       error => {
         var errorMessage = <any>error;
-        console.log(errorMessage);
+        //console.log(errorMessage);
       },
     );
    

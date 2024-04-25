@@ -2,7 +2,7 @@
 :root{
     --sidebar-width:160px;
     --cabecera-height:40px;
-    --value-gap-layout: 5px;
+    --value-gap-layout: 4px;
 }
 
 
@@ -13,7 +13,7 @@ html,body{
     margin: 0;
     padding: 0;
     font-family: sans-serif;
-    font-size: 2vh;
+    font-size: 1.7vh;
     
  
     background-color: black;
