@@ -1,6 +1,6 @@
 /* :host hace referencia a el div virtual que envuelve al componente*/
 :host{
-   border: 5px;
+   border:var(--value-gap-layout);
    border-color: black;
    border-style: solid;
    height: 100%;
@@ -10,10 +10,10 @@
     grid-template-areas: 
     "header header"
     "querier querier"
-    "sidebar content"
+    "content content"
     "footer footer";
-    grid-template-columns: 250px 1fr;
-    grid-template-rows: 30px 180px 1fr 40px;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 30px var(--sidebar-height) 1fr 40px;
     
     /* la asignacion del valor de una variable
     se hace con var(variable)    */    
@@ -22,7 +22,7 @@
 
 .content{
     display: block;
-    background-color: cyan;
+    background-color:black;
     grid-area: content;
 }
   

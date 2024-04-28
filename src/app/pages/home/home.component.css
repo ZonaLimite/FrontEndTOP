@@ -2,39 +2,3 @@
     height: 200px; /* set a fixed height for the div 
     overflow-y: scroll; /* enable vertical scrollbar 
   }*/
-
-  .containerMio {
-    display: flex;
-    width:fit-content;
-    height: 60dvh;
-  
-   
-  }
-  
-  .right {
-    flex: 5;
-    position: relative;
-  }
-  
-  .chat-wrapper {
-    display: flex;
-    flex-flow: row wrap;
-    flex-direction: column;
-   
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-  }
-  
-  .chat-body {
-    flex: 6;
-  
-    overflow-y: hidden;
-    overflow-x: hidden;
-  }
-
-  ul, li {
-    font-size: 12px;
-  }

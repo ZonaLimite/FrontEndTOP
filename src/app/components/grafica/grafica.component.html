@@ -1,0 +1,26 @@
+<p>Intervalo {{interval}}</p>
+<div style="background:black;width: 100%">
+
+    <ngx-charts-bar-vertical
+    [animations]="animations"
+    [scheme]="colorScheme"
+    [schemeType]="schemeType"
+    [results]="single"
+    [barPadding]="padding"
+    [gradient]="gradient"
+    [xAxis]="showXAxis"
+    [yAxis]="showYAxis"
+    [legend]="showLegend"
+    [showXAxisLabel]="showXAxisLabel"
+    [showYAxisLabel]="showYAxisLabel"
+    [xAxisLabel]="xAxisLabel"
+    [yAxisLabel]="yAxisLabel"
+    [yScaleMax]="yMax"
+    (select)="onSelect($event)"
+    style="fill: #ddd; ">   <!--color fuente letras -->
+    </ngx-charts-bar-vertical>
+
+</div>
+<!--<button (click)="onRandomData()">
+  Random data
+</button>-->

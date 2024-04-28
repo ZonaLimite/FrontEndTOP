@@ -1,8 +1,10 @@
 /*la notacion -- permite la definicion  de variables css */
 :root{
-    --sidebar-width:160px;
+    --sidebar-height:160px;
+    --tableSidebar-height: calc(var(--sidebar-height) - 40px);
+    
     --cabecera-height:40px;
-    --value-gap-layout: 4px;
+    --value-gap-layout: 3px;
 }
 
 
@@ -13,9 +15,13 @@ html,body{
     margin: 0;
     padding: 0;
     font-family: sans-serif;
-    font-size: 1.7vh;
+    font-size: 1.5vh;
     
  
     background-color: black;
     color: aliceblue;
+}
+
+.ngx-charts .gridline-path {
+    stroke: #455066 !important;
 }

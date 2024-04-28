@@ -1,1 +1,64 @@
-<p>fallos works!</p>
+<div id="principal">
+    <div style="width: 99%;">
+        <div class="row" style="padding:5px">
+            <div class="col-2">
+               <span>
+                    <sidebar (eventSubmitQuery)="lanzarQuery($event)"></sidebar>
+               </span>
+            </div>
+            <!------------------Logica render graficas----------------------------------->
+            <div *ngIf="!verMaquina1 && !verMaquina2" class="col-10">
+                <span>
+                    Ambas , url= {{url}}
+                     <grafica [url]="url" 
+                              [xAxisLabel]="xAxisLabel"
+                              [yAxisLabel]="yAxisLabel"
+                             >
+                     </grafica>
+                </span>
+             </div>
+ 
+            <div *ngIf="verMaquina1 && !verMaquina2" class="col-10">
+               <span>
+                    TOP1
+                    <grafica [url]="urlTop1" 
+                             [xAxisLabel]="xAxisLabel"
+                             [yAxisLabel]="yAxisLabel"
+                            >
+                    </grafica>
+               </span>
+            </div>
+            <div *ngIf="verMaquina2 && !verMaquina1" class="col-10">
+                <span>
+                    TOP2
+                     <grafica [url]="urlTop2" 
+                              [xAxisLabel]="xAxisLabel"
+                              [yAxisLabel]="yAxisLabel"
+                             >
+                     </grafica>
+                </span>
+             </div>
+             <div *ngIf="verMaquina1 && verMaquina2" class="col-5">
+                <span>
+                    TOP1
+                     <grafica [url]="urlTop1" 
+                              [xAxisLabel]="xAxisLabel"
+                              [yAxisLabel]="yAxisLabel"
+                             >
+                     </grafica>
+                </span>
+             </div>
+
+             <div *ngIf="verMaquina1 && verMaquina2" class="col-5">
+               <span>
+                   TOP2
+                    <grafica [url]="urlTop2" 
+                             [xAxisLabel]="xAxisLabel"
+                             [yAxisLabel]="yAxisLabel"
+                            >
+                    </grafica>
+               </span>
+            </div>
+        </div>
+    </div>
+</div>    

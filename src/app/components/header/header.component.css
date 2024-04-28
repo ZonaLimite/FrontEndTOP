@@ -1,25 +1,14 @@
 :host{
     display:block;
     grid-area: header;
-  
-    
- 
-  
 }
 
 #menu {
     height: 100%;
     font-size: 2vh;
-   
-
 }
 
 
 
-#aText{
-   
-/*color: azure;*/
-margin-left: 12px;
 
-}
 
