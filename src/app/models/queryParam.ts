@@ -8,6 +8,6 @@ export class QueryParam{
         public programa: string,
         public maquina1: boolean,
         public maquina2: boolean,
-        public apiError: string
+        public apiFault: string
     ){}
 }

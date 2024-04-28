@@ -15,7 +15,12 @@ interface Faults{
 })
 export class GraficaComponent {
   interval: number;
+  //Url de la consulta que ejecuta la grafica
   @Input() url: string="";
+  
+  //Variables de personalizacion de la grafica desde el selector
+  @Input() xAxisLabel: string ="Label eje X";
+  @Input() yAxisLabel:string  = "Objeto de la grafica";
 
   // array de datos de la grafica
   private data: Faults[] = [];
@@ -27,6 +32,7 @@ export class GraficaComponent {
 
   ngOnInit(){
     setInterval(() =>{
+      console.log(this.xAxisLabel+" : "+this.url)
       if(this.url !=""){
         this.faultsService.faultsDataFromRestForgraphic(this.url)
         .subscribe(data=>{
@@ -55,9 +61,8 @@ export class GraficaComponent {
   gradient = false;
   showLegend = false;
   showXAxisLabel = true;
-  //Variables de personalizacion de la grafica desde el selector
-  @Input() xAxisLabel: string ="Label eje X";
-  @Input() yAxisLabel:string  = "Objeto de la grafica";
+  
+  
   showYAxisLabel = true;
   yMax =3;
   padding=1;
