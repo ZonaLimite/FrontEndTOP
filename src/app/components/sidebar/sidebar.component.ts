@@ -1,4 +1,4 @@
-import { Component, Input , Output, EventEmitter, OnInit} from '@angular/core';
+import { Component, Input , Output, EventEmitter, OnInit, OnDestroy} from '@angular/core';
 import { QueryParam } from '../../models/queryParam';
 import { ApiFaults } from '../../models/apiFaults';
 import { FormGroup, FormControl } from '@angular/forms';
@@ -14,11 +14,11 @@ interface apiFaults{
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit,OnDestroy {
   public title: string;
+  public autoRefresh: boolean;
+  private handlerInterval:any;
  
-
-
   //Estructura vinculacion select->api
   public listError:ApiFaults[]=
             [new ApiFaults('ETACS','/faults/ejGroupBy'),
@@ -37,7 +37,8 @@ export class SidebarComponent implements OnInit {
     this.formQuery = new QueryParam("","","","","Tarde","",false, false,"");
     
     this.title="Un formulario para Querys";
-    
+    this.autoRefresh=false;
+    this.handlerInterval=0;
     this.eventSubmitQuery = new EventEmitter();
   }
 
@@ -48,6 +49,28 @@ export class SidebarComponent implements OnInit {
 
   onSubmit(){
     this.eventSubmitQuery.emit(this.formQuery);
+  }
+
+  onAutorefreshChange(event:any){
+    if (this.autoRefresh)this.startSetInterval();
+    if (!this.autoRefresh)this.stopInterval();
+  }
+  startSetInterval(){
+    this.handlerInterval=setInterval(() =>{
+            this.onSubmit();
+    }, 5000);  
+    console.log("Interval -->ON")
+    }
+  stopInterval(){
+    clearInterval(this.handlerInterval);
+    console.log("Interval -->OFF")
+  }
+
+  ngOnDestroy(): void {
+    //Called once, before the instance is destroyed.
+    this.stopInterval;
+    console.log("sidebar destroyed");
+    
   }
 
 }

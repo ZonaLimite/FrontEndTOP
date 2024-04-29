@@ -61,9 +61,18 @@
                 </div>
               </div>
   
-            <div class="col-12">
+            <div class="col-6">
               <button type="submit" class="btn btn-primary col-12">Ver Fallos</button>
             </div>
+            <div class="col-6">
+              <div class="form-check" (change)="onAutorefreshChange($event)">
+                <input class="form-check-input" type="checkbox"  #nombre="ngModel" name="autorefresh" [(ngModel)]="autoRefresh" id="autorefresh">
+                <label class="form-check-label"autoRefresh for="autorefresh">
+                  A.Refresh
+                </label>
+              </div>
+            </div>
+
           </form>
     </div>
   </div>
