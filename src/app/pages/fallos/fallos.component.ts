@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { QueryParam } from '../../models/queryParam';
+import { GraficasService } from '../../services/graficas.service';
 
 
 
@@ -8,20 +9,24 @@ import { QueryParam } from '../../models/queryParam';
   templateUrl: './fallos.component.html',
   styleUrl: './fallos.component.css'
 })
-export class FallosComponent {
+export class FallosComponent implements OnInit {
   private urlCommon ="";
   public urlAmbos:string ="";
   public urlTop1:string ="";
   public urlTop2:string ="";
 
-  public xAxisLabel:string ="Fallo STOP DEVICES";
+  public xAxisLabel:string ="Dispositivos";
   public yAxisLabel="Numero de Fallos"
   public verMaquina1:boolean = false;
   public verMaquina2:boolean = false;
 
-  constructor(){
+  //Inyeccion del servicio de graficas
+  constructor(private graficasService: GraficasService){}
 
-  }
+  //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
+  ngOnInit(): void {
+    this.graficasService.resetData();
+ }
 
   //Metodo construccion submit Query
   lanzarQuery(filter: QueryParam ){
@@ -45,18 +50,21 @@ export class FallosComponent {
       this.urlAmbos = this.urlCommon
       this.verMaquina1=false;
       this.verMaquina2=false;
+      this.graficasService.faultsDataFromRest('Ambos',this.urlAmbos);
       console.log("url es :"+this.urlAmbos);
     } 
     //Solo se quiere visualizar la TOP1
     if(filter.maquina1 && !filter.maquina2) {
       this.urlTop1=this.urlCommon + "&maquina=4";
       this.verMaquina1=true;
+      this.graficasService.faultsDataFromRest('Top1',this.urlTop1);
       console.log("url es :"+this.urlTop1);
     }
     //Solo se quiere visualizar la TOP2  
     if(filter.maquina2 && !filter.maquina1) {
       this.urlTop2=this.urlCommon + "&maquina=5";
       this.verMaquina2=true;
+      this.graficasService.faultsDataFromRest('Top2',this.urlTop2);
       console.log("url es :"+this.urlTop2);
     } 
     //Se quiere visualizar ambas  
@@ -65,6 +73,8 @@ export class FallosComponent {
       this.urlTop2=this.urlCommon + "&maquina=5";
       this.verMaquina1=true;
       this.verMaquina2=true;
+      this.graficasService.faultsDataFromRest('Top1',this.urlTop1);
+      this.graficasService.faultsDataFromRest('Top2',this.urlTop2);
       console.log("url de Top1 es:"+this.urlTop1);
       console.log("url de Top2 es:"+this.urlTop2);
     } 

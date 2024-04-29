@@ -38,7 +38,8 @@
               <label for="errorSelected" class="form-label col-sm-3">Fallos</label>
               <div class="col-sm-12">
                 <select class="form-select col-sm-6" name="errorSelected" [(ngModel)]="formQuery.apiFault" id="errorSelected">
-                    <option [value]="item.faultApi" *ngFor="let item of listError">{{item.faultLabel}}</option>
+                    <option [value]="item.faultApi" *ngFor="let item of listError; let i=index">{{item.faultLabel}}</option>
+                    
                 </select>
             </div>  
             </div>

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Color, ScaleType} from '@swimlane/ngx-charts';
 import { ResultsetService } from '../../services/resultset.service';
 import { Input } from '@angular/core';
+import { GraficasService } from '../../services/graficas.service';
 
 interface Faults{
   name: string;
@@ -14,47 +15,44 @@ interface Faults{
   styleUrl: './grafica.component.css'
 })
 export class GraficaComponent {
-  interval: number;
-  //Url de la consulta que ejecuta la grafica
-  @Input() url: string="";
+  
+  //Target de la grafica de maquina a la que representa
+  @Input() target:string="";
   
   //Variables de personalizacion de la grafica desde el selector
   @Input() xAxisLabel: string ="Label eje X";
   @Input() yAxisLabel:string  = "Objeto de la grafica";
-
-  // array de datos de la grafica
-  private data: Faults[] = [];
-
-  //Inyeccion de dependencia del servicio
-  constructor(private faultsService: ResultsetService){
-    this.interval=0;
+ 
+  //Inyeccion de dependencia del servicio de graficas
+  constructor(private graficasService: GraficasService){
+ 
   }
 
   ngOnInit(){
-    setInterval(() =>{
-      console.log(this.xAxisLabel+" : "+this.url)
-      if(this.url !=""){
-        this.faultsService.faultsDataFromRestForgraphic(this.url)
-        .subscribe(data=>{
-          this.data= data as Faults[];
-        });  
-      }
-     
-      this.interval++;
-    }, 3000);
-  }
-
-  
-  onRandomData(){
-    this.faultsService.randomData();
+ 
   }
 
   // options grafica //
   view: [number,number] = [0, 0];
-  //La propiedad single apunta a la variable miembro que contiene los datos de la grafica
+
+  //La propiedad single apunta a la variable miembro del 
+  //servicio que contiene la gestion de la grafica
   get single(){
-    return this.data;
+    switch (this.target){
+      case 'Top1':
+        return this.graficasService.dataServiceTop1;
+        break;
+      case 'Top2':
+        return this.graficasService.dataServiceTop2;
+          break;
+      case 'Ambos':
+        return this.graficasService.dataServiceAmbos;
+          break;
+      default:
+        return [];          
+    }  
   }
+
   animations = true;
   showXAxis = true;
   showYAxis = true;
