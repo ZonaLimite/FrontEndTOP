@@ -5,6 +5,8 @@ interface Faults{
   name: string;
   value: number;
 }
+
+//Un servicio propio para las graficas
 @Injectable({
   providedIn: 'root'
 })
