@@ -13,6 +13,7 @@ export class TableviewerComponent {
 
   private interval: number;
 
+  //arreglo con las filas del la tabla
   rows: any[] =[] ;
 
   
@@ -25,20 +26,18 @@ export class TableviewerComponent {
   }
 
   ngOnInit(){
-    if(this.urlRest!=""){
-      this.resultsetService.resultsetFromRest(this.urlRest).subscribe(
-        {
-          next: (result) =>   this.rows = result,
-          error: (e) => console.error(e),
-          complete: () => console.info('complete') 
-      });
-    }
-    
-    /*setInterval(() =>{
-      this.resultsetService.faultsDataFromRest();
-      this.interval++;
-    }, 3000);*/
-
+  
+  setInterval(() =>{
+      if(this.urlRest!=""){
+        this.resultsetService.resultsetFromRest(this.urlRest).subscribe(
+          {
+            next: (result) =>   this.rows = result,
+            error: (e) => console.error(e)/*,
+            complete: () => /*console.info('complete') */
+        });
+      }
+    }, 5000)
+   
   }
 
 }

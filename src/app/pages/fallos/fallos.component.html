@@ -10,7 +10,7 @@
             <div *ngIf="!verMaquina1 && !verMaquina2" class="col-10">
                 <span>
                     Ambas , url= {{urlAmbos}}
-                     <grafica [url]="urlAmbos" 
+                     <grafica [target]="'Ambos'" 
                               [xAxisLabel]="xAxisLabel"
                               [yAxisLabel]="yAxisLabel"
                              >
@@ -21,7 +21,7 @@
             <div *ngIf="verMaquina1 && !verMaquina2" class="col-10">
                <span>
                     TOP1
-                    <grafica [url]="urlTop1" 
+                    <grafica [target]="'Top1'" 
                              [xAxisLabel]="xAxisLabel"
                              [yAxisLabel]="yAxisLabel"
                             >
@@ -31,7 +31,7 @@
             <div *ngIf="verMaquina2 && !verMaquina1" class="col-10">
                 <span>
                     TOP2
-                     <grafica [url]="urlTop2" 
+                     <grafica [target]="'Top2'" 
                               [xAxisLabel]="xAxisLabel"
                               [yAxisLabel]="yAxisLabel"
                              >
@@ -41,7 +41,7 @@
              <div *ngIf="verMaquina1 && verMaquina2" class="col-5">
                 <span>
                     TOP1
-                     <grafica [url]="urlTop1" 
+                     <grafica [target]="'Top1'" 
                               [xAxisLabel]="xAxisLabel"
                               [yAxisLabel]="yAxisLabel"
                              >
@@ -52,7 +52,7 @@
              <div *ngIf="verMaquina1 && verMaquina2" class="col-5">
                <span>
                    TOP2
-                    <grafica [url]="urlTop2" 
+                    <grafica [target]="'Top2'" 
                              [xAxisLabel]="xAxisLabel"
                              [yAxisLabel]="yAxisLabel"
                             >
