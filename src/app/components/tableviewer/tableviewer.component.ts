@@ -8,8 +8,8 @@ import { ResultsetService } from '../../services/resultset.service';
 })
 export class TableviewerComponent {
  
-  @Input() cabecera: string;
-  @Input() urlRest: string;
+  @Input() cabecera: string; //Titulo impuesto al volcado de tabla
+  @Input() urlRest: string; //Url del servicio Rest que proporciona los datos de la grafica
 
   private interval: number;
 

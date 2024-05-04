@@ -26,6 +26,8 @@ import { FallosComponent } from './pages/fallos/fallos.component';
 import { EstadisticasComponent } from './pages/estadisticas/estadisticas.component';
 import { TableviewerComponent } from './components/tableviewer/tableviewer.component';
 import { GraficaComponent } from './components/grafica/grafica.component';
+import { RemotengineComponent } from './components/remotengine/remotengine.component';
+import { TrazastopComponent } from './pages/trazastop/trazastop.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +41,8 @@ import { GraficaComponent } from './components/grafica/grafica.component';
     TableviewerComponent,
     QuerierComponent,
     GraficaComponent,
+    RemotengineComponent,
+    TrazastopComponent,
 
     
   ],

@@ -33,7 +33,7 @@ export class GraficaComponent {
   }
 
   // options grafica //
-  view: [number,number] = [0, 0];
+  view: [number,number] = [260, 400];
 
   //La propiedad single apunta a la variable miembro del 
   //servicio que contiene la gestion de la grafica

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 interface Faults{
   name: string;
@@ -11,9 +12,9 @@ interface Faults{
   providedIn: 'root'
 })
 export class GraficasService {
-  private dataTop1: Faults[] = [];//Array de datos de la grafica
-  private dataTop2: Faults[] = [];//Array de datos de la grafica
-  private dataAmbos: Faults[] = [];//Array de datos de la grafica
+  private dataTop1: Faults[] = [];//Array de datos de la grafica TOP1
+  private dataTop2: Faults[] = [];//Array de datos de la grafica TOP2
+  private dataAmbos: Faults[] = [];//Array de datos de la grafica Ambas
   constructor(private http: HttpClient) { }
 
   get dataServiceTop1(){
@@ -34,6 +35,12 @@ export class GraficasService {
     this.dataAmbos= [];
   }
 
+  //metodo obtencion datos grafica (Solo Observable)
+  faultsDataFromRestForgraphic(url:string): Observable<Faults[]> {
+    return this.http.get<Faults[]>(url);
+  }
+
+  //metodo obtencion datos grafica
   faultsDataFromRest(target:string, url:string) {
     this.http.get(url).subscribe(data=>{
       switch ( target ) {

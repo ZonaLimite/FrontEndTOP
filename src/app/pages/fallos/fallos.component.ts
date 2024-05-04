@@ -29,7 +29,7 @@ export class FallosComponent implements OnInit {
  }
 
   //Metodo construccion submit Query
-  lanzarQuery(filter: QueryParam ){
+  lanzarQuery(filter: QueryParam ){ //QueryParam es el model recibido del Formulario
     this.urlCommon ="";
     this.urlAmbos="";
     this.urlTop1="";
