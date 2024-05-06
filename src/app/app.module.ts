@@ -28,6 +28,7 @@ import { TableviewerComponent } from './components/tableviewer/tableviewer.compo
 import { GraficaComponent } from './components/grafica/grafica.component';
 import { RemotengineComponent } from './components/remotengine/remotengine.component';
 import { TrazastopComponent } from './pages/trazastop/trazastop.component';
+import { ChatComponent } from './components/chat/chat.component';
 
 @NgModule({
   declarations: [
@@ -43,6 +44,7 @@ import { TrazastopComponent } from './pages/trazastop/trazastop.component';
     GraficaComponent,
     RemotengineComponent,
     TrazastopComponent,
+    ChatComponent,
 
     
   ],

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { QueryParam } from '../../models/queryParam';
 import { GraficasService } from '../../services/graficas.service';
+import { GLOBAL } from '../../services/global';
 
 
 
@@ -10,6 +11,7 @@ import { GraficasService } from '../../services/graficas.service';
   styleUrl: './fallos.component.css'
 })
 export class FallosComponent implements OnInit {
+  private urlBase:string = GLOBAL.urlBase;
   private urlCommon ="";
   public urlAmbos:string ="";
   public urlTop1:string ="";
@@ -37,7 +39,7 @@ export class FallosComponent implements OnInit {
     this.verMaquina1=filter.maquina1;
     this.verMaquina2=filter.maquina2;
     
-    this.urlCommon="http://localhost:8080/api"+ filter.apiFault+"?";
+    this.urlCommon=this.urlBase+"api"+ filter.apiFault+"?";
     
     if(filter.fechaIni != "" ) this.urlCommon += "fecha='"+filter.fechaIni+"' AND '"+filter.fechaFin+"'";
     if(filter.horaIni != "") this.urlCommon += "&hora='"+filter.horaIni+"' AND '"+filter.horaFin+"'";

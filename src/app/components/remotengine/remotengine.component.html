@@ -1,34 +1,52 @@
 
 
 
-<div class="card mx-4 my-4">
+<div class="card mx-4 my-4 ">
+ 
   <div class="card-header">
-    <ul class="nav nav-pills card-header-pills">
-      <li class="nav-item mr-2" *ngIf="!conectado">
-        <input type="text" [(ngModel)]="mensaje.username" class="form-control" placeholder="Tu Username..." name="username">
-      </li>
-      <li class="nav-item mr-2">
-        <button class="btn btn-success" type="button" (click)="conectar()"
-        *ngIf="!conectado" [disabled]="!mensaje.username">Conectar</button>
-      </li>
-      <li class="nav-item">
+    <div class="row">
+      <div class="col-2" id="connect">
+        <button class="btn btn-success" type="button" (click)="conectar()" 
+        *ngIf="!conectado" >Link TOP</button>
+      </div>
+      <div class="col-2">
         <button class="btn btn-warning" type="button" (click)="desconectar()"
-        *ngIf="conectado">Cerrar Chat</button>
-      </li>
-    </ul>
+        *ngIf="conectado">Desconectar</button>
+      </div>
+    </div>  
+    <div class="row" *ngIf="conectado" >
+      <div class="col-3">
+          <label for="errorSelected" class="form-label ">Maquina</label>
+          <select class="form-select " name="errorSelected" [(ngModel)]="remoteParam.maquina" >
+              <option [value]="item" *ngFor="let item of dataMaquinas;let i=index" [class.table-active]="i==0">{{item}}</option>
+          </select>
+      </div> 
+      <div class="col-3">
+        <label for="errorSelected" class="form-label">Sistema</label>
+        <select class="form-select" name="errorSelected" [(ngModel)]="remoteParam.sistema" >
+            <option [value]="item" *ngFor="let item of dataSistemas;  let i=index" [class.table-active]="i==0" [class.table-active]="i==0">{{item}}</option>
+        </select>
+      </div> 
+      <div class="col-3">
+        <label for="errorSelected" class="form-label">Modulo</label>
+        <select class="form-select " name="errorSelected" [(ngModel)]="remoteParam.modulo" >
+          <option [value]="item" *ngFor="let item of dataModulos; let i=index" [class.table-active]="i==0">{{item}}</option>
+        </select>
+      </div> 
+      <div class="col-3">
+        <label for="errorSelected" class="form-label">Listener</label>
+        <select class="form-select " name="errorSelected" [(ngModel)]="remoteParam.listener" >
+          <option [value]="item" *ngFor="let item of dataListener; let i=index" [class.table-active]="i==0">{{item}}</option>
+        </select>
+      </div> 
+
+    </div>
   </div>
-  <div #scrollChat [scrollTop]="valueTop" class="card-body" style="overflow-y: scroll; height: 360px;"
+  <div class="card-body" #scrollChat [scrollTop]="valueTop"   style="overflow-y: scroll; height: 360px;"
     *ngIf="conectado">
     <ul class="list-group list-group-flush ">
-      <li  class="list-group-item list-group-item-light" *ngFor="let mensaje of mensajes">
-        <span *ngIf="mensaje.tipo=='NUEVO_USUARIO'" >
-          {{mensaje.fecha | date:'shortTime'}} - {{mensaje.texto}}
-          <span [ngStyle]="{'color': mensaje.color}">{{mensaje.username}}</span>
-        </span>
-        <span *ngIf="mensaje.tipo=='MENSAJE'">
-          {{mensaje.fecha | date:'shortTime'}}
-          <span [ngStyle]="{'color': mensaje.color}">{{mensaje.username}}</span> dice:<br> {{mensaje.texto}}
-        </span>
+      <li  class="list-group-item list-group-item-light" *ngFor="let trace of traces">
+          {{trace.data}}
       </li>
     </ul>
   </div>
@@ -36,16 +54,17 @@
   <div class="card-footer" *ngIf="conectado">
     <form >
       <div class="row justify-content-start">
-        <div class="col-3">
+        <div class="col-2">
           <button class="btn btn-primary " type="submit" (click)="enviarMensaje()">Enviar</button>
         </div>
-        <div class="col-9">
-         <input type="text" [(ngModel)]="mensaje.texto" class="form-control " placeholder="Escribe un mensaje..." name="texto"
-          (keyup)="escribiendoEvento()">
+        <div class="col-10">
+         <input type="text" [(ngModel)]="debugger" class="form-control " placeholder="Conectando..." name="texto"
+          >
         </div>
       </div>
      
     </form>
-    <div>{{escribiendo}}</div>
   </div>
-</div>
+</div>  
+
+
