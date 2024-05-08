@@ -3,6 +3,7 @@ export class RemoteParam{
         public maquina: string,
         public sistema: string,
         public modulo: string,
-        public listener: string,        
+        public listener: string,   
+        public textListener: string     
     ){}
 }

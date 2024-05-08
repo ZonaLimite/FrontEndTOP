@@ -7,41 +7,50 @@
     <div class="row">
       <div class="col-2" id="connect">
         <button class="btn btn-success" type="button" (click)="conectar()" 
-        *ngIf="!conectado" >Link TOP</button>
+        *ngIf="!conectado" >Socket Top</button>
       </div>
       <div class="col-2">
         <button class="btn btn-warning" type="button" (click)="desconectar()"
-        *ngIf="conectado">Desconectar</button>
+        *ngIf="conectado">Cerrar</button>
       </div>
-    </div>  
+      <div class="col-3">
+        <button class="btn btn-primary" type="button" (click)="linkarTop()"
+        *ngIf="!linkTop && conectado">Abrir Consulta</button>
+      </div>
+   
+      <div class="col-3"  >
+        <button class="btn btn-primary" type="button" (click)="unLinkarTop()"
+        *ngIf="linkTop && conectado">Cerrar Consulta </button>
+      </div>
+    </div> 
+   
     <div class="row" *ngIf="conectado" >
       <div class="col-3">
-          <label for="errorSelected" class="form-label ">Maquina</label>
-          <select class="form-select " name="errorSelected" [(ngModel)]="remoteParam.maquina" >
-              <option [value]="item" *ngFor="let item of dataMaquinas;let i=index" [class.table-active]="i==0">{{item}}</option>
+          <label for="maquina" class="form-label ">Maquina</label>
+          <select class="form-select " name="maquina" id="maquina" [(ngModel)]="remoteParam.maquina" >
+              <option [value]="item" *ngFor="let item of dataMaquinas;let i=index" >{{item}}</option>
           </select>
       </div> 
       <div class="col-3">
-        <label for="errorSelected" class="form-label">Sistema</label>
-        <select class="form-select" name="errorSelected" [(ngModel)]="remoteParam.sistema" >
-            <option [value]="item" *ngFor="let item of dataSistemas;  let i=index" [class.table-active]="i==0" [class.table-active]="i==0">{{item}}</option>
+        <label for="sistema" class="form-label">Sistema</label>
+        <select class="form-select" name="sistema" id="sistema" [(ngModel)]="remoteParam.sistema" (change)="dataChanged($event)"  >
+            <option [value]="item" *ngFor="let item of dataSistemas;  let i=index">{{item}}</option>
         </select>
       </div> 
       <div class="col-3">
-        <label for="errorSelected" class="form-label">Modulo</label>
-        <select class="form-select " name="errorSelected" [(ngModel)]="remoteParam.modulo" >
-          <option [value]="item" *ngFor="let item of dataModulos; let i=index" [class.table-active]="i==0">{{item}}</option>
+        <label for="modulo" class="form-label">Modulo</label>
+        <select class="form-select " name="modulo" id="modulo" [(ngModel)]="remoteParam.modulo" >
+          <option [value]="item" *ngFor="let item of dataModulos; let i=index">{{item}}</option>
         </select>
       </div> 
       <div class="col-3">
-        <label for="errorSelected" class="form-label">Listener</label>
-        <select class="form-select " name="errorSelected" [(ngModel)]="remoteParam.listener" >
+        <label for="listener" class="form-label">Listener</label>
+        <select class="form-select " name="listener" id="listener" [(ngModel)]="remoteParam.listener" >
           <option [value]="item" *ngFor="let item of dataListener; let i=index" [class.table-active]="i==0">{{item}}</option>
         </select>
       </div> 
-
     </div>
-  </div>
+  
   <div class="card-body" #scrollChat [scrollTop]="valueTop"   style="overflow-y: scroll; height: 360px;"
     *ngIf="conectado">
     <ul class="list-group list-group-flush ">
@@ -55,14 +64,13 @@
     <form >
       <div class="row justify-content-start">
         <div class="col-2">
-          <button class="btn btn-primary " type="submit" (click)="enviarMensaje()">Enviar</button>
+          <button class="btn btn-primary " type="submit" (click)="incluirListenerRapido()">Filtrar por</button>
         </div>
         <div class="col-10">
-         <input type="text" [(ngModel)]="debugger" class="form-control " placeholder="Conectando..." name="texto"
+         <input type="text" [(ngModel)]="remoteParam.textListener" class="form-control " placeholder="Introduce una cadena de busqueda y pulsa Filtrar..." name="texto"
           >
         </div>
       </div>
-     
     </form>
   </div>
 </div>  

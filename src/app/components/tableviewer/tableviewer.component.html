@@ -3,7 +3,12 @@
 <h5>{{cabecera}}</h5>    
 <div  id="scroller">
     <table class="table table-primary table-hover table-bordered border-primary table-sm" >
-        <thead>
+        <thead *ngIf="rows.length==0">
+          <tr>
+                <th>Recopilando datos ....</th>
+          </tr>
+        </thead>
+        <thead *ngIf="rows.length > 0">
             <tr>
               <th scope="col">#</th>
               <th scope="col">Fecha</th>

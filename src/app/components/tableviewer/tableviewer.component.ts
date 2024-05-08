@@ -36,7 +36,7 @@ export class TableviewerComponent {
             complete: () => /*console.info('complete') */
         });
       }
-    }, 5000)
+    }, 15000)
    
   }
 

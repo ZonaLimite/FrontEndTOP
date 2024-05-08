@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild} from '@angular/core';
+import { AfterRenderPhase, Component, ElementRef, ViewChild, afterRender} from '@angular/core';
 
 import SockJS from 'sockjs-client';
 import { Client, IStompSocket } from '@stomp/stompjs';
@@ -34,6 +34,11 @@ export class ChatComponent {
     this.escribiendo= "";
 
     this.mensaje=new Mensaje("",0,"","","");
+    afterRender(() => {
+      if(this.bindingInput != undefined){
+        this.bindingInput.nativeElement.scrollTop= this.bindingInput.nativeElement.scrollHeight;
+      }
+    }, {phase: AfterRenderPhase.Write});
   }
   
   ngOnInit() {
@@ -64,15 +69,8 @@ export class ChatComponent {
         }
        
         this.mensajes.push(mensaje);
-        var suma = (this.bindingInput.nativeElement.scrollHeight) + 28;
-       
-        this.valueTop = suma ;
-       
-        this.bindingInput.nativeElement.scrollIntoView(true);
-        console.log(mensaje);
+            
       });
-
-   
 
       this.client.subscribe('/channel/escribiendo', e => {
         this.escribiendo = e.body;
@@ -99,7 +97,6 @@ export class ChatComponent {
 
   }
  
-
   conectar(): void {
     this.client.activate();
   }
