@@ -30,7 +30,9 @@ export class RemotengineComponent {
   public dataMaquinas: string[]=[];
   public dataSistemas:string[]=[] ;
   public dataModulos:string[]=[];
+
   public dataListener:string[]=[];
+  public dataListenerActivos:string[]=[];
   
   conectado: boolean = false; //variable de estado conexion socketJs
   linkTop: boolean = false; //variable estado conexion TOP
@@ -90,6 +92,8 @@ export class RemotengineComponent {
 
   }
 //######################################################################
+ //handlers y metodos loclaes
+//######################################################################
 
   handleOnDisconnect(reason:string){
     console.log('Desconectados de socket TOP: ' + !this.client.connected + ' : ' + reason);
@@ -107,10 +111,10 @@ export class RemotengineComponent {
   }
 
   linkarTop(){ //solicitar link Top
-   this.enviarComando("adjustnumtop",[this.remoteParam.maquina]) ; //ajustar el numero de maquina
-   this.enviarComando("selectSistema",[this.remoteParam.sistema]) ; //ajustar el sistema de maquina
-   this.enviarComando("selectConsulta",[this.remoteParam.modulo]) ; //ajustar la consulta empleada
-   this.enviarComando("conectar",[]);
+   this.enviarComando("adjustnumtop",[this.remoteParam.maquina]) ; //ajusta el numero de maquina
+   this.enviarComando("selectSistema",[this.remoteParam.sistema]) ; //ajusta el sistema de maquina
+   this.enviarComando("selectConsulta",[this.remoteParam.modulo]) ; //ajusta la consulta empleada
+   this.enviarComando("conectar",[]); //conecta
 
   }
   unLinkarTop(){ //solicitar cerrar la conexion a la TOP (No al socket engine)
@@ -131,10 +135,37 @@ export class RemotengineComponent {
     this.enviarComando("maquinas",[] );
     this.enviarComando("sistemas",[]);
     this.enviarComando("modulos",["IL"]);
+
     this.enviarComando("listeners",[]);
+    this.enviarComando("listenersActivos",[]);
   }
 
+   //manejador de evento de cambio combo sistemas
+   dataChanged(event: Event) {
+    console.log("el item seleccionado es:" + this.remoteParam.sistema);
+    this.enviarComando("selectSistema",[this.remoteParam.sistema]);
+    this.enviarComando("modulos",[this.remoteParam.sistema]);
+    
+  }
+
+  //manejador solicitud incluir listener rapido
+  incluirListenerRapido(){
+    this.enviarComando("incluirListenerRapido",[this.remoteParam.textListener]);
+    this.enviarComando("doClickListenerrapido",[]);
+  }
+
+  incluirListener(){
+
+  }
+
+
+  //############################################################################
   //Manejador responses de Engine
+  //############################################################################
+  
+  //#####################
+  //---> channel control
+  //#####################
   handleMessage(resultRest: ResultEngine) {
     
      console.log("Recibido de channel control:"+resultRest )
@@ -166,14 +197,22 @@ export class RemotengineComponent {
 
       case "listeners":
         this.dataListener = resultRest.data;
+       
+        break;
+      case "listenersActivos":
+        this.dataListenerActivos = resultRest.data;
         if(this.dataListener.length > 0){
-          if(this.remoteParam.listener==""){
+          if(this.remoteParam.listener==""){//seleccionar primero
             this.remoteParam.listener=this.dataListener[0];
           }else{
             
           }  
         }
         break;
+      case "listenerRapido":
+        this.remoteParam.textListener = resultRest.data[0];
+        break;
+  
 
       case "ackConectar":
         this.linkTop=true;
@@ -186,25 +225,16 @@ export class RemotengineComponent {
       }
 
   }
+  //#####################
+  //---> channel traces
+  //#####################
 
-  //manejador para recepcion de eventos de Engine (consumer)
+  //event traces from Engine
   handleTracesEvent(eventTrace: Traces) {
     this.traces.push(eventTrace);
   }
 
-  //manejador de evento de cambio combo sistemas
-  dataChanged(event: Event) {
-    console.log("el item seleccionado es:" + this.remoteParam.sistema);
-    this.enviarComando("selectSistema",[this.remoteParam.sistema]);
-    this.enviarComando("modulos",[this.remoteParam.sistema]);
-    
-  }
-
-  //manejador solicitud incluir listener rapido
-  incluirListenerRapido(){
-    this.enviarComando("incluirListenerRapido",[this.remoteParam.textListener]);
-    this.enviarComando("doClickListenerrapido",[]);
-  }
+ 
   
 }
 
