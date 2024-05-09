@@ -13,7 +13,7 @@
     "content content"
     "footer footer";
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 30px var(--sidebar-height) 1fr 40px;
+    grid-template-rows: 40px var(--sidebar-height) 1fr 40px;
     
     /* la asignacion del valor de una variable
     se hace con var(variable)    */    

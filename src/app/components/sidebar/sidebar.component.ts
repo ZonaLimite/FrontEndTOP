@@ -58,7 +58,7 @@ export class SidebarComponent implements OnInit,OnDestroy {
   startSetInterval(){
     this.handlerInterval=setInterval(() =>{
             this.onSubmit();
-    }, 5000);  
+    }, 15000);  
     console.log("Interval -->ON")
     }
   stopInterval(){

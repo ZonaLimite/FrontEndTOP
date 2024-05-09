@@ -1,6 +1,6 @@
 /*la notacion -- permite la definicion  de variables css */
 :root{
-    --sidebar-height:160px;
+    --sidebar-height:174px;
     --tableSidebar-height: calc(var(--sidebar-height) - 40px);
     
     --cabecera-height:40px;
@@ -25,3 +25,6 @@ html,body{
 .ngx-charts .gridline-path {
     stroke: #455066 !important;
 }
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

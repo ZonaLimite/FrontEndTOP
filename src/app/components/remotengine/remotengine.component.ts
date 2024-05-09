@@ -1,13 +1,19 @@
-import { AfterRenderPhase, Component, ElementRef, ViewChild, afterRender} from '@angular/core';
+import { AfterRenderPhase, Component, ElementRef, TemplateRef, ViewChild, afterRender} from '@angular/core';
 import { GLOBAL } from '../../services/global';
 
 import SockJS from 'sockjs-client';
 import { Client, IStompSocket } from '@stomp/stompjs';
 
-import { Mensaje } from '../../models/mensaje';
 import { RemoteParam } from '../../models/remoteParam';
 import { ResultEngine } from '../../models/resultEngine';
 import { Traces } from '../../models/traces';
+import { DialogService } from '../../services/dialog.service';
+
+//Material
+import { FormControl, FormGroup } from '@angular/forms';
+import { MatDialogRef } from '@angular/material/dialog';
+import { DialogWithTemplateComponent } from '../dialog-with-template/dialog-with-template.component';
+
 
 
 @Component({
@@ -16,6 +22,10 @@ import { Traces } from '../../models/traces';
   styleUrl: './remotengine.component.css'
 })
 export class RemotengineComponent {
+  //vinculacion controles con controlador en C. Dialogo emergente
+  formGroup: FormGroup = new FormGroup({
+    optionSel: new FormControl()
+  });
 
   @ViewChild('scrollChat') scroll!: ElementRef; //observer del elemento div panel de eventos
 
@@ -25,6 +35,8 @@ export class RemotengineComponent {
 
   //Objeto enlazado (TwoBinding) a todos los campos recibidos del formulario
   public remoteParam: RemoteParam;
+
+  private matDialogRef!: MatDialogRef<DialogWithTemplateComponent>;
 
   //Estructuras para soportar data de selects
   public dataMaquinas: string[]=[];
@@ -44,20 +56,21 @@ export class RemotengineComponent {
 
   debugger: string="Conectando ....";
 
-  constructor() {
+  constructor(private dialogService:DialogService) { //Inyectamos el servicio de Dialogos
     this.urlEngine = this.urlBaseEngine + "topwebsocket"; //url broker StompJS en el server Engine
   
     this.client=new Client();
     this.clienteId = 'id-' + new Date().getTime() + '-' + Math.random().toString(36).substr(2);
     this.valueTop = 0;
     this.remoteParam = new RemoteParam("","","","","");
+
     afterRender(() => { //life hook que permite ajustar el scroll del elemento una vez se ha renderizado
       if(this.scroll != undefined){
         this.scroll.nativeElement.scrollTop= this.scroll.nativeElement.scrollHeight;
       }
     }, {phase: AfterRenderPhase.Write});
   }
-  
+  //############ On Init #######################################
   ngOnInit() {
 
     this.client.webSocketFactory = () => { // Stomp on sockjs
@@ -100,6 +113,31 @@ export class RemotengineComponent {
     this.conectado = false;
     //this.mensaje =new Mensaje("",0,"","","");
     this.traces = [];
+  }
+  //Recogida datos listener de dialogo emergente
+  openWithDialogWithTemplate(template: TemplateRef<any>){
+    this.matDialogRef = this.dialogService.openDialogWithTemplate({
+      template
+    })
+
+    /*this.matDialogRef
+    .afterClosed()
+    .subscribe(res => console.log("Dialog With Template Close"));
+    //this.formGroup.reset;*/
+  }
+
+  //Eviar una solicitud a Engine para registrar un Listener
+  onSaveListener(){ 
+    this.enviarComando("incluirlistenermodelfilter",[this.formGroup.value.optionSel]) ;
+
+    this.matDialogRef.close();
+  }
+
+  //Solicitud de borrado de listener (el que este seleccionado en el combo)
+  eliminarListener(){
+    this.enviarComando("quitarlistenermodelfilter",[this.remoteParam.listener])
+    
+
   }
 
   onSubmit(){
@@ -179,20 +217,14 @@ export class RemotengineComponent {
 
       case "sistemas":// recibido arreglo para combo sistemas
         this.dataSistemas = resultRest.data;
-        if(this.remoteParam.sistema==""){
-          this.remoteParam.sistema=this.dataSistemas[0];
-        } 
+        if(this.dataSistemas.length > 0)this.remoteParam.sistema=resultRest.data[0]
         break;
 
       case "modulos":// recibido arreglo para combo sistemas (puede estar vacio)
         this.dataModulos = resultRest.data;
-        if(this.dataModulos.length > 0){
-          if(this.remoteParam.modulo==""){
-            this.remoteParam.modulo=this.dataModulos[0];
-          }else{
-            
-          }  
-        } 
+        
+          if(this.dataModulos.length > 0)this.remoteParam.modulo=resultRest.data[0]
+        
         break;
 
       case "listeners":
@@ -201,14 +233,9 @@ export class RemotengineComponent {
         break;
       case "listenersActivos":
         this.dataListenerActivos = resultRest.data;
-        if(this.dataListener.length > 0){
-          if(this.remoteParam.listener==""){//seleccionar primero
-            this.remoteParam.listener=this.dataListener[0];
-          }else{
-            
-          }  
-        }
+        if(this.dataListenerActivos.length > 0)this.remoteParam.listener=resultRest.data[resultRest.data.length-1]
         break;
+
       case "listenerRapido":
         this.remoteParam.textListener = resultRest.data[0];
         break;

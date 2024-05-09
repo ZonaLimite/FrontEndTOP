@@ -5,6 +5,12 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 
+//Material
+import {MatDialogModule} from "@angular/material/dialog";
+import {MatInputModule} from "@angular/material/input";
+import { MatSelectModule } from '@angular/material/select';
+import { ReactiveFormsModule } from '@angular/forms';
+
 //Graficas
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -29,6 +35,8 @@ import { GraficaComponent } from './components/grafica/grafica.component';
 import { RemotengineComponent } from './components/remotengine/remotengine.component';
 import { TrazastopComponent } from './pages/trazastop/trazastop.component';
 import { ChatComponent } from './components/chat/chat.component';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { DialogWithTemplateComponent } from './components/dialog-with-template/dialog-with-template.component';
 
 @NgModule({
   declarations: [
@@ -45,8 +53,7 @@ import { ChatComponent } from './components/chat/chat.component';
     RemotengineComponent,
     TrazastopComponent,
     ChatComponent,
-
-    
+    DialogWithTemplateComponent,
   ],
   imports: [
     BrowserModule,
@@ -54,9 +61,13 @@ import { ChatComponent } from './components/chat/chat.component';
     HttpClientModule,
     FormsModule,
     BrowserAnimationsModule,
-    NgxChartsModule
+    NgxChartsModule,
+    MatDialogModule,
+    MatInputModule,
+    ReactiveFormsModule,
+    MatSelectModule
   ],
-  providers: [ResultsetService],
+  providers: [ResultsetService, provideAnimationsAsync()],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
