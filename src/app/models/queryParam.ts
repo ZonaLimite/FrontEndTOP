@@ -1,3 +1,5 @@
+import { ApiFaults } from "./apiFaults";
+
 export class QueryParam{
     constructor(
         public fechaIni: string,
@@ -8,6 +10,7 @@ export class QueryParam{
         public programa: string,
         public maquina1: boolean,
         public maquina2: boolean,
-        public apiFault: string
+        public apiFault: ApiFaults,
+        public labelheader: string
     ){}
 }

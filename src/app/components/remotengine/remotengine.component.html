@@ -69,7 +69,11 @@
             <option [value]="item" *ngFor="let item of dataListenerActivos; let i=index" >{{item}}</option>
           </select>
         </div> 
-        <div class="col-2">
+        <div class="col-1">
+          <button class="btn btn-primary " type="submit" (click)="clearDisplay()">Clear</button>
+        </div>
+        
+        <div class="col-1">
           <button class="btn btn-primary " type="submit" (click)="incluirListenerRapido()">Añadir</button>
         </div>
 

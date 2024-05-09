@@ -43,23 +43,25 @@ export class RemotengineComponent {
   public dataSistemas:string[]=[] ;
   public dataModulos:string[]=[];
 
-  public dataListener:string[]=[];
-  public dataListenerActivos:string[]=[];
+  public dataListener:string[]=[];//Modelo de datos de Listener registrados en Engine
+  public dataListenerActivos:string[]=[];//Modelo de datos de Listener activos registrados en Engine
   
   conectado: boolean = false; //variable de estado conexion socketJs
+
   linkTop: boolean = false; //variable estado conexion TOP
   
-  traces: Traces[] = [];
+  traces: Traces[] = []; //arreglo de valores recibidos de trazas filtradas 
   valueTop:number ;
   clienteId: string;
   urlEngine :string;
 
   debugger: string="Conectando ....";
 
-  constructor(private dialogService:DialogService) { //Inyectamos el servicio de Dialogos
+  constructor(private dialogService:DialogService) { //Inyectamos el servicio de Dialogos de Material
+
     this.urlEngine = this.urlBaseEngine + "topwebsocket"; //url broker StompJS en el server Engine
   
-    this.client=new Client();
+    this.client=new Client(); //Inicializacion de u cliente Socks
     this.clienteId = 'id-' + new Date().getTime() + '-' + Math.random().toString(36).substr(2);
     this.valueTop = 0;
     this.remoteParam = new RemoteParam("","","","","");
@@ -192,7 +194,8 @@ export class RemotengineComponent {
     this.enviarComando("doClickListenerrapido",[]);
   }
 
-  incluirListener(){
+  clearDisplay(){
+    this.traces=[];
 
   }
 

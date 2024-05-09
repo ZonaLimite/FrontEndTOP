@@ -1,10 +1,10 @@
 <div style="width: 99%;">
     <div class="row" style="padding:5px">
         <div class="col-6">
-            <tableviewer [cabecera]="'Sesiones TOP1'" [urlRest]="urlForTop1"></tableviewer>
+            <tableviewer [cabecera]="'Sesiones TOP1'" [urlRest]="urlForTop1" (isession)="adjustIsessionTop1($event)"></tableviewer>
         </div>
         <div class="col-6">
-            <tableviewer [cabecera]="'Sesiones TOP2'" [urlRest]="urlForTop2"></tableviewer>
+            <tableviewer [cabecera]="'Sesiones TOP2'" [urlRest]="urlForTop2" (isession)="adjustIsessionTop2($event)"></tableviewer>
         </div>
     </div>
 </div>

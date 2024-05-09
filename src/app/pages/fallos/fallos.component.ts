@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { QueryParam } from '../../models/queryParam';
 import { GraficasService } from '../../services/graficas.service';
 import { GLOBAL } from '../../services/global';
@@ -11,7 +11,15 @@ import { GLOBAL } from '../../services/global';
   styleUrl: './fallos.component.css'
 })
 export class FallosComponent implements OnInit {
-  private urlBase:string = GLOBAL.urlBase;
+  private sessionTop1Selected: number=0;
+  private sessionTop2Selected: number=0;
+
+  
+  
+  @Input() private iSessionValueParentTop1: number = 0;
+  public iSessionValueTop1: number = 0;
+
+
   private urlCommon ="";
   public urlAmbos:string ="";
   public urlTop1:string ="";
@@ -39,7 +47,7 @@ export class FallosComponent implements OnInit {
     this.verMaquina1=filter.maquina1;
     this.verMaquina2=filter.maquina2;
     
-    this.urlCommon="http://localhost:8080/api"+ filter.apiFault+"?";
+    this.urlCommon=GLOBAL.urlBase + filter.apiFault.faultApi+"?";
     
     if(filter.fechaIni != "" ) this.urlCommon += "fecha='"+filter.fechaIni+"' AND '"+filter.fechaFin+"'";
     if(filter.horaIni != "") this.urlCommon += "&hora='"+filter.horaIni+"' AND '"+filter.horaFin+"'";
@@ -82,7 +90,7 @@ export class FallosComponent implements OnInit {
     } 
 
     
-    this.xAxisLabel=filter.apiFault;
+    this.xAxisLabel=filter.apiFault.faultLabel;
     this.yAxisLabel="numero de fallos";
   
     

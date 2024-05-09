@@ -1,7 +1,8 @@
-import { Component, Input , Output, EventEmitter, OnInit, OnDestroy} from '@angular/core';
+import { Component, Input , Output, EventEmitter, OnInit, OnDestroy, WritableSignal, effect} from '@angular/core';
 import { QueryParam } from '../../models/queryParam';
 import { ApiFaults } from '../../models/apiFaults';
-import { FormGroup, FormControl } from '@angular/forms';
+import { misignal } from '../tableviewer/tableviewer.component';
+
 
 
 interface apiFaults{
@@ -15,27 +16,31 @@ interface apiFaults{
   styleUrl: './sidebar.component.css'
 })
 export class SidebarComponent implements OnInit,OnDestroy {
+  
+  
   public title: string;
   public autoRefresh: boolean;
   private handlerInterval:any;
+  
  
   //Estructura vinculacion select->api
   public listError:ApiFaults[]=
-            [new ApiFaults('ETACS','/faults/ejGroupBy'),
-             new ApiFaults('FRACASOS ENTRADA','/faults/etifGroupBy'),
+            [new ApiFaults('ETACS','api/faults/ejGroupBy'),
+             new ApiFaults('FRACASOS ENTRADA','api/faults/etifGroupBy'),
             ];
   
-  
-
   //Objeto para acomodar todos los campos recibidos del formulario
-  public formQuery: QueryParam;
+  //Utilizo un signal importado desde tableviewer (para recoger ciertos valores de ese componente)
+  public formQuerySignal:WritableSignal<QueryParam>=misignal;
+
 
   //Variable de tipo Emitter para exportar el objeto QueryParam
   @Output() eventSubmitQuery:EventEmitter<QueryParam>;
 
+ 
+
   constructor(){
-    this.formQuery = new QueryParam("","","","","Tarde","",false, false,"");
-    
+   
     this.title="Un formulario para Querys";
     this.autoRefresh=false;
     this.handlerInterval=0;
@@ -43,12 +48,14 @@ export class SidebarComponent implements OnInit,OnDestroy {
   }
 
   ngOnInit(): void {
-    //Seleccionamos esta opcion como selected en el select
-    this.formQuery.apiFault='/faults/ejGroupBy';
+    //Seleccionamos la primera opcion de fallos por defecto
+    this.formQuerySignal().apiFault=this.listError[0];
+    
   }
 
   onSubmit(){
-    this.eventSubmitQuery.emit(this.formQuery);
+    
+    this.eventSubmitQuery.emit(this.formQuerySignal());
   }
 
   onAutorefreshChange(event:any){

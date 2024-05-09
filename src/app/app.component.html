@@ -1,17 +1,14 @@
 
 <app-header></app-header>
-<app-querier></app-querier>
-
-<!---<app-sidebar [propiedad_uno]="ModeloP1"
-             [propiedad_dos]="'Este dato es directo desde el conector'">
-</app-sidebar>-->
-
-
+<app-querier (iSessionValueEventTop1)="updateISessionTop1($event)"
+             (iSessionValueEventTop2)="updateISessionTop2($event)">
+</app-querier>
 
 <div class="content">
-    <router-outlet></router-outlet>    
+    <router-outlet ></router-outlet>    
 </div>
 
-<app-footer></app-footer>
+<app-footer [pieText]="textFooterValue"
+></app-footer>
 
 

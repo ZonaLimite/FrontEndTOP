@@ -9,7 +9,8 @@
             <!------------------Logica render graficas----------------------------------->
             <div *ngIf="!verMaquina1 && !verMaquina2" class="col-10">
                 <span>
-                    Ambas , url= {{urlAmbos}}
+                    <p>Ambas , url= {{urlAmbos}}</p>
+                    <h5 style="text-align:center">AMBAS MAQUINAS</h5>
                      <grafica [target]="'Ambos'" 
                               [xAxisLabel]="xAxisLabel"
                               [yAxisLabel]="yAxisLabel"
@@ -20,7 +21,8 @@
  
             <div *ngIf="verMaquina1 && !verMaquina2" class="col-10">
                <span>
-                    TOP1
+                <p>Top1 , url= {{urlTop1}}</p>
+                <h5 style="text-align:center">TOP 1</h5>
                     <grafica [target]="'Top1'" 
                              [xAxisLabel]="xAxisLabel"
                              [yAxisLabel]="yAxisLabel"
@@ -30,7 +32,9 @@
             </div>
             <div *ngIf="verMaquina2 && !verMaquina1" class="col-10">
                 <span>
-                    TOP2
+                    <p>Top2 , url= {{urlTop2}}</p>
+                    <h5 style="text-align:center">TOP 2</h5>
+    
                      <grafica [target]="'Top2'" 
                               [xAxisLabel]="xAxisLabel"
                               [yAxisLabel]="yAxisLabel"
