@@ -52,7 +52,7 @@ export class RemotengineComponent {
   
   traces: Traces[] = []; //arreglo de valores recibidos de trazas filtradas 
   valueTop:number ;
-  clienteId: string;
+
   urlEngine :string;
 
   debugger: string="Conectando ....";
@@ -62,7 +62,7 @@ export class RemotengineComponent {
     this.urlEngine = this.urlBaseEngine + "topwebsocket"; //url broker StompJS en el server Engine
   
     this.client=new Client(); //Inicializacion de u cliente Socks
-    this.clienteId = 'id-' + new Date().getTime() + '-' + Math.random().toString(36).substr(2);
+  
     this.valueTop = 0;
     this.remoteParam = new RemoteParam("","","","","");
 
@@ -93,7 +93,7 @@ export class RemotengineComponent {
         this.handleTracesEvent(traces);
       });  
    
-      console.log(this.clienteId);
+
     
       this.refreshComboMaquinas();
     }

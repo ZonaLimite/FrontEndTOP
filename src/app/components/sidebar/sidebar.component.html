@@ -36,7 +36,7 @@
               <label for="errorSelected" class="form-label col-sm-3">Fallo</label>
               <div class="col-sm-12">
                 <select class="form-select col-sm-6" name="errorSelected" [(ngModel)]="formQuerySignal().apiFault" id="errorSelected">
-                    <option [ngValue]="item" *ngFor="let item of listError; let i=index">{{item.faultLabel}}</option>
+                    <option [ngValue]="item" *ngFor="let item of listItemsCombo; let i=index">{{item.faultLabel}}</option>
                     
                 </select>
             </div>  
@@ -60,7 +60,7 @@
               </div>
   
             <div class="col-6">
-              <button type="submit" class="btn btn-primary col-12">Fallos</button>
+              <button type="submit" class="btn btn-primary col-12">Submit</button>
             </div>
             <div class="col-6">
               <div class="form-check" (change)="onAutorefreshChange($event)">

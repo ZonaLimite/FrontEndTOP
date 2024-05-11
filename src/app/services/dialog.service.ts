@@ -16,7 +16,6 @@ export class DialogService {
   
   openDialogWithTemplate(data:DialogWithTemplateData){
     return this.matDialog.open(DialogWithTemplateComponent,{data})
-
   }
 
 }

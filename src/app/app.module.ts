@@ -37,6 +37,7 @@ import { TrazastopComponent } from './pages/trazastop/trazastop.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { DialogWithTemplateComponent } from './components/dialog-with-template/dialog-with-template.component';
+import { TableViewerCommonComponent } from './components/tableviewercommon/tableviewercommon.component';
 
 @NgModule({
   declarations: [
@@ -54,6 +55,7 @@ import { DialogWithTemplateComponent } from './components/dialog-with-template/d
     TrazastopComponent,
     ChatComponent,
     DialogWithTemplateComponent,
+    TableViewerCommonComponent,
   ],
   imports: [
     BrowserModule,
