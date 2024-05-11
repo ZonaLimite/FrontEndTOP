@@ -6,42 +6,69 @@
                     <sidebar [listItemsCombo]="listItemsConcepto"   (eventSubmitQuery)="lanzarQuery($event)"></sidebar>
                </span>
             </div>
-            <!------------------Logica render graficas----------------------------------->
-            <div *ngIf="!verMaquina1 && !verMaquina2" class="col-10">
+            <!------------------Logica render graficas------------------------
+            <div *ngIf="!verMaquina1 && !verMaquina2" class="col-10"></div>
+           
                 <span>
-                    <p>Ambas , url= {{urlAmbos}}</p>
-                    <h5 style="text-align:center">AMBAS MAQUINAS</h5>
-                    <tableviewer></tableviewer>
+                    AMBAS
+                    <tableviewercommon [modelColumn]=modelCol [cabecera]="'AMBAS'" [urlRest]="urlAmbos"></tableviewercommon>
                 </span>
              </div>
  
             <div *ngIf="verMaquina1 && !verMaquina2" class="col-10">
+
+               
                <span>
-                <p>Top1 , url= {{urlTop1}}</p>
-                <h5 style="text-align:center">TOP 1</h5>
-                <tableviewercommon [modelColumn]=modelCol [cabecera]="'Sesiones TOP1'" [urlRest]="urlForTop1"></tableviewercommon>
+                TOP1
+                <tableviewercommon  [cabecera]="'TOP1'" ></tableviewercommon>
                </span>
             </div>
             <div *ngIf="verMaquina2 && !verMaquina1" class="col-10">
+
                 <span>
-                    <p>Top2 , url= {{urlTop2}}</p>
-                    <h5 style="text-align:center">TOP 2</h5>
-    
-                    <tableviewer></tableviewer>
+                   TOP2
+                    <tableviewercommon [modelColumn]=modelCol [cabecera]="'TOP2'" [urlRest]="urlTop2"></tableviewercommon>
                 </span>
              </div>
+
              <div *ngIf="verMaquina1 && verMaquina2" class="col-5">
+               
                 <span>
-                    <tableviewer></tableviewer>
+                    TOP1
+                    <tableviewercommon  [cabecera]="'TOP1'" ></tableviewercommon>
                 </span>
              </div>
 
              <div *ngIf="verMaquina1 && verMaquina2" class="col-5">
                <span>
                    TOP2
-                   <tableviewer></tableviewer>
+                   <tableviewercommon  [cabecera]="'Sesiones TOP1'"></tableviewercommon>
                </span>
-            </div>
+            </div>---->
+            <div class="col-10">
+            <span class="d-block">
+                <div >
+                    <span>
+                    <tableviewercommon ></tableviewercommon>
+                    </span>
+                </div>
+            </span>   
+            <span class="d-block">
+                <div >
+                    <span>
+                    <tableviewercommon ></tableviewercommon>
+                    </span>
+                </div>
+            </span>  
+            <span class="d-block">
+                <div >
+                    <span>
+                    <tableviewercommon ></tableviewercommon>
+                    </span>
+                </div>
+            </span>  
+
+        </div> 
         </div>
     </div>
 </div>    

@@ -65,7 +65,7 @@ export class SidebarComponent implements OnInit,OnDestroy {
   //Al pulsar el Submit del formulario emite el QueryParam
   onSubmit(){
     this.eventSubmitQuery.emit(this.formQuerySignal());
-    console.info(this.formQuerySignal())
+    console.info("QueryParam :"+this.formQuerySignal())
   }
 
   onAutorefreshChange(event:any){

@@ -1,5 +1,5 @@
 import { ApiFaults } from "./apiFaults";
-import { ApiFaultsTable } from "./apiFaultsTable.model";
+
 
 export class QueryParam{
     constructor(

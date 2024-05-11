@@ -6,7 +6,7 @@ import { ApiFaults } from '../../models/apiFaults';
 
 
 //Exportar un signal para los sidebar
-export var misignal = signal<QueryParam>(new QueryParam("","","","","","",true, true,new ApiFaults("",""),""));
+export var misignal = signal<QueryParam>(new QueryParam("","","","","","",false, false,new ApiFaults("","",[]),""));
 
 @Component({
   selector: 'tableviewer',
@@ -55,7 +55,7 @@ export class TableviewerComponent {
   //la contruccion y aporte de parametros para la consulta
   //Se apoya en un signal que es consumido en el componente sidebar.
   handleClick(index:number){
-    this.isession.emit(this.rows[index].isessionnumber);
+    //this.isession.emit(this.rows[index].isessionnumber);
     this.indexRow=index;
     
     let fechaIni =  this.rows[index].ddate;
@@ -70,7 +70,7 @@ export class TableviewerComponent {
     if (maquina==4) maquina1=true;
     if (maquina==5) maquina2=true;
 
-    let paramQuerySidebar = new QueryParam(fechaIni,fechaFin,horaIni,horaFin,turno,programa,maquina1,maquina2,new ApiFaults('ETACS','api/faults/ejGroupBy'),"");
+    let paramQuerySidebar = new QueryParam(fechaIni,fechaFin,horaIni,horaFin,turno,programa,maquina1,maquina2,new ApiFaults('ETACS','api/faults/ejGroupBy',[]),"");
     
     misignal.set(paramQuerySidebar);//set signal value
  

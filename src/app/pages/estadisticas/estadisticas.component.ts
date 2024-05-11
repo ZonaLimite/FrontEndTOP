@@ -1,9 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { AfterViewChecked, Component, Input, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import { QueryParam } from '../../models/queryParam';
-import { GraficasService } from '../../services/graficas.service';
 import { GLOBAL } from '../../services/global';
 import { ApiFaults } from '../../models/apiFaults';
-import { ApiFaultsTable } from '../../models/apiFaultsTable.model';
+import { TableViewerCommonComponent } from '../../components/tableviewercommon/tableviewercommon.component';
 
 @Component({
   selector: 'app-estadisticas',
@@ -15,21 +14,25 @@ export class EstadisticasComponent {
   private urlCommon ="";
   public urlAmbos:string ="";
   public urlTop1:string ="";
+  
   public urlTop2:string ="";
 
-  public xAxisLabel:string ="Dispositivos";
-  public yAxisLabel="Numero de Fallos"
   public verMaquina1:boolean = true;
   public verMaquina2:boolean = false;
 
+  //Lo utilizo para obtener una referencia al componente hijo TableViewer y asi poder hacer uso
+  //de su metodo refreshTable()
+  @ViewChildren(TableViewerCommonComponent) 
+  tablas!: QueryList<TableViewerCommonComponent> ;
   
   //Modelo de Column tablas utilizado
-  modelColInputLineItems: string[]= ["smachinetype","isessionnumber"];
+  modelColInputLineItems: string[]= ["iinputLineId","injectedItems","cullingRejectOld","mailpieceAppeared","outOfSlotTooLate","slotTooEarly","injectableCollision","unInjectableCollision","tooThick","tooHigh","tooLong","tooShort","unavailableBucket","tooCloseToCulledItem","cullingReject"];
+
   modelCol :string[]=[]
 
   //Inicializador Combo de conceptos a manejar
   public listItemsConcepto:ApiFaults[]=
-            [new ApiFaultsTable('INPUT LINE ITEMS','api/laque sea',this.modelColInputLineItems), 
+            [new ApiFaults('INPUT LINE ITEMS','api/querys/ilItems',this.modelColInputLineItems), 
             // new ApiFaults('CONVEYOR ITEMS','api/faults/etifGroupBy'),
             // new ApiFaults('FEEDER ITEMS','api/faults/etifGroupBy'),
              //new ApiFaults('MACHIME ITEMS','api/faults/etifGroupBy'),
@@ -39,23 +42,28 @@ export class EstadisticasComponent {
            
   
   private urlBase:string = GLOBAL.urlBase;
-  public urlForTop1:string =this.urlBase+"api/sessions/machine/4";
-  public urlForTop2:string =this.urlBase+"api/sessions/machine/5";
           
-  //Inyeccion del servicio de graficas
-  constructor(private graficasService: GraficasService){}
+
+  constructor(){}
 
   
   //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
   ngOnInit(): void {
-    this.graficasService.resetData();
- }
+    //this.graficasService.resetData();
+  }
 
   //Metodo construccion submit Query
   lanzarQuery(filter: QueryParam ){ //QueryParam es el model recibido del sidebar
     this.urlCommon ="";
     this.urlAmbos="";
     this.urlTop1="";
+
+    //reseteamos datos de tablas
+    this.tablas.forEach(tabla =>{
+      tabla.resetRows();
+      
+    })
+   
     this.urlTop2="";
     this.verMaquina1=filter.maquina1;
     this.verMaquina2=filter.maquina2;
@@ -74,25 +82,32 @@ export class EstadisticasComponent {
       this.verMaquina1=false;
       this.verMaquina2=false;
 
-      //this.graficasService.faultsDataFromRest('Ambos',this.urlAmbos);
+      this.tablas.get(2)!.refreshTable("Ambas",this.urlAmbos,this.modelCol);
+      //this.tableViewerCommonComponent.refreshTable("Ambas",this.urlAmbos,this.modelCol);
       console.log("url es :"+this.urlAmbos);
     } 
+    //<!--------------------->
     //Solo se quiere visualizar la TOP1
     if(filter.maquina1 && !filter.maquina2) {
       this.urlTop1=this.urlCommon + "&maquina=4";
       this.verMaquina1=true;
+      this.modelCol =filter.apiFault.modelColumn;
+      let cabecera:string = "TOP1";
 
-      //this.graficasService.faultsDataFromRest('Top1',this.urlTop1);
-      console.log("url es :"+this.urlTop1);
-      console.log("faultApi es :"+filter.apiFault);
+      this.tablas.get(0)!.refreshTable("TOP1",this.urlTop1,this.modelCol);
+      //this.tableViewerCommonComponent.refreshTable(cabecera,this.urlTop1,this.modelCol);
+      //console.log("url es :"+this.urlTop1);
     }
     //Solo se quiere visualizar la TOP2  
     if(filter.maquina2 && !filter.maquina1) {
       this.urlTop2=this.urlCommon + "&maquina=5";
       this.verMaquina2=true;
+      this.modelCol =filter.apiFault.modelColumn;
+      let cabecera:string = "TOP2";
 
-      //this.graficasService.faultsDataFromRest('Top2',this.urlTop2);
-      console.log("url es :"+this.urlTop2);
+      this.tablas.get(1)!.refreshTable("TOP2",this.urlTop2,this.modelCol);
+      //this.tableViewerCommonComponent.refreshTable("TOP2",this.urlTop2,this.modelCol);
+      //console.log("url es :"+this.urlTop2);
     } 
     //Se quiere visualizar ambas  
     if(filter.maquina1 && filter.maquina2) {
@@ -101,14 +116,17 @@ export class EstadisticasComponent {
       this.verMaquina1=true;
       this.verMaquina2=true;
 
-
-      //this.graficasService.faultsDataFromRest('Top1',this.urlTop1);
-      //this.graficasService.faultsDataFromRest('Top2',this.urlTop2);
+      this.modelCol =filter.apiFault.modelColumn;
+      this.tablas.get(0)!.refreshTable("TOP1",this.urlTop1,this.modelCol);
+      this.tablas.get(1)!.refreshTable("TOP2",this.urlTop2,this.modelCol);
+      
+      //this.tableViewerCommonComponent.refreshTable("TOP1",this.urlTop1,this.modelCol);
+      //this.tableViewerCommonComponent.refreshTable("TOP2",this.urlTop2,this.modelCol);
       console.log("url de Top1 es:"+this.urlTop1);
       console.log("url de Top2 es:"+this.urlTop2);
     } 
-    this.xAxisLabel=filter.apiFault.faultLabel;
-    this.yAxisLabel="numero de fallos";
+   
   }
 
 }
+
