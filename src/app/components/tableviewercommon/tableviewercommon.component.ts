@@ -24,9 +24,7 @@ export class TableViewerCommonComponent {
   @Input() urlRest: string=""; //Url del servicio Rest que proporciona los datos
   @Input() modelColumn:string[]=[];//Modelo del encolumnado de la tabla
 
- //Utilizado a modo de prueba para enviar info al footer
-  @Output() isession = new EventEmitter();
-
+ 
   //arreglo con las tuplas de la tabla
   rows: any[] =[] ;
   

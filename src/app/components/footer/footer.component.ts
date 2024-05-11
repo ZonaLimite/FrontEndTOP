@@ -10,14 +10,10 @@ export class FooterComponent {
 
 @Input()  public pieText: string="";
 
-constructor(){
-  
-}
+constructor(){}
 
 ngOnInit(): void {
-  
   this.triggerDeletePietext();
-  
 }
 
 triggerDeletePietext() {
