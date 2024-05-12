@@ -1,9 +1,14 @@
 
 <div>
-<h5>{{cabecera}}</h5>    
+<span>{{cabecera}}</span>    
 <div  id="scroller">
     <table class="table table-primary table-hover table-bordered border-primary table-sm" >
-        <thead>
+        <thead *ngIf="rows.length==0">
+          <tr>
+                <th>Recopilando datos ....</th>
+          </tr>
+        </thead>
+        <thead *ngIf="rows.length > 0">
             <tr>
               <th scope="col">#</th>
               <th scope="col">Fecha</th>
@@ -15,7 +20,7 @@
  
           <tbody>
             <!---<tr class="table-active">-->
-            <tr *ngFor="let item of rows; let i=index" [class.table-active]="i==0" >
+            <tr *ngFor="let item of rows; let i=index" [class.table-active]="i==indexRow" (dblclick)="this.handleClick(i)">
               <th scope="row">{{i}}</th>
               <td>{{item.ddate}}</td>
               <td>{{item.htime}}</td>

@@ -1,6 +1,4 @@
-<!--<p style="padding: 5px;">{{title}}</p>
-<p style="padding: 5px;">{{propiedad_uno}}</p>
-<p style="padding: 5px;">{{propiedad_dos}}</p>-->
+
 <div class="card" >
     <div class="card-header">
       Fallos Maquinas
@@ -8,37 +6,37 @@
     <div class="card-body">
         <form #fQuery="ngForm" (ngSubmit)="onSubmit()" class="row g-3">
             <div class="col-md-6 mb-2" >
-              <label for="fechaIni" class="form-label">Fecha Ini</label>
-              <input type="text" class="form-control" #nombre="ngModel" name="fechaIni" [(ngModel)]="formQuery.fechaIni" id="fechaIni">
+              <label for="fechaIni" class="form-label">Fecha</label>
+              <input type="text" class="form-control" #nombre="ngModel" name="fechaIni" [(ngModel)]="formQuerySignal().fechaIni" id="fechaIni">
             </div>
-            <div class="col-md-6">
-              <label for="fechaFin" class="form-label">Fecha Fin</label>
-              <input type="text" class="form-control" #nombre="ngModel" name="fechaFin" [(ngModel)]="formQuery.fechaFin" id="fechaFin">
+            <div class="col-md-6 mb-2" >
+              <label for="fechaFin" class="form-label">Fech.Fin</label>
+              <input type="text" class="form-control" #nombre="ngModel" name="fechaFin" [(ngModel)]="formQuerySignal().fechaFin" id="fechaFin">
             </div>
             <div class="col-md-6 mb-2" >
                 <label for="horaIni" class="form-label">HoraIni</label>
-                <input type="text" class="form-control"  #nombre="ngModel" name="horaIni" [(ngModel)]="formQuery.horaIni" id="horaIni">
+                <input type="text" class="form-control"  #nombre="ngModel" name="horaIni" [(ngModel)]="formQuerySignal().horaIni" id="horaIni">
             </div>    
             <div class="col-md-6 mb-2" >                
                 <label for="horaFin" class="form-label">HoraFin</label>
-                <input type="text" class="form-control"  #nombre="ngModel" name="horaFin" [(ngModel)]="formQuery.horaFin" id="horaFin">
+                <input type="text" class="form-control"  #nombre="ngModel" name="horaFin" [(ngModel)]="formQuerySignal().horaFin" id="horaFin">
             </div>
         
             <div class="col-md-12">
                 <label for="turno" class="form-label">Turno</label>
-                <input type="text" class="form-control"  #nombre="ngModel" name="turno" [(ngModel)]="formQuery.turno" id="turno">
+                <input type="text" class="form-control"  #nombre="ngModel" name="turno" [(ngModel)]="formQuerySignal().turno" id="turno">
             </div>
             
             <div class="col-md-12">
                 <label for="programa" class="form-label" >Programa</label>
-                <input type="text" class="form-control" #nombre="ngModel" name="programa" [(ngModel)]="formQuery.programa" id="programa">
+                <input type="text" class="form-control" #nombre="ngModel" name="programa" [(ngModel)]="formQuerySignal().programa" id="programa">
             </div>
 
             <div  class="col-md-12">
-              <label for="errorSelected" class="form-label col-sm-3">Fallos</label>
+              <label for="errorSelected" class="form-label ">Fallo</label>
               <div class="col-sm-12">
-                <select class="form-select col-sm-6" name="errorSelected" [(ngModel)]="formQuery.apiFault" id="errorSelected">
-                    <option [value]="item.faultApi" *ngFor="let item of listError; let i=index">{{item.faultLabel}}</option>
+                <select class="form-select col-sm-6" name="errorSelected" [(ngModel)]="formQuerySignal().apiFault" id="errorSelected">
+                    <option [ngValue]="item" *ngFor="let item of listItemsCombo; let i=index">{{item.faultLabel}}</option>
                     
                 </select>
             </div>  
@@ -46,7 +44,7 @@
             
             <div class="col-6">
               <div class="form-check">
-                <input class="form-check-input" type="checkbox"  #nombre="ngModel" name="top1" [(ngModel)]="formQuery.maquina1" id="top1">
+                <input class="form-check-input" type="checkbox"  #nombre="ngModel" name="top1" [(ngModel)]="formQuerySignal().maquina1" id="top1">
                 <label class="form-check-label" for="top1">
                   TOP 1
                 </label>
@@ -54,7 +52,7 @@
             </div>
             <div class="col-6">
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox"  #nombre="ngModel" name="top2" [(ngModel)]="formQuery.maquina2" id="top2">
+                  <input class="form-check-input" type="checkbox"  #nombre="ngModel" name="top2" [(ngModel)]="formQuerySignal().maquina2" id="top2">
                   <label class="form-check-label" for="top2">
                     TOP 2
                   </label>
@@ -62,13 +60,13 @@
               </div>
   
             <div class="col-6">
-              <button type="submit" class="btn btn-primary col-12">Ver Fallos</button>
+              <button type="submit" class="btn btn-primary col-12">Submit</button>
             </div>
             <div class="col-6">
               <div class="form-check" (change)="onAutorefreshChange($event)">
                 <input class="form-check-input" type="checkbox"  #nombre="ngModel" name="autorefresh" [(ngModel)]="autoRefresh" id="autorefresh">
                 <label class="form-check-label"autoRefresh for="autorefresh">
-                  A.Refresh
+                  Auto
                 </label>
               </div>
             </div>

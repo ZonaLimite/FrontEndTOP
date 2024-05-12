@@ -1,6 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { QueryParam } from '../../models/queryParam';
 import { GraficasService } from '../../services/graficas.service';
+import { GLOBAL } from '../../services/global';
+import { ApiFaults } from '../../models/apiFaults';
+import { SidebarComponent } from '../../components/sidebar/sidebar.component';
+
 
 
 
@@ -10,6 +14,9 @@ import { GraficasService } from '../../services/graficas.service';
   styleUrl: './fallos.component.css'
 })
 export class FallosComponent implements OnInit {
+  private sessionTop1Selected: number=0;
+  private sessionTop2Selected: number=0;
+
   private urlCommon ="";
   public urlAmbos:string ="";
   public urlTop1:string ="";
@@ -23,13 +30,19 @@ export class FallosComponent implements OnInit {
   //Inyeccion del servicio de graficas
   constructor(private graficasService: GraficasService){}
 
+  //Inicializador Combo de conceptos a manejar
+  public listItemsConcepto:ApiFaults[]=
+            [new ApiFaults('ETACS','api/faults/ejGroupBy',[]),
+             new ApiFaults('FRACASOS ENTRADA','api/faults/etifGroupBy',[]),
+            ];
+
   //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
   ngOnInit(): void {
     this.graficasService.resetData();
  }
 
   //Metodo construccion submit Query
-  lanzarQuery(filter: QueryParam ){
+  lanzarQuery(filter: QueryParam ){ //QueryParam es el model recibido del sidebar
     this.urlCommon ="";
     this.urlAmbos="";
     this.urlTop1="";
@@ -37,7 +50,7 @@ export class FallosComponent implements OnInit {
     this.verMaquina1=filter.maquina1;
     this.verMaquina2=filter.maquina2;
     
-    this.urlCommon="http://localhost:8080/api"+ filter.apiFault+"?";
+    this.urlCommon=GLOBAL.urlBase + filter.apiFault.faultApi+"?";
     
     if(filter.fechaIni != "" ) this.urlCommon += "fecha='"+filter.fechaIni+"' AND '"+filter.fechaFin+"'";
     if(filter.horaIni != "") this.urlCommon += "&hora='"+filter.horaIni+"' AND '"+filter.horaFin+"'";
@@ -78,12 +91,7 @@ export class FallosComponent implements OnInit {
       console.log("url de Top1 es:"+this.urlTop1);
       console.log("url de Top2 es:"+this.urlTop2);
     } 
-
-    
-    this.xAxisLabel=filter.apiFault;
+    this.xAxisLabel=filter.apiFault.faultLabel;
     this.yAxisLabel="numero de fallos";
-  
-    
-    
   }
 }

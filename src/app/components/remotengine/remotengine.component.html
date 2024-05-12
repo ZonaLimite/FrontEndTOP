@@ -1,0 +1,113 @@
+
+
+
+<div class="card mx-4 my-4 ">
+ 
+  <div class="card-header">
+    <div class="row">
+      <div class="col-2" id="connect">
+        <button class="btn btn-success" type="button" (click)="conectar()" 
+        *ngIf="!conectado" >Socket</button>
+      </div>
+      <div class="col-2">
+        <button class="btn btn-warning" type="button" (click)="desconectar()"
+        *ngIf="conectado">Cerrar</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-primary" type="button" (click)="linkarTop()"
+        *ngIf="!linkTop && conectado">Abrir Consulta</button>
+      </div>
+   
+      <div class="col-3"  >
+        <button class="btn btn-primary" type="button" (click)="unLinkarTop()"
+        *ngIf="linkTop && conectado">Cerrar Consulta </button>
+      </div>
+    </div> 
+   
+    <div class="row" *ngIf="conectado" >
+      <div class="col-3">
+          <label for="maquina" class="form-label ">Maquina</label>
+          <select class="form-select " name="maquina" id="maquina" [(ngModel)]="remoteParam.maquina"  (change)="maquinaChanged($event)" >
+              <option [value]="item" *ngFor="let item of dataMaquinas;let i=index" >{{item}}</option>
+          </select>
+      </div> 
+      <div class="col-3">
+        <label for="sistema" class="form-label">Sistema</label>
+        <select class="form-select" name="sistema" id="sistema" [(ngModel)]="remoteParam.sistema" (change)="dataChanged($event)"  >
+            <option [value]="item" *ngFor="let item of dataSistemas;  let i=index">{{item}}</option>
+        </select>
+      </div> 
+      <div class="col-3">
+        <label for="modulo" class="form-label">Modulo</label>
+        <select class="form-select " name="modulo" id="modulo" [(ngModel)]="remoteParam.modulo" >
+          <option [value]="item" *ngFor="let item of dataModulos; let i=index">{{item}}</option>
+        </select>
+      </div> 
+   
+      <div class="col-3">
+        <label for="active" class="form-label ">Active</label>
+        <input type="checkbox" class="form-check" name="active" id="active" [(ngModel)]="remoteParam.active" [checked]="remoteParam.active" (change)="activeChaged($event)" >
+      </div> 
+    </div>      
+  <!-- renderizacion de la ventana display de eventos recibidos-->
+  <div class="card-body" #scrollChat [scrollTop]="valueTop"   style="overflow-y: scroll; height: 360px;"
+    *ngIf="conectado">
+    <ul class="list-group list-group-flush ">
+      <li  class="list-group-item list-group-item-light" *ngFor="let trace of traces">
+          {{trace.data}}
+      </li>
+    </ul>
+  </div>
+
+  <div class="card-footer px-4 " *ngIf="conectado">
+    <form >
+      <div class="row justify-content-evenly gx-5">
+        <div class="col-1">
+          <button class="btn btn-primary " type="submit" (click)="openWithDialogWithTemplate(dialogTemplate2)" >Incluir</button>
+        </div>
+        <div class="col-1">
+          <button class="btn btn-primary " type="submit" (click)="eliminarListener()" >Borrar</button>
+        </div>
+        <div class="col-3">
+         
+          <select class="form-select " [(ngModel)]="remoteParam.listener" name="listener" id="listener"  >
+            <option [value]="item" *ngFor="let item of dataListenerActivos; let i=index" >{{item}}</option>
+          </select>
+        </div> 
+        <div class="col-1">
+          <button class="btn btn-primary " type="submit" (click)="clearDisplay()">Clear</button>
+        </div>
+        
+        <div class="col-1">
+          <button class="btn btn-primary " type="submit" (click)="incluirListenerRapido()">Añadir</button>
+        </div>
+
+        <div class="col-5">
+         <input type="text" [(ngModel)]="remoteParam.textListener" class="form-control " placeholder="Introduce una cadena de busqueda y pulsa Filtrar..." name="texto"
+          >
+        </div>
+  
+      </div>
+    </form>
+  </div>
+</div>  
+
+<ng-template #dialogTemplate2>
+  <h1 mat-dialog-title>Seleccion de Listeners</h1>
+  <div mat-dialog-content>
+    <form [formGroup]="formGroup">
+      <mat-form-field>
+        <mat-label>Elija un listener</mat-label>
+        <mat-select formControlName = "optionSel">
+          @for (listener of dataListener; track listener) {
+          <mat-option [value]="listener">{{listener}}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </form>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button (click)="onSaveListener()">Save</button>
+      <button mat-button mat-dialog-close >Close</button>
+  </div>
+</ng-template>

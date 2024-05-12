@@ -1,9 +1,11 @@
-import { Component, Input , Output, EventEmitter, OnInit, OnDestroy} from '@angular/core';
+import { Component, Input , Output, EventEmitter, OnInit, OnDestroy, WritableSignal, effect} from '@angular/core';
 import { QueryParam } from '../../models/queryParam';
 import { ApiFaults } from '../../models/apiFaults';
-import { FormGroup, FormControl } from '@angular/forms';
+import { misignal } from '../tableviewer/tableviewer.component';
 
 
+
+//Estructura para albergar value y label datos del select
 interface apiFaults{
   faultLabel:string;
   faultApi:string;
@@ -15,27 +17,39 @@ interface apiFaults{
   styleUrl: './sidebar.component.css'
 })
 export class SidebarComponent implements OnInit,OnDestroy {
-  public title: string;
-  public autoRefresh: boolean;
-  private handlerInterval:any;
  
-  //Estructura vinculacion select->api
-  public listError:ApiFaults[]=
-            [new ApiFaults('ETACS','/faults/ejGroupBy'),
-             new ApiFaults('FRACASOS ENTRADA','/faults/etifGroupBy'),
-            ];
-  
-  
 
-  //Objeto para acomodar todos los campos recibidos del formulario
-  public formQuery: QueryParam;
+  public title: string;
+  public tempApiFaults: any;
 
-  //Variable de tipo Emitter para exportar el objeto QueryParam
+  public autoRefresh: boolean;//Variables para el gobierno de autorefresh
+  private handlerInterval:any;//y el interval que permite hacer polling 
+  
+  //Estructura vinculacion select->api pasado por Input desde el padre
+  @Input() listItemsCombo:ApiFaults[]=[];
+
+  //Variable de tipo Emitter para lanzar evento de objeto QueryParam
   @Output() eventSubmitQuery:EventEmitter<QueryParam>;
+ 
+  /* public listError:ApiFaults[]=
+            [new ApiFaults('ETACS','api/faults/ejGroupBy'),
+             new ApiFaults('FRACASOS ENTRADA','api/faults/etifGroupBy'),
+            ];*/
+  
+  //Objeto para acomodar todos los campos recibidos del formulario
+  //Utilizo un signal importado desde tableviewer (para recoger ciertos valores de ese componente)
+  public formQuerySignal:WritableSignal<QueryParam>=misignal;
 
   constructor(){
-    this.formQuery = new QueryParam("","","","","Tarde","",false, false,"");
-    
+    //Un effect propio de los signals, que al cambio de los valores
+    //del signal, lo utilizo para seleccionar la primera fila del combo
+    effect(() => {
+      //cuando el signal cambia
+      this.tempApiFaults = this.formQuerySignal().apiFault;
+      //me selecciona el primer item del combo
+      this.formQuerySignal().apiFault=this.listItemsCombo[0];
+    });
+
     this.title="Un formulario para Querys";
     this.autoRefresh=false;
     this.handlerInterval=0;
@@ -43,12 +57,15 @@ export class SidebarComponent implements OnInit,OnDestroy {
   }
 
   ngOnInit(): void {
-    //Seleccionamos esta opcion como selected en el select
-    this.formQuery.apiFault='/faults/ejGroupBy';
+    //Seleccionamos la primera opcion de fallos por defecto
+    this.formQuerySignal().apiFault=this.listItemsCombo[0];
+    
   }
 
+  //Al pulsar el Submit del formulario emite el QueryParam
   onSubmit(){
-    this.eventSubmitQuery.emit(this.formQuery);
+    this.eventSubmitQuery.emit(this.formQuerySignal());
+    console.info("QueryParam :"+this.formQuerySignal())
   }
 
   onAutorefreshChange(event:any){
@@ -58,7 +75,7 @@ export class SidebarComponent implements OnInit,OnDestroy {
   startSetInterval(){
     this.handlerInterval=setInterval(() =>{
             this.onSubmit();
-    }, 5000);  
+    }, 15000);  
     console.log("Interval -->ON")
     }
   stopInterval(){

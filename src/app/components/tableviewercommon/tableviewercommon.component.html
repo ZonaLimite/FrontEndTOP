@@ -1,0 +1,22 @@
+<div>
+    <span>{{cabecera}}</span>    
+    <div  id="scroller">
+        <table class="table table-primary table-hover table-bordered border-primary table-sm" >
+           
+            <thead *ngIf="rows.length > 0">
+                <tr>
+                  
+                  <th *ngFor="let col of modelColumn" scope="col">{{col}}</th><!--bucle de columnas-->
+                </tr>
+              </thead>
+     
+              <tbody>
+                <!---<tr class="table-active">-->
+                <tr *ngFor="let item of rows; let i=index" [class.table-active]="i==indexRow" >
+                  
+                  <td *ngFor="let col of modelColumn">{{item[col]}}</td>
+                </tr>
+              </tbody>
+        </table>
+    </div>
+</div>

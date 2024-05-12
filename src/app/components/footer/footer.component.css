@@ -1,5 +1,6 @@
 :host{
     display: block;
-    background-color: blueviolet;
+    background-color:black;
     grid-area: footer;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
