@@ -6,45 +6,7 @@
                     <sidebar [listItemsCombo]="listItemsConcepto"   (eventSubmitQuery)="lanzarQuery($event)"></sidebar>
                </span>
             </div>
-            <!------------------Logica render graficas------------------------
-            <div *ngIf="!verMaquina1 && !verMaquina2" class="col-10"></div>
-           
-                <span>
-                    AMBAS
-                    <tableviewercommon [modelColumn]=modelCol [cabecera]="'AMBAS'" [urlRest]="urlAmbos"></tableviewercommon>
-                </span>
-             </div>
- 
-            <div *ngIf="verMaquina1 && !verMaquina2" class="col-10">
-
-               
-               <span>
-                TOP1
-                <tableviewercommon  [cabecera]="'TOP1'" ></tableviewercommon>
-               </span>
-            </div>
-            <div *ngIf="verMaquina2 && !verMaquina1" class="col-10">
-
-                <span>
-                   TOP2
-                    <tableviewercommon [modelColumn]=modelCol [cabecera]="'TOP2'" [urlRest]="urlTop2"></tableviewercommon>
-                </span>
-             </div>
-
-             <div *ngIf="verMaquina1 && verMaquina2" class="col-5">
-               
-                <span>
-                    TOP1
-                    <tableviewercommon  [cabecera]="'TOP1'" ></tableviewercommon>
-                </span>
-             </div>
-
-             <div *ngIf="verMaquina1 && verMaquina2" class="col-5">
-               <span>
-                   TOP2
-                   <tableviewercommon  [cabecera]="'Sesiones TOP1'"></tableviewercommon>
-               </span>
-            </div>---->
+       
             <div class="col-10">
             <span class="d-block">
                 <div >

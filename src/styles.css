@@ -1,6 +1,6 @@
 /*la notacion -- permite la definicion  de variables css */
 :root{
-    --sidebar-height:174px;
+    --sidebar-height:206px;
     --tableSidebar-height: calc(var(--sidebar-height) - 40px);
     
     --cabecera-height:40px;

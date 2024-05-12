@@ -6,7 +6,7 @@ import { ApiFaults } from '../../models/apiFaults';
 
 
 //Exportar un signal para los sidebar
-export var misignal = signal<QueryParam>(new QueryParam("","","","","","",false, false,new ApiFaults("","",[]),""));
+export var misignal = signal<QueryParam>(new QueryParam("","","","","","",true, true,new ApiFaults("","",[]),""));
 
 @Component({
   selector: 'tableviewer',

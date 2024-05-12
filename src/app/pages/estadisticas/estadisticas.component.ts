@@ -18,7 +18,7 @@ export class EstadisticasComponent {
   public urlTop2:string ="";
 
   public verMaquina1:boolean = true;
-  public verMaquina2:boolean = false;
+  public verMaquina2:boolean = true;
 
   //Lo utilizo para obtener una referencia al componente hijo TableViewer y asi poder hacer uso
   //de su metodo refreshTable()
@@ -81,7 +81,7 @@ export class EstadisticasComponent {
       this.urlAmbos = this.urlCommon
       this.verMaquina1=false;
       this.verMaquina2=false;
-
+      let cabecera:string = "AMBAS MAQUINAS";
       this.tablas.get(2)!.refreshTable("Ambas",this.urlAmbos,this.modelCol);
       //this.tableViewerCommonComponent.refreshTable("Ambas",this.urlAmbos,this.modelCol);
       console.log("url es :"+this.urlAmbos);
