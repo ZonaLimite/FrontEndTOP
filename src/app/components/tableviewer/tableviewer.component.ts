@@ -47,7 +47,7 @@ export class TableviewerComponent {
             complete: () => /*console.info('complete') */
         });
       }
-    }, 5000)
+    }, 10000)
    
   }
   //metodo de obtencion datos de fila tabla, para construir un

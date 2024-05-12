@@ -36,6 +36,7 @@ export class RemotengineComponent {
   //Objeto enlazado (TwoBinding) a todos los campos recibidos del formulario
   public remoteParam: RemoteParam;
 
+  //referencia a un Dialogo abierto mediante el MatDialogService
   private matDialogRef!: MatDialogRef<DialogWithTemplateComponent>;
 
   //Estructuras para soportar data de selects
@@ -50,21 +51,22 @@ export class RemotengineComponent {
 
   linkTop: boolean = false; //variable estado conexion TOP
   
-  traces: Traces[] = []; //arreglo de valores recibidos de trazas filtradas 
-  valueTop:number ;
+  traces: Traces[] = []; //arreglo de valores conteniendo trazas recibidas de Engine
+  
+  valueTop:number ; //El valor representando la TOP que estamos monitorizando
 
-  urlEngine :string;
+  urlEngine :string; //url Endpoint del broker StompJS corriendo en server Engine
 
   debugger: string="Conectando ....";
 
   constructor(private dialogService:DialogService) { //Inyectamos el servicio de Dialogos de Material
 
-    this.urlEngine = this.urlBaseEngine + "topwebsocket"; //url broker StompJS en el server Engine
+    this.urlEngine = this.urlBaseEngine + "topwebsocket"; 
   
-    this.client=new Client(); //Inicializacion de u cliente Socks
+    this.client=new Client(); //Inicializacion de nuestro cliente SocksJ
   
     this.valueTop = 0;
-    this.remoteParam = new RemoteParam("","","","","");
+    this.remoteParam = new RemoteParam("","","","","", false);//mascara de Inicializacion campos de control
 
     afterRender(() => { //life hook que permite ajustar el scroll del elemento una vez se ha renderizado
       if(this.scroll != undefined){
@@ -76,7 +78,7 @@ export class RemotengineComponent {
   ngOnInit() {
 
     this.client.webSocketFactory = () => { // Stomp on sockjs
-      return new SockJS(this.urlEngine) as IStompSocket; //Ojo Engine esta en el puerto 8090
+      return new SockJS(this.urlEngine) as IStompSocket; //Instanciacion del websocket StompJ
     }
    
     this.client.onConnect = (frame) => {
@@ -92,10 +94,8 @@ export class RemotengineComponent {
         let traces:Traces  = JSON.parse(e.body) as Traces;
         this.handleTracesEvent(traces);
       });  
-   
-
     
-      this.refreshComboMaquinas();
+      this.refreshComboMaquinas(); //Inicializacion (requerido a Engine) de valores de control
     }
 
     this.client.onDisconnect = (frame) => {
@@ -138,8 +138,6 @@ export class RemotengineComponent {
   //Solicitud de borrado de listener (el que este seleccionado en el combo)
   eliminarListener(){
     this.enviarComando("quitarlistenermodelfilter",[this.remoteParam.listener])
-    
-
   }
 
   onSubmit(){
@@ -187,6 +185,16 @@ export class RemotengineComponent {
     this.enviarComando("modulos",[this.remoteParam.sistema]);
     
   }
+   maquinaChanged(event : Event){
+    this.enviarComando("adjustnumtop",[this.remoteParam.maquina]);
+   }
+   activeChaged(event :any){
+      if(event.target.checked){
+        this.enviarComando("setWebsocketPublish",["1"]);
+      }else{
+        this.enviarComando("setWebsocketPublish",["0"]);
+      }
+   }
 
   //manejador solicitud incluir listener rapido
   incluirListenerRapido(){
@@ -209,7 +217,7 @@ export class RemotengineComponent {
   //#####################
   handleMessage(resultRest: ResultEngine) {
     
-     console.log("Recibido de channel control:"+resultRest )
+    
     switch (resultRest.tipoResult){ //tipoResult identifica el tipo de mensaje rcibido
       case "maquinas":// recibido arreglo para combo maquinas
         this.dataMaquinas = resultRest.data;
