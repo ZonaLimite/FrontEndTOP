@@ -29,7 +29,7 @@ export class RemotengineComponent {
 
   @ViewChild('scrollChat') scroll!: ElementRef; //observer del elemento div panel de eventos
 
-  private client: Client; //StompJs
+  public client: Client; //StompJs
 
   private urlBaseEngine:string = GLOBAL.urlBaseEngine;//una propertie para mapear la URl del servidor Engine
 
@@ -59,7 +59,7 @@ export class RemotengineComponent {
 
   debugger: string="Conectando ....";
 
-  constructor(private dialogService:DialogService) { //Inyectamos el servicio de Dialogos de Material
+  constructor(public dialogService:DialogService) { //Inyectamos el servicio de Dialogos de Material
 
     this.urlEngine = this.urlBaseEngine + "topwebsocket"; 
   
