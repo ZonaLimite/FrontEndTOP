@@ -24,7 +24,7 @@ export class GraficaComponent {
   @Input() yAxisLabel:string  = "Objeto de la grafica";
  
   //Inyeccion de dependencia del servicio de graficas
-  constructor(private graficasService: GraficasService){
+  constructor(public graficasService: GraficasService){
  
   }
 

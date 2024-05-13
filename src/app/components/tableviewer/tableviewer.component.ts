@@ -29,7 +29,7 @@ export class TableviewerComponent {
 
   
   //Inyeccion de dependencia del servicio
-  constructor(private resultsetService: ResultsetService){
+  constructor(public resultsetService: ResultsetService){
     this.urlRest="";
     this.cabecera="";
   }
