@@ -14,7 +14,11 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { DialogWithTemplateComponent } from '../dialog-with-template/dialog-with-template.component';
 
-
+//Un paso de variable desde el fichero assets/configuraciones
+//para permitir sin tener que volver a transpilar ,obtener parametro de urls de servidores
+// confuraciones.js esta ubicado en assets/configuraciones
+// y es instanciado en en Index.html , en el head como un script
+declare var configuraciones: any;
 
 @Component({
   selector: 'app-remotengine',
@@ -31,7 +35,9 @@ export class RemotengineComponent {
 
   public client: Client; //StompJs
 
-  private urlBaseEngine:string = GLOBAL.urlBaseEngine;//una propertie para mapear la URl del servidor Engine
+  //private urlBaseEngine:string = GLOBAL.urlBaseEngine;//una propertie para mapear la URl del servidor Engine
+  // Al final hacemos el paso de parametro externo desde configuraciones 
+  private urlBaseEngine:string = configuraciones.urlBaseEngine;//una propertie para mapear la URl del servidor Engine
 
   //Objeto enlazado (TwoBinding) a todos los campos recibidos del formulario
   public remoteParam: RemoteParam;
