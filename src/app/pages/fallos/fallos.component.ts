@@ -5,7 +5,11 @@ import { GLOBAL } from '../../services/global';
 import { ApiFaults } from '../../models/apiFaults';
 import { SidebarComponent } from '../../components/sidebar/sidebar.component';
 
-
+//Un paso de variable desde el fichero assets/configuraciones
+//para permitir sin tener que volver a transpilar ,obtener parametro de urls de servidores
+// confuraciones.js esta ubicado en assets/configuraciones
+// y es instanciado en en Index.html , en el head como un script
+declare var configuraciones: any;
 
 
 @Component({
@@ -50,7 +54,7 @@ export class FallosComponent implements OnInit {
     this.verMaquina1=filter.maquina1;
     this.verMaquina2=filter.maquina2;
     
-    this.urlCommon=GLOBAL.urlBase + filter.apiFault.faultApi+"?";
+    this.urlCommon=configuraciones.urlBase + filter.apiFault.faultApi+"?";
     
     if(filter.fechaIni != "" ) this.urlCommon += "fecha='"+filter.fechaIni+"' AND '"+filter.fechaFin+"'";
     if(filter.horaIni != "") this.urlCommon += "&hora='"+filter.horaIni+"' AND '"+filter.horaFin+"'";

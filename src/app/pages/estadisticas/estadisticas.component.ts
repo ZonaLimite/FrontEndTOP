@@ -4,6 +4,12 @@ import { GLOBAL } from '../../services/global';
 import { ApiFaults } from '../../models/apiFaults';
 import { TableViewerCommonComponent } from '../../components/tableviewercommon/tableviewercommon.component';
 
+//Un paso de variable desde el fichero assets/configuraciones
+//para permitir sin tener que volver a transpilar ,obtener parametro de urls de servidores
+// confuraciones.js esta ubicado en assets/configuraciones
+// y es instanciado en en Index.html , en el head como un script
+declare var configuraciones: any;
+
 @Component({
   selector: 'app-estadisticas',
   templateUrl: './estadisticas.component.html',
@@ -41,7 +47,8 @@ export class EstadisticasComponent {
 
            
   
-  private urlBase:string = GLOBAL.urlBase;
+  //private urlBase:string = GLOBAL.urlBase;
+  private urlBase:string = configuraciones.urlBase;
           
 
   constructor(){}
@@ -68,7 +75,8 @@ export class EstadisticasComponent {
     this.verMaquina1=filter.maquina1;
     this.verMaquina2=filter.maquina2;
     
-    this.urlCommon=GLOBAL.urlBase + filter.apiFault.faultApi+"?";
+    //this.urlCommon=GLOBAL.urlBase + filter.apiFault.faultApi+"?";
+    this.urlCommon=configuraciones.urlBase + filter.apiFault.faultApi+"?";
     
     if(filter.fechaIni != "" ) this.urlCommon += "fecha='"+filter.fechaIni+"' AND '"+filter.fechaFin+"'";
     if(filter.horaIni != "") this.urlCommon += "&hora='"+filter.horaIni+"' AND '"+filter.horaFin+"'";
