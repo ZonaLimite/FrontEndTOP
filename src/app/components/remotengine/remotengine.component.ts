@@ -75,7 +75,7 @@ export class RemotengineComponent {
     this.remoteParam = new RemoteParam("","","","","", false);//mascara de Inicializacion campos de control
 
     afterRender(() => { //life hook que permite ajustar el scroll del elemento una vez se ha renderizado
-      if(this.scroll != undefined){
+      if(this.scroll != undefined && this.remoteParam.active){
         this.scroll.nativeElement.scrollTop= this.scroll.nativeElement.scrollHeight;
       }
     }, {phase: AfterRenderPhase.Write});
