@@ -1,5 +1,5 @@
 export class Mensaje {
-    
+
     constructor(
       public texto: string,
       public fecha: number,

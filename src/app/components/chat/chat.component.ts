@@ -75,8 +75,8 @@ export class ChatComponent {
       this.client.subscribe('/channel/escribiendo', e => {
         this.escribiendo = e.body;
         setTimeout(() => this.escribiendo = '', 3000)
-
       });
+
       console.log(this.clienteId);
       this.client.subscribe('/channel/historial/' + this.clienteId, e => {
         const historial = JSON.parse(e.body) as Mensaje[];

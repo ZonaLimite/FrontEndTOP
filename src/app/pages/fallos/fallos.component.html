@@ -3,7 +3,8 @@
         <div class="row" style="padding:5px">
             <div class="col-2">
                <span>
-                    <sidebar (eventSubmitQuery)="lanzarQuery($event)"></sidebar>
+                        
+                    <sidebar  [listItemsCombo]="listItemsConcepto"  (eventSubmitQuery)="lanzarQuery($event)"></sidebar>
                </span>
             </div>
             <!------------------Logica render graficas----------------------------------->

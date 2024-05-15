@@ -6,7 +6,7 @@
     <div class="card-body">
         <form #fQuery="ngForm" (ngSubmit)="onSubmit()" class="row g-3">
             <div class="col-md-6 mb-2" >
-              <label for="fechaIni" class="form-label">Fecha Ini</label>
+              <label for="fechaIni" class="form-label">Fecha</label>
               <input type="text" class="form-control" #nombre="ngModel" name="fechaIni" [(ngModel)]="formQuerySignal().fechaIni" id="fechaIni">
             </div>
             <div class="col-md-6 mb-2" >
@@ -33,10 +33,10 @@
             </div>
 
             <div  class="col-md-12">
-              <label for="errorSelected" class="form-label col-sm-3">Fallo</label>
+              <label for="errorSelected" class="form-label ">Fallo</label>
               <div class="col-sm-12">
                 <select class="form-select col-sm-6" name="errorSelected" [(ngModel)]="formQuerySignal().apiFault" id="errorSelected">
-                    <option [ngValue]="item" *ngFor="let item of listError; let i=index">{{item.faultLabel}}</option>
+                    <option [ngValue]="item" *ngFor="let item of listItemsCombo; let i=index">{{item.faultLabel}}</option>
                     
                 </select>
             </div>  
@@ -60,13 +60,13 @@
               </div>
   
             <div class="col-6">
-              <button type="submit" class="btn btn-primary col-12">Fallos</button>
+              <button type="submit" class="btn btn-primary col-12">Submit</button>
             </div>
             <div class="col-6">
               <div class="form-check" (change)="onAutorefreshChange($event)">
                 <input class="form-check-input" type="checkbox"  #nombre="ngModel" name="autorefresh" [(ngModel)]="autoRefresh" id="autorefresh">
                 <label class="form-check-label"autoRefresh for="autorefresh">
-                  A.Refresh
+                  Auto
                 </label>
               </div>
             </div>

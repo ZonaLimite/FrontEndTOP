@@ -1,14 +1,11 @@
 
 <app-header></app-header>
-<app-querier (iSessionValueEventTop1)="updateISessionTop1($event)"
-             (iSessionValueEventTop2)="updateISessionTop2($event)">
-</app-querier>
+<app-querier ></app-querier>
 
 <div class="content">
     <router-outlet ></router-outlet>    
 </div>
 
-<app-footer [pieText]="textFooterValue"
-></app-footer>
+<app-footer></app-footer>
 
 

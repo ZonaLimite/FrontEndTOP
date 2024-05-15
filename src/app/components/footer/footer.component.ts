@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 
+
 @Component({
   selector: 'app-footer',
   templateUrl: './footer.component.html',
@@ -7,13 +8,17 @@ import { Component, Input } from '@angular/core';
 })
 export class FooterComponent {
 
-@Input()  public pieText: string;
+@Input()  public pieText: string="";
 
-constructor(){
-  this.pieText="Bienvenido a la app SPA de Mantenimiento correos TOP 2000";
+constructor(){}
+
+ngOnInit(): void {
+  this.triggerDeletePietext();
 }
 
 triggerDeletePietext() {
+  //actualizo valor y al momento se borra
+  this.pieText="Bienvenidos a la APP SPA de mantenimiento TOP 2000"
   setTimeout(() => this.pieText = '', 5000)
 }
  

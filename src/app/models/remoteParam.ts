@@ -4,6 +4,7 @@ export class RemoteParam{
         public sistema: string,
         public modulo: string,
         public listener: string,   
-        public textListener: string     
+        public textListener: string,
+        public active: boolean    
     ){}
 }

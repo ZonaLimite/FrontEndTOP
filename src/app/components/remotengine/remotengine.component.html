@@ -7,7 +7,7 @@
     <div class="row">
       <div class="col-2" id="connect">
         <button class="btn btn-success" type="button" (click)="conectar()" 
-        *ngIf="!conectado" >Socket Top</button>
+        *ngIf="!conectado" >Socket</button>
       </div>
       <div class="col-2">
         <button class="btn btn-warning" type="button" (click)="desconectar()"
@@ -27,7 +27,7 @@
     <div class="row" *ngIf="conectado" >
       <div class="col-3">
           <label for="maquina" class="form-label ">Maquina</label>
-          <select class="form-select " name="maquina" id="maquina" [(ngModel)]="remoteParam.maquina" >
+          <select class="form-select " name="maquina" id="maquina" [(ngModel)]="remoteParam.maquina"  (change)="maquinaChanged($event)" >
               <option [value]="item" *ngFor="let item of dataMaquinas;let i=index" >{{item}}</option>
           </select>
       </div> 
@@ -43,8 +43,13 @@
           <option [value]="item" *ngFor="let item of dataModulos; let i=index">{{item}}</option>
         </select>
       </div> 
-    </div>
-  
+   
+      <div class="col-3">
+        <label for="active" class="form-label ">Active</label>
+        <input type="checkbox" class="form-check" name="active" id="active" [(ngModel)]="remoteParam.active" [checked]="remoteParam.active" (change)="activeChaged($event)" >
+      </div> 
+    </div>      
+  <!-- renderizacion de la ventana display de eventos recibidos-->
   <div class="card-body" #scrollChat [scrollTop]="valueTop"   style="overflow-y: scroll; height: 360px;"
     *ngIf="conectado">
     <ul class="list-group list-group-flush ">

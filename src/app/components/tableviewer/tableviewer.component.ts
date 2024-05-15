@@ -4,8 +4,9 @@ import { QueryParam } from '../../models/queryParam';
 import { ApiFaults } from '../../models/apiFaults';
 
 
-//Exportar un signal
-export var misignal = signal<QueryParam>(new QueryParam("","","","","","",true, true,new ApiFaults("",""),""));
+
+//Exportar un signal para los sidebar
+export var misignal = signal<QueryParam>(new QueryParam("","","","","","",true, true,new ApiFaults("","",[]),""));
 
 @Component({
   selector: 'tableviewer',
@@ -15,12 +16,12 @@ export var misignal = signal<QueryParam>(new QueryParam("","","","","","",true, 
 export class TableviewerComponent {
  
   @Input() cabecera: string; //Titulo impuesto al volcado de tabla
-  @Input() urlRest: string; //Url del servicio Rest que proporciona los datos de la grafica
+  @Input() urlRest: string; //Url del servicio Rest que proporciona los datos
 
  //Utilizado a modo de prueba para enviar info al footer
   @Output() isession = new EventEmitter();
 
-  //arreglo con las filas del la tabla
+  //arreglo con las tuplas de la tabla
   rows: any[] =[] ;
 
   //numero de fila seleccionada
@@ -28,11 +29,9 @@ export class TableviewerComponent {
 
   
   //Inyeccion de dependencia del servicio
-  constructor(private resultsetService: ResultsetService){
+  constructor(public resultsetService: ResultsetService){
     this.urlRest="";
     this.cabecera="";
-
-    
   }
 
   ngOnInit(){
@@ -41,16 +40,22 @@ export class TableviewerComponent {
       if(this.urlRest!=""){
         this.resultsetService.resultsetFromRest(this.urlRest).subscribe(
           {
-            next: (result) =>   this.rows = result,
+            next: (result) => {
+              this.rows = result;
+            }  ,
             error: (e) => console.error(e)/*,
             complete: () => /*console.info('complete') */
         });
       }
-    }, 15000)
+    }, 10000)
    
   }
+  //metodo de obtencion datos de fila tabla, para construir un
+  //objeto que permita caracterizar el sidebar, faclitando asi
+  //la contruccion y aporte de parametros para la consulta
+  //Se apoya en un signal que es consumido en el componente sidebar.
   handleClick(index:number){
-    this.isession.emit(this.rows[index].isessionnumber);
+    //this.isession.emit(this.rows[index].isessionnumber);
     this.indexRow=index;
     
     let fechaIni =  this.rows[index].ddate;
@@ -65,9 +70,9 @@ export class TableviewerComponent {
     if (maquina==4) maquina1=true;
     if (maquina==5) maquina2=true;
 
-    let paramQuerySidebar = new QueryParam(fechaIni,fechaFin,horaIni,horaFin,turno,programa,maquina1,maquina2,new ApiFaults('ETACS','api/faults/ejGroupBy'),"");
-  
-    misignal.set(paramQuerySidebar);//lanzamiento de cambio de signal value
+    let paramQuerySidebar = new QueryParam(fechaIni,fechaFin,horaIni,horaFin,turno,programa,maquina1,maquina2,new ApiFaults('ETACS','api/faults/ejGroupBy',[]),"");
+    
+    misignal.set(paramQuerySidebar);//set signal value
  
   }
 }

@@ -1,5 +1,6 @@
 import { ApiFaults } from "./apiFaults";
 
+
 export class QueryParam{
     constructor(
         public fechaIni: string,

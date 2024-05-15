@@ -2,3 +2,21 @@
     height: 200px; /* set a fixed height for the div 
     overflow-y: scroll; /* enable vertical scrollbar 
   }*/
+
+  #contenido{
+  color: wheat;
+  text-align: center;
+  }
+  #image {
+   
+    width: 80%;
+    margin-left: 10%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  #cabecera {
+    margin-left: 10%;
+    text-align: center;
+    color: aqua;
+  }

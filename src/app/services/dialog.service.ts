@@ -8,15 +8,13 @@ import { DialogWithTemplateData } from '../models/dialog-with-template-data.mode
 })
 export class DialogService {
 
-  //Inyectamos el servicio de material para maejar Dialogos
-  constructor(private matDialog: MatDialog) { }
+  //Inyectamos el servicio de material para manejar Dialogos
+  constructor(public matDialog: MatDialog) { }
 
   //la firma de este metodo es el DialogoComponente a manejar y
   // unos datos de configuracion (que vienen como un arreglo)
-  
   openDialogWithTemplate(data:DialogWithTemplateData){
     return this.matDialog.open(DialogWithTemplateComponent,{data})
-
   }
 
 }
