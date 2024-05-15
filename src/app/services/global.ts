@@ -1,4 +1,4 @@
 export var GLOBAL = {
-    urlBase: 'http://192.168.1.5:8080/',
-    urlBaseEngine: 'http://192.168.1.5:8090/',
+    urlBase: 'http://21.4.1.7:8080/',
+    urlBaseEngine: 'http://21.4.1.7:8090/',
 }
