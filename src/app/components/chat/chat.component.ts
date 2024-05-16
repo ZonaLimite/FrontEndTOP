@@ -5,9 +5,11 @@ import { Client, IStompSocket } from '@stomp/stompjs';
 
 import { Mensaje } from '../../models/mensaje';
 
-export function mySocketFactory() {
-  return new SockJS('http://127.0.0.1:15674/stomp');
-}
+//Un paso de variable desde el fichero assets/configuraciones
+//para permitir sin tener que volver a transpilar ,obtener parametro de urls de servidores
+// confuraciones.js esta ubicado en assets/configuraciones
+// y es instanciado en en Index.html , en el head como un script
+declare var configuraciones: any;
 
 @Component({
   selector: 'app-chat',
@@ -24,11 +26,15 @@ export class ChatComponent {
   valueTop = 0;
   escribiendo: string;
   clienteId: string;
-  url :string;
+ 
+  // Al final hacemos el paso de parametro externo desde configuraciones 
+    private urlBaseEngine:string = configuraciones.urlBaseEngine;//una propertie para mapear la URl del servidor Engine
+    urlEngine :string; //url Endpoint del broker StompJS corriendo en server Engine
 
   constructor() {
-    this.url = "http://localhost:8090/topwebsocket"; //Ojo el Engine corre en puerto 8090
-    let ws = new SockJS(this.url);
+    this.urlEngine = this.urlBaseEngine + "topwebsocket"; 
+   
+    let ws = new SockJS(this.urlEngine);
     this.client=new Client();
     this.clienteId = 'id-' + new Date().getTime() + '-' + Math.random().toString(36).substr(2);
     this.escribiendo= "";
@@ -44,7 +50,7 @@ export class ChatComponent {
   ngOnInit() {
 
     this.client.webSocketFactory = () => { // Stomp on sockjs
-      return new SockJS("http://localhost:8090/topwebsocket") as IStompSocket; //Ojo Engine esta en el puerto 8090
+      return new SockJS(this.urlEngine) as IStompSocket; //Ojo Engine esta en el puerto 8090
     }
    
     this.client.onDisconnect = (frame) => {

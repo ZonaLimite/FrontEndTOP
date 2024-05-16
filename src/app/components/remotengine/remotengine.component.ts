@@ -35,7 +35,6 @@ export class RemotengineComponent {
 
   public client: Client; //StompJs
 
-  //private urlBaseEngine:string = GLOBAL.urlBaseEngine;//una propertie para mapear la URl del servidor Engine
   // Al final hacemos el paso de parametro externo desde configuraciones 
   private urlBaseEngine:string = configuraciones.urlBaseEngine;//una propertie para mapear la URl del servidor Engine
 
@@ -80,9 +79,9 @@ export class RemotengineComponent {
       }
     }, {phase: AfterRenderPhase.Write});
   }
+
   //############ On Init #######################################
   ngOnInit() {
-
     this.client.webSocketFactory = () => { // Stomp on sockjs
       return new SockJS(this.urlEngine) as IStompSocket; //Instanciacion del websocket StompJ
     }
@@ -112,9 +111,6 @@ export class RemotengineComponent {
     }
 
   }
-//######################################################################
- //handlers y metodos loclaes
-//######################################################################
 
   handleOnDisconnect(reason:string){
     console.log('Desconectados de socket TOP: ' + !this.client.connected + ' : ' + reason);
@@ -122,17 +118,17 @@ export class RemotengineComponent {
     //this.mensaje =new Mensaje("",0,"","","");
     this.traces = [];
   }
+
   //Recogida datos listener de dialogo emergente
   openWithDialogWithTemplate(template: TemplateRef<any>){
     this.matDialogRef = this.dialogService.openDialogWithTemplate({
       template
     })
-
-    /*this.matDialogRef
-    .afterClosed()
-    .subscribe(res => console.log("Dialog With Template Close"));
-    //this.formGroup.reset;*/
   }
+
+//######################################################################
+//metodos locales de envio solicitudes a ENGINE
+//######################################################################
 
   //Eviar una solicitud a Engine para registrar un Listener
   onSaveListener(){ 
@@ -223,8 +219,7 @@ export class RemotengineComponent {
   //#####################
   handleMessage(resultRest: ResultEngine) {
     
-    
-    switch (resultRest.tipoResult){ //tipoResult identifica el tipo de mensaje rcibido
+    switch (resultRest.tipoResult){ //tipoResult identifica el tipo de mensaje recibido
       case "maquinas":// recibido arreglo para combo maquinas
         this.dataMaquinas = resultRest.data;
         if(this.remoteParam.maquina==""){
@@ -237,26 +232,25 @@ export class RemotengineComponent {
         if(this.dataSistemas.length > 0)this.remoteParam.sistema=resultRest.data[0]
         break;
 
-      case "modulos":// recibido arreglo para combo sistemas (puede estar vacio)
+      case "modulos":// recibido arreglo para combo modulos (puede estar vacio)
         this.dataModulos = resultRest.data;
         
           if(this.dataModulos.length > 0)this.remoteParam.modulo=resultRest.data[0]
         
         break;
 
-      case "listeners":
+      case "listeners": //recibido arreglo de listeners registrados para el Dialogo Modal
         this.dataListener = resultRest.data;
        
         break;
-      case "listenersActivos":
+      case "listenersActivos":// recibido arreglo para combo de listeners activos
         this.dataListenerActivos = resultRest.data;
         if(this.dataListenerActivos.length > 0)this.remoteParam.listener=resultRest.data[resultRest.data.length-1]
         break;
 
-      case "listenerRapido":
+      case "listenerRapido":// recibido mascara de texto de listenerrapido
         this.remoteParam.textListener = resultRest.data[0];
         break;
-  
 
       case "ackConectar":
         this.linkTop=true;

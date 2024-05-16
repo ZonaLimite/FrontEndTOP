@@ -27,7 +27,8 @@ export class EstadisticasComponent {
   public verMaquina2:boolean = true;
 
   //Lo utilizo para obtener una referencia al componente hijo TableViewer y asi poder hacer uso
-  //de su metodo refreshTable()
+  //de su metodo refreshTable(), en este caso habra 3 children y para referirnos a cada uno  lo hacemos
+  // mediante tablas.get(numero dechildren)
   @ViewChildren(TableViewerCommonComponent) 
   tablas!: QueryList<TableViewerCommonComponent> ;
   

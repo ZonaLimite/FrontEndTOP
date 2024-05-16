@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { Color, ScaleType} from '@swimlane/ngx-charts';
-import { ResultsetService } from '../../services/resultset.service';
 import { Input } from '@angular/core';
 import { GraficasService } from '../../services/graficas.service';
 
