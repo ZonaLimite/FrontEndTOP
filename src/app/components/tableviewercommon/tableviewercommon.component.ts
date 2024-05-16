@@ -10,8 +10,8 @@ import { ApiFaults } from '../../models/apiFaults';
 }
 
 
-//Exportar un signal para los sidebar
-export var misignal = signal<QueryParam>(new QueryParam("","","","","","",true, true,new ApiFaults("","",[]),""));
+//Exportar un signal para los sidebar. No lo utilizamos en este caso.
+//export var misignal = signal<QueryParam>(new QueryParam("","","","","","",true, true,new ApiFaults("","",[]),""));
 
 @Component({
   selector: 'tableviewercommon',
@@ -47,6 +47,8 @@ export class TableViewerCommonComponent {
     console.log("reseteando "+ this.cabecera);
   }
 
+  //Es un metodo pensado para su utilizacion mmediante @ViewClild o @ViewChildren, de tal manera que es llamado
+  //desde otro componente padre.
   refreshTable(cabecera: string, urlRest: string, modelColumn:string[]){
     this.cabecera=cabecera;
     this.urlRest=urlRest;

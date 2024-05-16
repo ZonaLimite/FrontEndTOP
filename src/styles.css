@@ -1,23 +1,19 @@
 /*la notacion -- permite la definicion  de variables css */
 :root{
-    --sidebar-height:204px;
+    --sidebar-height:198px;
     --tableSidebar-height: calc(var(--sidebar-height) - 38px);
     
     --cabecera-height:40px;
     --value-gap-layout: 3px;
 }
 
-
 html,body{
-    /*height: calc(100% - 5px);*/
     height: 100%;
     width:100%;
     margin: 0;
     padding: 0;
     font-family: sans-serif;
     font-size: 1.4vh;
-    
- 
     background-color: black;
     color: aliceblue;
 }

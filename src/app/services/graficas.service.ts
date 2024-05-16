@@ -35,11 +35,6 @@ export class GraficasService {
     this.dataAmbos= [];
   }
 
-  //metodo obtencion datos grafica (Solo Observable)
-  faultsDataFromRestForgraphic(url:string): Observable<Faults[]> {
-    return this.http.get<Faults[]>(url);
-  }
-
   //metodo obtencion datos grafica
   faultsDataFromRest(target:string, url:string) {
     this.http.get(url).subscribe(data=>{
