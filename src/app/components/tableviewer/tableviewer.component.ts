@@ -55,16 +55,16 @@ export class TableviewerComponent {
   //la contruccion y aporte de parametros para la consulta
   //Se apoya en un signal que es consumido en el componente sidebar.
   handleClick(index:number){
-    //this.isession.emit(this.rows[index].isessionnumber);
+   
     this.indexRow=index;
     
-    let fechaIni =  this.rows[index].ddate;
-    let fechaFin = this.rows[index].ddate;
-    let horaIni =  this.rows[index].htime;
-    let horaFin = this.rows[index].htime;
-    let turno = this.rows[index].sshift;
-    let programa = this.rows[index].sexploitationplan;
-    let maquina = this.rows[index].imachineid;
+    let fechaIni =  this.rows[index].fecha;
+    let fechaFin = this.rows[index].fecha;
+    let horaIni =  this.rows[index].hora;
+    let horaFin = this.rows[index].hora;
+    let turno = this.rows[index].turno;
+    let programa = this.rows[index].programa;
+    let maquina = this.rows[index].machineid;
     let maquina1:boolean = false;
     let maquina2:boolean= false;
     if (maquina==4) maquina1=true;

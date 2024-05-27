@@ -14,8 +14,8 @@ export class QuerierComponent {
 
   constructor(){
   this.urlBase= configuraciones.urlBase;
-  this.urlForTop1=this.urlBase+"api/sessions/machine/4";
-  this.urlForTop2 =this.urlBase+"api/sessions/machine/5";
+  this.urlForTop1=this.urlBase+"api/sessionsQuerier/machine/4";
+  this.urlForTop2 =this.urlBase+"api/sessionsQuerier/machine/5";
   }
 
 }
