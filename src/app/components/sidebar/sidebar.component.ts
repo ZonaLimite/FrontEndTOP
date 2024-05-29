@@ -2,7 +2,7 @@ import { Component, Input , Output, EventEmitter, OnInit, OnDestroy, WritableSig
 import { QueryParam } from '../../models/queryParam';
 import { ApiFaults } from '../../models/apiFaults';
 import { misignal } from '../tableviewer/tableviewer.component';
-
+import moment from 'moment-timezone';
 
 
 //Estructura para albergar value y label datos del select
@@ -64,8 +64,36 @@ export class SidebarComponent implements OnInit,OnDestroy {
 
   //Al pulsar el Submit del formulario emite el QueryParam
   onSubmit(){
+    //Hacemos aqui la conversion de fechas y horas time Zone hacia UTC+0
+    //que es enl aque esta fijada la base de datos
+    // --->
+    let fechaIni = this.formQuerySignal().fechaIni;
+    let fechaFin = this.formQuerySignal().fechaFin;
+    let horaIni =  this.formQuerySignal().horaIni
+    let horaFin = this.formQuerySignal().horaFin;
+
+    if(horaIni !="" && fechaIni!=""){
+      let maskMoment = fechaIni + " " + horaIni;
+      var m = moment.tz(maskMoment, "YYYY/MM/DD HH:mm:ss", "Europe/Madrid");
+
+      let newHoraIni = m.clone().utc().format("HH:mm:ss");
+      let newHoraFin = newHoraIni;
+      let newFechaIni = m.clone().utc().format("YYYY/MM/DD");
+      let newFechaFin = newFechaIni;
+      //---> NO podemo scambiar el valor de campo del formulario.
+      //Hay que crear campos nuevos para los campos fecha y hora de UTC+0
+      //ya que sino se cambia la hora en el formulario a cada peticion.
+      this.formQuerySignal().fechaIniUtc=newFechaIni;
+      this.formQuerySignal().fechaFinUtc=newFechaFin;
+      this.formQuerySignal().horaIniUtc=newHoraIni;
+      this.formQuerySignal().horaFinUtc=newHoraFin;
+
+      console.log("FechaIni = " + this.formQuerySignal().fechaIni); 
+      console.log("HoraIni" + this.formQuerySignal().horaIni); 
+    }
+
     this.eventSubmitQuery.emit(this.formQuerySignal());
-    console.info("QueryParam :"+this.formQuerySignal())
+    console.info(this.formQuerySignal())
   }
 
   onAutorefreshChange(event:any){

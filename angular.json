@@ -68,7 +68,7 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "port": 4200,
-            "host": "localhost"
+            "host": "21.4.1.2"
           },
           "configurations": {
             "production": {

@@ -55,9 +55,9 @@ export class FallosComponent implements OnInit {
     this.verMaquina2=filter.maquina2;
     
     this.urlCommon=configuraciones.urlBase + filter.apiFault.faultApi+"?";
-    
-    if(filter.fechaIni != "" ) this.urlCommon += "fecha='"+filter.fechaIni+"' AND '"+filter.fechaFin+"'";
-    if(filter.horaIni != "") this.urlCommon += "&hora='"+filter.horaIni+"' AND '"+filter.horaFin+"'";
+  
+    if(filter.fechaIni != "" ) this.urlCommon += "fecha='"+filter.fechaIniUtc+"' AND '"+filter.fechaFinUtc+"'";
+    if(filter.horaIni != "") this.urlCommon += "&hora='"+filter.horaIniUtc+"' AND '"+filter.horaFinUtc+"'";
 
     if(filter.turno !="")  this.urlCommon += "&turno="+filter.turno;
     if(filter.programa != "")  this.urlCommon += "&programa="+filter.programa;

@@ -6,7 +6,7 @@ import { ApiFaults } from '../../models/apiFaults';
 
 
 //Exportar un signal para los sidebar
-export var misignal = signal<QueryParam>(new QueryParam("","","","","","",true, true,new ApiFaults("","",[]),""));
+export var misignal = signal<QueryParam>(new QueryParam("","","","","","",true, true,new ApiFaults("","",[]),"","","","",""));
 
 @Component({
   selector: 'tableviewer',
@@ -41,7 +41,11 @@ export class TableviewerComponent {
         this.resultsetService.resultsetFromRest(this.urlRest).subscribe(
           {
             next: (result) => {
-              this.rows = result;
+              if(result==null){
+                this.rows=[];  
+              }else{
+                this.rows = result;                
+              }
             }  ,
             error: (e) => console.error(e)/*,
             complete: () => /*console.info('complete') */
@@ -70,7 +74,7 @@ export class TableviewerComponent {
     if (maquina==4) maquina1=true;
     if (maquina==5) maquina2=true;
 
-    let paramQuerySidebar = new QueryParam(fechaIni,fechaFin,horaIni,horaFin,turno,programa,maquina1,maquina2,new ApiFaults('ETACS','api/faults/ejGroupBy',[]),"");
+    let paramQuerySidebar = new QueryParam(fechaIni,fechaFin,horaIni,horaFin,turno,programa,maquina1,maquina2,new ApiFaults('ETACS','api/faults/ejGroupBy',[]),"","","","","");
     
     misignal.set(paramQuerySidebar);//set signal value
  
