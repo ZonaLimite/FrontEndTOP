@@ -66,22 +66,27 @@ export class SidebarComponent implements OnInit,OnDestroy {
   onSubmit(){
     //Hacemos aqui la conversion de fechas y horas time Zone hacia UTC+0
     //que es enl aque esta fijada la base de datos
-    // --->
+    // Resetemos valores previos
+    this.formQuerySignal().fechaIniUtc="";
+    this.formQuerySignal().fechaFinUtc="";
+    this.formQuerySignal().horaIniUtc="";
+    this.formQuerySignal().horaFinUtc="";
+
     let fechaIni = this.formQuerySignal().fechaIni;
     let fechaFin = this.formQuerySignal().fechaFin;
     let horaIni =  this.formQuerySignal().horaIni
     let horaFin = this.formQuerySignal().horaFin;
-
+    //Con la libreria moment.js instanciamos un moment de zona horaria Madrid
     if(horaIni !="" && fechaIni!=""){
       let maskMoment = fechaIni + " " + horaIni;
       var m = moment.tz(maskMoment, "YYYY/MM/DD HH:mm:ss", "Europe/Madrid");
-
+      // y luego la pasamos a zona UTC+0 que es la que utiliza la base de datos
       let newHoraIni = m.clone().utc().format("HH:mm:ss");
       let newHoraFin = newHoraIni;
       let newFechaIni = m.clone().utc().format("YYYY/MM/DD");
       let newFechaFin = newFechaIni;
-      //---> NO podemo scambiar el valor de campo del formulario.
-      //Hay que crear campos nuevos para los campos fecha y hora de UTC+0
+      
+      //Se han creado nuevos campos para los campos fecha y hora de UTC+0
       //ya que sino se cambia la hora en el formulario a cada peticion.
       this.formQuerySignal().fechaIniUtc=newFechaIni;
       this.formQuerySignal().fechaFinUtc=newFechaFin;
@@ -90,6 +95,11 @@ export class SidebarComponent implements OnInit,OnDestroy {
 
       console.log("FechaIni = " + this.formQuerySignal().fechaIni); 
       console.log("HoraIni" + this.formQuerySignal().horaIni); 
+    }else{
+      this.formQuerySignal().fechaIniUtc=this.formQuerySignal().fechaIni;
+      this.formQuerySignal().fechaFinUtc=this.formQuerySignal().fechaFin;
+      this.formQuerySignal().horaIniUtc=this.formQuerySignal().horaIni;
+      this.formQuerySignal().horaFinUtc=this.formQuerySignal().horaFin;
     }
 
     this.eventSubmitQuery.emit(this.formQuerySignal());
