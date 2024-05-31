@@ -77,7 +77,7 @@ export class TableviewerComponent {
       {
         next: (result) => {
           if(result==null){
-            //logger.set("Recibido null ... " + this.urlRest);//set signal value
+            logger.set("Recibido null ... " + this.urlRest);//set signal value
             //this.rows=[];  
           }else{
             this.rows = result;                
@@ -86,8 +86,8 @@ export class TableviewerComponent {
         error: (e) => {
           logger.set("Error resultService ... " + this.urlRest)//set signal value
           console.log(e);
-        }/*,  
-        complete: () =>  //logger.set(" Completado servicio ... " + this.urlRest)//set signal value*/
+        }/**,  
+        complete: () =>  //logger.set(" Completado servicio ... " + this.urlRest)//set signal value**/
     });
   }
 }

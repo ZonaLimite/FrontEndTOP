@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { logger } from '../components/tableviewer/tableviewer.component';
 
 interface Faults{
   name: string;
@@ -37,19 +37,35 @@ export class GraficasService {
 
   //metodo obtencion datos grafica
   faultsDataFromRest(target:string, url:string) {
-    this.http.get(url).subscribe(data=>{
-      switch ( target ) {
-        case 'Top1':
-          this.dataTop1=data as Faults[];
-          break;
-        case 'Top2':
-          this.dataTop2=data as Faults[];
-            break;
-        case 'Ambos':
-          this.dataAmbos=data as Faults[];
-            break;
-     }
+    this.http.get(url).subscribe(
+      {
+        next: (data) => {
+          if(data==null){
+            this.resetData();
+            logger.set("Recibido null graficaService ... " + target +" "+ url)//set signal value
+          }else{
+            switch ( target ) {
+              case 'Top1':
+                this.dataTop1=data as Faults[];
+                break;
+              case 'Top2':
+                this.dataTop2=data as Faults[];
+                  break;
+              case 'Ambos':
+                this.dataAmbos=data as Faults[];
+                  break;
+            }
+          }  
+          
+        },
+        error: (e) => {
+          logger.set("Error graficaService ... " + target +" "+ url)//set signal value
+          console.log(e);
+        }/**,  
+        complete: () =>  //logger.set(" Completado servicio ... " + this.urlRest)//set signal value**/
     });
+      
+     
 }
 
 }
