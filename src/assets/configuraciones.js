@@ -1,4 +1,4 @@
 var configuraciones = {
-    urlBase: 'http://21.4.1.2:8080/',
-    urlBaseEngine: 'http://21.4.1.2:8090/',
+    urlBase: 'http://192.168.1.5:8080/',
+    urlBaseEngine: 'http://192.168.1.5:8090/',
 }

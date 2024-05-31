@@ -7,6 +7,8 @@ import { ApiFaults } from '../../models/apiFaults';
 
 //Exportar un signal para los sidebar
 export var misignal = signal<QueryParam>(new QueryParam("","","","","","",true, true,new ApiFaults("","",[]),"","","","",""));
+//Exportar un signal para el footer
+export var logger = signal<string>("tableviewer arrancando");
 
 @Component({
   selector: 'tableviewer',
@@ -38,18 +40,7 @@ export class TableviewerComponent {
   
   setInterval(() =>{
       if(this.urlRest!=""){
-        this.resultsetService.resultsetFromRest(this.urlRest).subscribe(
-          {
-            next: (result) => {
-              if(result==null){
-                this.rows=[];  
-              }else{
-                this.rows = result;                
-              }
-            }  ,
-            error: (e) => console.error(e)/*,
-            complete: () => /*console.info('complete') */
-        });
+        this.requestService (this.urlRest);
       }
     }, 10000)
    
@@ -78,6 +69,26 @@ export class TableviewerComponent {
     
     misignal.set(paramQuerySidebar);//set signal value
  
+  }
+
+  private requestService (url : string){
+      //logger.set(" Requiriendo servicio ... " + this.urlRest);
+      this.resultsetService.resultsetFromRest(url).subscribe(
+      {
+        next: (result) => {
+          if(result==null){
+            //logger.set("Recibido null ... " + this.urlRest);//set signal value
+            //this.rows=[];  
+          }else{
+            this.rows = result;                
+          }
+        },
+        error: (e) => {
+          logger.set("Error resultService ... " + this.urlRest)//set signal value
+          console.log(e);
+        }/*,  
+        complete: () =>  //logger.set(" Completado servicio ... " + this.urlRest)//set signal value*/
+    });
   }
 }
 
