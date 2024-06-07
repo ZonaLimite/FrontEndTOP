@@ -38,6 +38,9 @@ export class FallosComponent implements OnInit {
   public listItemsConcepto:ApiFaults[]=
             [new ApiFaults('ETACS','api/faults/ejGroupBy',[]),
              new ApiFaults('FRACASOS ENTRADA','api/faults/etifGroupBy',[]),
+             new ApiFaults('FALLOS ELECTROIMAN','api/faults/uefGroupBy',[]),
+             new ApiFaults('CUBA MAL CERRADA','api/faults/bnpcGroupBy',[]),
+             new ApiFaults('CUBA MAL ABIERTA','api/faults/cnobGroupBy',[]),
             ];
 
   //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
