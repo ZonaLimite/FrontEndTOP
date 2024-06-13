@@ -73,28 +73,33 @@ export class SidebarComponent implements OnInit,OnDestroy {
     this.formQuerySignal().horaFinUtc="";
 
     let fechaIni = this.formQuerySignal().fechaIni;
-    let fechaFin = this.formQuerySignal().fechaFin;
     let horaIni =  this.formQuerySignal().horaIni
+    let fechaFin = this.formQuerySignal().fechaFin;
     let horaFin = this.formQuerySignal().horaFin;
     //Con la libreria moment.js instanciamos un moment de zona horaria Madrid
     if(horaIni !="" && fechaIni!=""){
-      let maskMoment = fechaIni + " " + horaIni;
-      var m = moment.tz(maskMoment, "YYYY/MM/DD HH:mm:ss", "Europe/Madrid");
+      let maskMomentIni = fechaIni + " " + horaIni;
+      var momentIni = moment.tz(maskMomentIni, "YYYY/MM/DD HH:mm:ss", "Europe/Madrid");
       // y luego la pasamos a zona UTC+0 que es la que utiliza la base de datos
-      let newHoraIni = m.clone().utc().format("HH:mm:ss");
-      let newHoraFin = newHoraIni;
-      let newFechaIni = m.clone().utc().format("YYYY/MM/DD");
-      let newFechaFin = newFechaIni;
-      
+      let newFechaIni = momentIni.clone().utc().format("YYYY/MM/DD");
+      let newHoraIni = momentIni.clone().utc().format("HH:mm:ss");
+
+      let maskMomentFin = fechaFin + " " + horaFin;
+      var momentFin = moment.tz(maskMomentFin, "YYYY/MM/DD HH:mm:ss", "Europe/Madrid");
+      // y luego la pasamos a zona UTC+0 que es la que utiliza la base de datos
+      let newFechaFin = momentFin.clone().utc().format("YYYY/MM/DD");
+      let newHoraFin = momentFin.clone().utc().format("HH:mm:ss");
+
       //Se han creado nuevos campos para los campos fecha y hora de UTC+0
       //ya que sino se cambia la hora en el formulario a cada peticion.
       this.formQuerySignal().fechaIniUtc=newFechaIni;
-      this.formQuerySignal().fechaFinUtc=newFechaFin;
       this.formQuerySignal().horaIniUtc=newHoraIni;
+
+      this.formQuerySignal().fechaFinUtc=newFechaFin;
       this.formQuerySignal().horaFinUtc=newHoraFin;
 
-      console.log("FechaIni = " + this.formQuerySignal().fechaIni); 
-      console.log("HoraIni" + this.formQuerySignal().horaIni); 
+      console.log("Rango busqueda Ini = " + this.formQuerySignal().fechaIni+ " " + this.formQuerySignal().horaIni); 
+      console.log("Rango busqueda Fin = " + this.formQuerySignal().fechaFin+ " " + this.formQuerySignal().horaFin); 
     }else{
       this.formQuerySignal().fechaIniUtc=this.formQuerySignal().fechaIni;
       this.formQuerySignal().fechaFinUtc=this.formQuerySignal().fechaFin;

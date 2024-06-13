@@ -37,6 +37,7 @@ export class GraficasService {
 
   //metodo obtencion datos grafica
   faultsDataFromRest(target:string, url:string) {
+    logger.set("Solicitando consulta en graficaService ... " + target )//set signal value
     this.http.get(url).subscribe(
       {
         next: (data) => {
@@ -55,14 +56,15 @@ export class GraficasService {
                 this.dataAmbos=data as Faults[];
                   break;
             }
+            logger.set("");
           }  
           
         },
         error: (e) => {
           logger.set("Error graficaService ... " + target +" "+ url)//set signal value
           console.log(e);
-        }/**,  
-        complete: () =>  //logger.set(" Completado servicio ... " + this.urlRest)//set signal value**/
+        },/** 
+        complete: () =>  logger.set("")//set signal value**/
     });
       
      
