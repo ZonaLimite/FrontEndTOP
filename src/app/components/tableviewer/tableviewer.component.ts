@@ -64,8 +64,10 @@ export class TableviewerComponent {
     let maquina2:boolean= false;
     if (maquina==4) maquina1=true;
     if (maquina==5) maquina2=true;
+    let copyApiFaults:ApiFaults = misignal().apiFault;
 
-    let paramQuerySidebar = new QueryParam(fechaIni,fechaFin,horaIni,horaFin,turno,programa,maquina1,maquina2,new ApiFaults('ETACS','api/faults/ejGroupBy',[]),"","","","","");
+    //let paramQuerySidebar = new QueryParam(fechaIni,fechaFin,horaIni,horaFin,turno,programa,maquina1,maquina2,new ApiFaults('ETACS','api/faults/ejGroupBy',[]),"","","","","");
+    let paramQuerySidebar = new QueryParam(fechaIni,fechaFin,horaIni,horaFin,turno,programa,maquina1,maquina2,copyApiFaults,"","","","","");
     
     misignal.set(paramQuerySidebar);//set signal value
  

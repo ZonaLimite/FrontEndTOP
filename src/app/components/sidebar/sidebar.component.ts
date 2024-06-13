@@ -47,7 +47,7 @@ export class SidebarComponent implements OnInit,OnDestroy {
       //cuando el signal cambia
       this.tempApiFaults = this.formQuerySignal().apiFault;
       //me selecciona el primer item del combo
-      this.formQuerySignal().apiFault=this.listItemsCombo[0];
+      //this.formQuerySignal().apiFault=this.listItemsCombo[0];
     });
 
     this.title="Un formulario para Querys";
