@@ -1,0 +1,39 @@
+<div class="linea-container">
+   
+   <!-- MODO COORDENADAS (Posicionamiento Absoluto) -->
+  <div class="modulos-coords-wrapper" 
+       *ngIf="modoCoords"
+       [ngStyle]="getLineaStyleCoords()">
+    
+    <!-- Grid de fondo para referencia visual (opcional) -->
+    <!--<div class="grid-background"></div>-->
+    
+    <!-- Renderizar cada módulo en sus coordenadas -->
+    <div *ngFor="let moduloCoords of modulosCoordsConfig" 
+         [ngStyle]="getModuloStyleCoords(moduloCoords)"
+         class="modulo-wrapper">
+      
+      
+      <!-- Módulo tipo Coords -->
+      <app-modulo-transporte-coords 
+        [config]="moduloCoords.config">
+      </app-modulo-transporte-coords>
+      
+      <!-- Marcador de posición (opcional, para debugging) -->
+      <div class="position-marker" 
+           title="X: {{moduloCoords.x}}%, Y: {{moduloCoords.y}}%">
+      </div>
+    </div>
+  </div>
+  <div class="colConnection">
+    <!-- Estado de conexión -->
+    <div>{{ ws.estadoTexto() }}</div>
+    <div> Mensajes: {{ ws.mensajesRecibidos() }} | Tracking: {{ ws.trackingRecibidos() }}</div>
+
+    <button (click)="conectar()"   *ngIf="!ws.conectado()">Conectar</button>
+    <button (click)="desconectar()" *ngIf="ws.conectado()">Desconectar</button>
+    <button (click)="linkarTop()"  *ngIf="ws.conectado() && !ws.linkedTop()">Link TOP</button>
+  </div>
+
+
+</div>

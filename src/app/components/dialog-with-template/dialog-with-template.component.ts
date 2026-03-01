@@ -4,6 +4,7 @@ import { DialogWithTemplateData } from '../../models/dialog-with-template-data.m
 
 @Component({
   selector: 'app-dialog-with-template',
+  standalone: false,
   templateUrl: './dialog-with-template.component.html',
   styleUrl: './dialog-with-template.component.css'
 })

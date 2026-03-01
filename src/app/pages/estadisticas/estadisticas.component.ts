@@ -12,6 +12,7 @@ declare var configuraciones: any;
 
 @Component({
   selector: 'app-estadisticas',
+  standalone: false,
   templateUrl: './estadisticas.component.html',
   styleUrl: './estadisticas.component.css'
 })

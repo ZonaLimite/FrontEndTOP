@@ -1,0 +1,37 @@
+<div class="modulo-container" [class.orientacion-horizontal]="config.orientacion === 'horizontal'"
+     [class.orientacion-vertical]="config.orientacion === 'vertical'">
+  
+  <!-- Etiqueta del módulo -->
+  <div class="modulo-header">
+    <h4 class="modulo-titulo">{{ config.nombre }}</h4>
+    <span class="modulo-id">ID: {{ config.id }}</span>
+  </div>
+
+  <!-- Grid de fotocélulas -->
+  <div [ngStyle]="getGridStyle()">
+    
+    <!-- Renderizar cada fotocélula en su posición de grid -->
+    <div *ngFor="let fotocelulaConfig of config.fotocelulas" 
+         [ngStyle]="getFotocelulaGridStyle(fotocelulaConfig)"
+         class="fotocelula-cell">
+      
+      <app-fotocelula
+        [nombreFotocelula]="fotocelulaConfig.nombre"
+        [tamano]="fotocelulaConfig.tamano || 'normal'"
+        [ocultado]="false"
+        [orientacion]="fotocelulaConfig.orientacion || 'column'">
+      </app-fotocelula>
+      
+    </div>
+
+  </div>
+
+  <!-- Footer con información -->
+  <div class="modulo-footer">
+    <span class="info-text">
+      {{ config.fotocelulas.length }} fotocélula(s) | 
+      Grid: {{ config.gridRows }}x{{ config.gridColumns }}
+    </span>
+  </div>
+
+</div>

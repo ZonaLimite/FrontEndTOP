@@ -4,6 +4,7 @@ import { GLOBAL } from '../../services/global';
 declare var configuraciones: any;
 @Component({
   selector: 'app-querier',
+  standalone: false,
   templateUrl: './querier.component.html',
   styleUrl: './querier.component.css'
 })

@@ -14,6 +14,7 @@ declare var configuraciones: any;
 
 @Component({
   selector: 'app-fallos',
+  standalone: false,
   templateUrl: './fallos.component.html',
   styleUrl: './fallos.component.css'
 })

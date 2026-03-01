@@ -10,6 +10,7 @@ interface Faults{
 
 @Component({
   selector: 'grafica',
+  standalone: false,
   templateUrl: './grafica.component.html',
   styleUrl: './grafica.component.css'
 })

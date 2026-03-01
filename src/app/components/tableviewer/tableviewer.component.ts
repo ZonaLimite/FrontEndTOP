@@ -10,6 +10,7 @@ export var misignal = signal<QueryParam>(new QueryParam("","","","","","",true, 
 
 @Component({
   selector: 'tableviewer',
+  standalone: false,
   templateUrl: './tableviewer.component.html',
   styleUrl: './tableviewer.component.css'
 })

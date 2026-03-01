@@ -1,11 +1,118 @@
 <div id="contenido" class="col-lg-10 col-lg-offset-2">
     <div id="cabecera">HERRAMIENTA MANTENIMIENTO TOP 2000</div>
 
-        <img  id="image" src="assets/images/Top2000.png">
+    <img id="image" src="assets/images/Top2000.png">
+
 </div>
+
+    <!-- Demo Fotocélulas -->
+    <div class="demo-fotocelulas">
+        <h4>Demo Componente Fotocélula - Secuencia</h4>
+        <div class="fotocelulas-row">
+            
+            <div class="fotocelulas-modulo1">
+                
+                <div class="fotocelula-demo">
+                    <app-fotocelula #fcEventDemo3
+                        [nombreFotocelula]="'EXT-B2'" 
+                        [ocultado]="fotocelula2Ocultada"
+                        [tamano]="'pequeno'">
+                    </app-fotocelula>
+                </div>
+                <div class="fotocelula-demo">
+                    <app-fotocelula #fcEventDemo2
+                        [nombreFotocelula]="'EXT-B3'" 
+                        [ocultado]="fotocelula3Ocultada"
+                        [tamano]="'pequeno'">
+                    </app-fotocelula>
+                </div>
+                <div class="fotocelula-demo"> 
+                    <app-fotocelula #fcEventDemo1
+                        [nombreFotocelula]="'EXT-B4'" 
+                        [ocultado]="fotocelula4Ocultada"
+                        [tamano]="'pequeno'">
+                    </app-fotocelula>
+                </div>
+            </div>
+           
+            <div class="fotocelulas-modulo1">
+                <span class="linea-modulo">
+                    <div class="fotocelula-demo">
+                        <app-fotocelula #fcEventDemo3
+                            [nombreFotocelula]="'EXT-B2'" 
+                            [ocultado]="fotocelula2Ocultada"
+                            [tamano]="'pequeno'">
+                        </app-fotocelula>
+                    </div>
+                    <div class="fotocelula-demo">
+                        <app-fotocelula #fcEventDemo2
+                            [nombreFotocelula]="'EXT-B3'" 
+                            [ocultado]="fotocelula3Ocultada"
+                            [tamano]="'pequeno'">
+                        </app-fotocelula>
+                      
+                    </div>
+                    <div class="fotocelula-demo"> 
+                        <app-fotocelula #fcEventDemo1
+                            [nombreFotocelula]="'EXT-B4'" 
+                            [ocultado]="fotocelula4Ocultada"
+                            [tamano]="'pequeno'">
+                        </app-fotocelula>
+                    </div>
+                </span>    
+
+                <span class="linea-modulo">
+                    <div class="fotocelula-demo">
+                        <app-fotocelula #fcEventDemo3
+                            [nombreFotocelula]="'EXT-B2'" 
+                            [ocultado]="fotocelula2Ocultada"
+                            [tamano]="'pequeno'">
+                        </app-fotocelula>
+                    </div>
+                    <div class="fotocelula-demo">
+                        <app-fotocelula #fcEventDemo2
+                            [nombreFotocelula]="'EXT-B3'" 
+                            [ocultado]="fotocelula3Ocultada"
+                            [tamano]="'pequeno'">
+                        </app-fotocelula>
+                      
+                    </div>
+                    <div class="fotocelula-demo"> 
+                        <app-fotocelula #fcEventDemo1
+                            [nombreFotocelula]="'EXT-B4'" 
+                            [ocultado]="fotocelula4Ocultada"
+                            [tamano]="'pequeno'">
+                        </app-fotocelula>
+                    </div>
+                </span>
+            </div>
+
+        </div>
+        
+
+
+        <button class="btn-secuencia" (click)="hazSecuenciaDeLos4Leds()">▶ Iniciar Secuencia</button>
+        
+        <div class="event-controls">
+            <h5>Prueba de Eventos (FC-004):</h5>
+            <div class="event-buttons"> 
+                <button class="btn-event atiempo" (click)="fcEventDemo1.mostrarEvento('adelanto')">✅ A Tiempo</button>
+                <button class="btn-event retraso" (click)="fcEventDemo2.mostrarEvento('retraso')">🐢 Retraso</button>
+                <button class="btn-event adelanto" (click)="fcEventDemo3.mostrarEvento('adelanto')">🐇 Adelanto</button>
+            </div>
+        </div>
+        <div class="event-controls">
+            <h5>Prueba de ocultacion (FC-004):</h5>
+            <div class="event-buttons"> 
+                <button class="btn-event atiempo" (click)="fcEventDemo1.ocultado=!fcEventDemo1.ocultado">✅ A Tiempo</button>
+            </div>
+        </div>
+
+
+    </div>
+
     
    
 
- 
 
 

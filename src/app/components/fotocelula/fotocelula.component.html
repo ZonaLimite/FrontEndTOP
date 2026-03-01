@@ -1,0 +1,21 @@
+<div class="fotocelula-container" [ngClass]="'size-' + tamano">
+  <!-- Indicadores de Evento (Múltiples) -->
+  <div *ngFor="let evento of eventosActivos" 
+       class="event-indicator active" 
+       [class]="evento.tipo">
+    <span *ngIf="evento.tipo === 'atiempo'" >✅</span>
+    <span *ngIf="evento.tipo === 'retraso'" >🐢</span>
+    <span *ngIf="evento.tipo === 'adelanto'" >🐇</span>
+    <span *ngIf="evento.tipo === 'apparition'" >👻</span>
+    <span *ngIf="evento.tipo === 'desaparicion'" >❓</span>
+  </div>
+
+  <div class="fotocelula-body" [ngStyle]="{'flex-direction': orientacion}">
+    <!-- LED Verde - Siempre visible -->
+    <div class="led led-green" [class.led-on]="true"></div>
+    
+    <!-- LED Rojo - Solo visible cuando NO está ocultado (ve el emisor) -->
+    <div class="led led-red" [class.led-on]="ocultado"></div>
+  </div>
+  <span class="fotocelula-label">{{ nombreFotocelula }}</span>
+</div>

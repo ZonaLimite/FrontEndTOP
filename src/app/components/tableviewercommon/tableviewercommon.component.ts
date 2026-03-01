@@ -15,6 +15,7 @@ import { ApiFaults } from '../../models/apiFaults';
 
 @Component({
   selector: 'tableviewercommon',
+  standalone: false,
   templateUrl: './tableviewercommon.component.html',
   styleUrl: './tableviewercommon.component.css'
 })

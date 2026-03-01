@@ -1,0 +1,47 @@
+<div class="modulo-container" [class.orientacion-horizontal]="config.orientacion === 'horizontal'"
+     [class.orientacion-vertical]="config.orientacion === 'vertical'">
+  
+  <!-- Etiqueta del módulo 
+  <div class="modulo-header">
+    <h4 class="modulo-titulo">{{ config.nombre }}</h4>
+    <span class="modulo-id">ID: {{ config.id }}</span>
+  </div>-->
+
+  <!-- Área de fotocélulas con posicionamiento absoluto -->
+  <!--<div class="modulo-area" [ngStyle]="getModuloStyle()"></div>-->
+  <div [ngStyle]="getModuloStyle()">
+    
+    <!-- Grid de fondo para referencia visual (opcional) -->
+    <!--<div class="grid-background"></div>-->
+    
+    <!-- Renderizar cada fotocélula en sus coordenadas -->
+    <div *ngFor="let fotocelulaConfig of config.fotocelulas" 
+         [ngStyle]="getFotocelulaStyle(fotocelulaConfig)"
+         class="fotocelula-wrapper">
+      
+      <!-- ✅ fotocelulaId, moduloId y moduloNombre correctamente enlazados -->
+      <app-fotocelula
+        [fotocelulaId]="fotocelulaConfig.id"
+        [nombreFotocelula]="fotocelulaConfig.nombre"
+        [moduloId]="config.id"
+        [moduloNombre]="config.nombre"
+        [tamano]="fotocelulaConfig.tamano || 'normal'"
+        [ocultado]="false"
+        [orientacion]="fotocelulaConfig.orientacion || 'column'">
+      </app-fotocelula>
+      
+      <!-- Marcador de posición (opcional, para debugging) -->
+      <div class="position-marker" title="X: {{fotocelulaConfig.x}}%, Y: {{fotocelulaConfig.y}}%"></div>
+      
+    </div>
+
+  </div>
+
+  <!-- Footer con información -->
+  <div class="modulo-footer">
+    <span class="info-text">
+     {{config.id}} 
+     </span>
+  </div>
+
+</div>

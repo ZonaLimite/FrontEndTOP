@@ -13,6 +13,7 @@ declare var configuraciones: any;
 
 @Component({
   selector: 'app-chat',
+  standalone: false,
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css'
 })

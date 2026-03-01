@@ -25,6 +25,12 @@ import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { QuerierComponent } from './components/querier/querier.component';
+import { FotocelulaComponent } from './components/fotocelula/fotocelula.component';
+
+//Componentes de Módulos de Transporte
+import { ModuloTransporteGridComponent } from './components/modulo-transporte-grid/modulo-transporte-grid.component';
+import { ModuloTransporteCoordsComponent } from './components/modulo-transporte-coords/modulo-transporte-coords.component';
+import { LineaTransporteComponent } from './components/linea-transporte/linea-transporte.component';
 
 //Componentes as Pages
 import { HomeComponent } from './pages/home/home.component';
@@ -38,6 +44,8 @@ import { ChatComponent } from './components/chat/chat.component';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { DialogWithTemplateComponent } from './components/dialog-with-template/dialog-with-template.component';
 import { TableViewerCommonComponent } from './components/tableviewercommon/tableviewercommon.component';
+import { DemoModulosComponent } from './pages/demo-modulos/demo-modulos.component';
+import { EstadisticasEventosComponent } from './components/estadisticas-eventos/estadisticas-eventos.component';
 
 @NgModule({
   declarations: [
@@ -56,6 +64,13 @@ import { TableViewerCommonComponent } from './components/tableviewercommon/table
     ChatComponent,
     DialogWithTemplateComponent,
     TableViewerCommonComponent,
+    FotocelulaComponent,
+    ModuloTransporteGridComponent,
+    ModuloTransporteCoordsComponent,
+    LineaTransporteComponent,
+    DemoModulosComponent,
+    EstadisticasEventosComponent,
+    EstadisticasEventosComponent
   ],
   imports: [
     BrowserModule,
@@ -67,7 +82,7 @@ import { TableViewerCommonComponent } from './components/tableviewercommon/table
     MatDialogModule,
     MatInputModule,
     ReactiveFormsModule,
-    MatSelectModule
+    MatSelectModule  
   ],
   providers: [ResultsetService, provideAnimationsAsync()],
   bootstrap: [AppComponent]

@@ -20,3 +20,141 @@
     text-align: center;
     color: aqua;
   }
+
+  /* Demo Fotocélulas */
+  .demo-fotocelulas {
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    width: 100%;
+  }
+
+  .demo-fotocelulas h4 {
+    color: #00ffff;
+    margin-bottom: 15px;
+  }
+
+  .linea-modulo {
+    display: flex;
+    flex-direction: row ;
+    width: 50%;
+    color: #00ffff;
+    font-weight: bold;
+  }
+
+  .fotocelulas-row {
+    display: flex;
+    float: none;
+    width: 100%;
+    justify-content: center;
+    gap: 2px;
+  }
+
+  .fotocelulas-modulo1 {
+    display: flex;
+    flex-direction: row ;
+    align-items: center;
+    padding: 2px;
+    border: 1px solid #00ffff ;
+  }
+
+  .fotocelula-demo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 2px;
+  }
+
+  .fotocelula-demo button {
+    padding: 6px 12px;
+    background: #333;
+    color: #ccc;
+    border: 1px solid #555;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    transition: all 0.2s;
+  }
+
+  .fotocelula-demo button:hover {
+    background: #444;
+    border-color: #00ffff;
+    color: #00ffff;
+  }
+
+  .size-label {
+    font-size: 10px;
+    color: #666;
+    text-transform: uppercase;
+  }
+
+  .btn-secuencia {
+    margin-top: 20px;
+    padding: 10px 24px;
+    background: linear-gradient(145deg, #1a5a1a, #0d3d0d);
+    color: #00ff00;
+    border: 1px solid #00aa00;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+  }
+
+  .btn-secuencia:hover {
+    background: linear-gradient(145deg, #2a7a2a, #1a5a1a);
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+  }
+
+  /* Controles de Eventos */
+  .event-controls {
+    margin-top: 25px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .event-controls h5 {
+    color: #aaa;
+    margin-bottom: 12px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .event-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-event {
+    padding: 8px 16px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background: #222;
+    color: #eee;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-event:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    background: #333;
+  }
+
+  .btn-event.atiempo:hover { border-color: #00ff00; color: #00ff00; }
+  .btn-event.retraso:hover { border-color: #ffcc00; color: #ffcc00; }
+  .btn-event.adelanto:hover { border-color: #00ccff; color: #00ccff; }
+  .btn-event.apparition:hover { border-color: #ff00ff; color: #ff00ff; }
+  .btn-event.desaparicion:hover { border-color: #ff3333; color: #ff3333; }

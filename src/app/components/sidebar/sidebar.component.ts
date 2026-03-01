@@ -13,6 +13,7 @@ interface apiFaults{
 
 @Component({
   selector: 'sidebar',
+  standalone: false,  
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })

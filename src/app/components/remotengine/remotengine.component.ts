@@ -22,6 +22,7 @@ declare var configuraciones: any;
 
 @Component({
   selector: 'app-remotengine',
+  standalone: false,
   templateUrl: './remotengine.component.html',
   styleUrl: './remotengine.component.css'
 })

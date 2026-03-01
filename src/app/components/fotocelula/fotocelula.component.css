@@ -1,0 +1,193 @@
+.fotocelula-container {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+  overflow: visible;
+  z-index: 1;
+}
+
+.fotocelula-body {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+  border-radius: 6px;
+  border: 1px solid #444;
+  box-shadow: 
+    inset 0 1px 0 rgba(255,255,255,0.05),
+    0 2px 4px rgba(0,0,0,0.3);
+}
+
+.led {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  /* Transición asimétrica: fade-out suave, encendido instantáneo */
+  /*transition: background 0.15s ease-out, box-shadow 0.15s ease-out, border 0.05s;*/
+  transition: none;
+}
+
+/* LED Verde */
+.led-green {
+  background: radial-gradient(circle at 30% 30%, #003300, #001a00);
+  border: 1px solid #002200;
+}
+
+.led-green.led-on {
+  background: radial-gradient(circle at 30% 30%, #66ff66, #00cc00 40%, #009900);
+  border: 1px solid #00aa00;
+  box-shadow: 
+    0 0 4px #00ff00,
+    0 0 8px #00ff00,
+    0 0 12px rgba(0, 255, 0, 0.5);
+  /* Encendido instantáneo */
+  transition: none;
+}
+
+/* LED Rojo */
+.led-red {
+  background: radial-gradient(circle at 30% 30%, #330000, #1a0000);
+  border: 1px solid #220000;
+  transition: none;
+}
+
+.led-red.led-on {
+  background: radial-gradient(circle at 30% 30%, #ff6666, #cc0000 40%, #990000);
+  border: 1px solid #aa0000;
+  box-shadow: 
+    0 0 4px #ff0000,
+    0 0 8px #ff0000,
+    0 0 12px rgba(255, 0, 0, 0.5);
+  /* Encendido instantáneo */
+  transition: none;
+}
+
+.fotocelula-label {
+  font-size: 10px;
+  color: #888;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ============ TAMAÑOS ============ */
+
+/* Pequeño - 8px */
+.size-pequeno .led {
+  width: 8px;
+  height: 8px;
+}
+.size-pequeno .led-green.led-on {
+  box-shadow: 0 0 3px #00ff00, 0 0 6px #00ff00, 0 0 9px rgba(0, 255, 0, 0.5);
+}
+.size-pequeno .led-red.led-on {
+  box-shadow: 0 0 3px #ff0000, 0 0 6px #ff0000, 0 0 9px rgba(255, 0, 0, 0.5);
+}
+.size-pequeno .fotocelula-body {
+  padding: 6px 10px;
+  gap: 4px;
+}
+.size-pequeno .fotocelula-label {
+  font-size: 8px;
+}
+
+/* Normal - 12px (por defecto) */
+.size-normal .led {
+  width: 12px;
+  height: 12px;
+}
+
+/* Mediano - 16px */
+.size-mediano .led {
+  width: 16px;
+  height: 16px;
+}
+.size-mediano .led-green.led-on {
+  box-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 15px rgba(0, 255, 0, 0.5);
+}
+.size-mediano .led-red.led-on {
+  box-shadow: 0 0 5px #ff0000, 0 0 10px #ff0000, 0 0 15px rgba(255, 0, 0, 0.5);
+}
+.size-mediano .fotocelula-body {
+  padding: 10px 14px;
+  gap: 8px;
+}
+.size-mediano .fotocelula-label {
+  font-size: 11px;
+}
+
+/* Grande - 24px */
+.size-grande .led {
+  width: 24px;
+  height: 24px;
+}
+.size-grande .led-green.led-on {
+  box-shadow: 0 0 6px #00ff00, 0 0 12px #00ff00, 0 0 20px rgba(0, 255, 0, 0.6);
+}
+.size-grande .led-red.led-on {
+  box-shadow: 0 0 6px #ff0000, 0 0 12px #ff0000, 0 0 20px rgba(255, 0, 0, 0.6);
+}
+.size-grande .fotocelula-body {
+  padding: 12px 18px;
+  gap: 10px;
+}
+/* ============ EVENTOS DE TRACKING ============ */
+.event-indicator {
+  position: absolute;
+  top: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  font-weight: bold;
+  z-index: 10;
+  /* La animación controla la opacidad y el movimiento */
+}
+
+/* Estilos por botones de evento */
+/* Todos usan la misma animación base de flotar hacia arriba */
+.event-indicator.atiempo, 
+.event-indicator.retraso,
+.event-indicator.adelanto,
+.event-indicator.apparition {
+  animation: floatUpFade 2s ease-out forwards;
+}
+
+/* Opcional: Colores específicos para reforzar el mensaje */
+.event-indicator.atiempo { color: #00ff00; text-shadow: 0 0 5px rgba(0,255,0,0.5); }
+.event-indicator.retraso { color: #ffcc00; text-shadow: 0 0 5px rgba(255,204,0,0.5); }
+.event-indicator.adelanto { color: #00ccff; text-shadow: 0 0 5px rgba(0,204,255,0.5); }
+.event-indicator.apparition { color: #ff00ff; text-shadow: 0 0 5px rgba(255,0,255,0.5); }
+.event-indicator.desaparicion { color: #ff3333; text-shadow: 0 0 5px rgba(255,51,51,0.5); }
+.event-indicator.desaparicion { animation: floatUpFade 2s ease-out forwards; }
+
+/* Asegurar que el contenido respeta transformaciones si es necesario */
+.event-indicator span {
+    display: inline-block;
+}
+
+/* Ajuste de posición inicial según tamaño del componente */
+/* Iconos más grandes y centrados verticalmente SOBRE la fotocélula (parte superior) */
+.size-pequeno .event-indicator { top: -16px; font-size: 24px; }
+.size-normal .event-indicator { top: -18px; font-size: 32px; }
+.size-mediano .event-indicator { top: -22px; font-size: 40px; }
+.size-grande .event-indicator { top: -32px; font-size: 56px; }
+
+/* Animación de Ascenso y Desvanecimiento */
+@keyframes floatUpFade {
+  0% { 
+    /* Incluir translateX(-50%) para mantener centrado horizontal */
+    transform: translateX(-50%) translateY(0) scale(0.5); 
+    opacity: 0; 
+  }
+  10% {
+    transform: translateX(-50%) translateY(-10px) scale(1); 
+    opacity: 1; 
+  }
+  100% { 
+    transform: translateX(-50%) translateY(-100px) scale(1); 
+    opacity: 0; 
+  }
+}

@@ -1,0 +1,34 @@
+<div class="demo-container">
+  
+
+  <!-- ========================================
+       SECCIÓN 2: PATRÓN COORDENADAS
+       ======================================== -->
+  <section class="demo-section">
+      <app-estadisticas-eventos></app-estadisticas-eventos>
+      <app-linea-transporte
+          [modoCoords]="true"
+          [modulosCoordsConfig]="modulosLineaEntrada"
+          [anchoLinea]="1150"
+          [altoLinea]="300"
+          [titulo]="'LINEA-01'">
+
+      </app-linea-transporte>
+
+
+     <!-- Estadísticas y Controls -->
+  <div class="seccion-estadisticas">
+    <div class="controls">
+      <button (click)="simularEventosEnTodosModulos()" class="btn-simular">
+        🎲 Simular Evento Aleatorio
+      </button>
+      <button (click)="simularSeguimientoEnTodosModulos()" class="btn-simular">
+        🎲 Simular Seguimiento  
+      </button>
+
+    </div>
+  </div>
+
+  </section>
+
+</div>

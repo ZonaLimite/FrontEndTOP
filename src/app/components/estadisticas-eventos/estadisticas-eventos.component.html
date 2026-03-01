@@ -1,0 +1,116 @@
+<div class="estadisticas-container">
+
+  <!-- Panel de Filtros -->
+  <div class="panel-filtros">
+    <div class="filtros-contenedor">
+
+      <label *ngFor="let tipo of tiposEventos" class="filtro-label">
+        <input
+          type="checkbox"
+          [checked]="filtrosActivos()[tipo]"
+          (change)="toggleFiltro(tipo)">
+        <span class="filtro-nombre" [style.color]="getColorTipo(tipo)">
+          {{ tipo | uppercase }}
+        </span>
+      </label>
+
+      <button class="btn-pequeno" (click)="activarTodosFiltros()">✓ Todos</button>
+      <button class="btn-pequeno" (click)="desactivarTodosFiltros()">✗ Ninguno</button>
+
+      <button class="btn btn-limpiar" (click)="limpiarEstadisticas()" title="Borrar todas las estadísticas">
+        🔄 Limpiar Estadísticas
+      </button>
+
+      <button class="btn btn-exportar" (click)="exportarCSV()" title="Descargar como CSV">
+        📥 Descargar CSV
+      </button>
+
+      <button class="btn-historial" (click)="toggleHistorial()" title="Mostrar/Ocultar historial">
+        📜 {{ mostrarHistorial() ? 'Ocultar' : 'Mostrar' }} Historial
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Tabla de Estadísticas -->
+  <!-- Sin | async — estadisticasFiltradas() es un computed() Signal -->
+  <div class="tabla-contenedor">
+
+    <div *ngIf="estadisticasFiltradas().length === 0" class="tabla-vacia">
+      <p>No hay eventos registrados aún</p>
+    </div>
+
+    <table *ngIf="estadisticasFiltradas().length > 0" class="estadisticas-tabla-transversal">
+      <thead>
+        <tr class="tabla-encabezado-transversal">
+          <th class="columna-evento-tipo">Tipo de Evento</th>
+          <th
+            *ngFor="let fotocelula of estadisticasFiltradas()"
+            class="columna-fotocelula"
+            title="{{ fotocelula.moduloNombre }}">
+            <div class="encabezado-fotocelula">
+              <strong>{{ fotocelula.fotocelulaNombre }}</strong>
+            </div>
+          </th>
+          <!-- Columna TOTAL al extremo derecho -->
+          <th class="columna-total-header">TOTAL</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let tipo of tiposEventosFiltrados()" class="tabla-fila-transversal">
+
+          <td class="columna-evento-tipo">
+            <span class="evento-tipo-nombre" [style.color]="getColorTipo(tipo)">
+              ● {{ tipo | uppercase }}
+            </span>
+          </td>
+
+          <td
+            *ngFor="let fotocelula of estadisticasFiltradas()"
+            class="columna-valor-fotocelula"
+            [ngClass]="{
+              'evento-maximo-highlight': esEventoMaximo(fotocelula, tipo),
+              'intensidad-0': !esEventoMaximo(fotocelula, tipo) && fotocelula[tipo] === 0 && tipo !== 'atiempo',
+              'intensidad-1': !esEventoMaximo(fotocelula, tipo) && fotocelula[tipo] > 0   && fotocelula[tipo] <= 25 && tipo !== 'atiempo',
+              'intensidad-2': !esEventoMaximo(fotocelula, tipo) && fotocelula[tipo] > 25  && fotocelula[tipo] <= 50 && tipo !== 'atiempo',
+              'intensidad-3': !esEventoMaximo(fotocelula, tipo) && fotocelula[tipo] > 50  && fotocelula[tipo] <= 75 && tipo !== 'atiempo',
+              'intensidad-4': !esEventoMaximo(fotocelula, tipo) && fotocelula[tipo] > 75  && tipo !== 'atiempo'
+            }">
+            <span class="valor-numero">{{ fotocelula[tipo] }}</span>
+          </td>
+
+          <!-- Celda TOTAL: suma de este tipo en todas las fotocélulas visibles -->
+          <td class="columna-total-valor">
+            <span class="valor-total" [style.color]="getColorTipo(tipo)">
+              {{ getTotalPorTipo(tipo) }}
+            </span>
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Historial expandible -->
+  <div class="historial-seccion" *ngIf="mostrarHistorial()">
+    <div class="historial-header">
+      <h3>📜 Historial Completo de Eventos</h3>
+      <small>Últimos 50 eventos</small>
+    </div>
+
+    <div class="historial-lista">
+      <div *ngIf="historial().length === 0" class="historial-vacio">
+        No hay historial disponible
+      </div>
+      <div *ngFor="let evento of historial().slice(0, 50)" class="evento-item">
+        <span class="evento-timestamp">{{ evento.timestamp | date: 'HH:mm:ss' }}</span>
+        <span class="evento-modulo">{{ evento.moduloNombre }}</span>
+        <span class="evento-fotocelula">{{ evento.fotocelulaNombre }}</span>
+        <span class="evento-tipo" [style.color]="getColorTipo(evento.tipo)">
+          ● {{ evento.tipo | uppercase }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+</div>

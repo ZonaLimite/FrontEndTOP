@@ -1,0 +1,120 @@
+/* ========================================
+   CONTENEDOR PRINCIPAL DEL MÓDULO
+   ======================================== */
+
+.modulo-container {
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+  border: 2px solid #444;
+  border-radius: 12px;
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.modulo-container:hover {
+  border-color: #666;
+  box-shadow: 
+    0 6px 12px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Orientaciones específicas */
+.modulo-container.orientacion-horizontal {
+  border-left: 4px solid #00aaff;
+}
+
+.modulo-container.orientacion-vertical {
+  border-top: 4px solid #00ff88;
+}
+
+/* ========================================
+   HEADER DEL MÓDULO
+   ======================================== */
+
+.modulo-header {
+  background: linear-gradient(180deg, #333 0%, #282828 100%);
+  padding: 8px 16px;
+  border-bottom: 1px solid #444;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modulo-titulo {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #00aaff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.modulo-id {
+  font-size: 11px;
+  color: #888;
+  font-family: 'Courier New', monospace;
+}
+
+/* ========================================
+   GRID DE FOTOCÉLULAS
+   ======================================== */
+
+.modulo-grid {
+  background: 
+    linear-gradient(0deg, rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 20px 20px;
+  position: relative;
+}
+
+.fotocelula-cell {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.fotocelula-cell:hover {
+  background: rgba(0, 170, 255, 0.1);
+  border-color: rgba(0, 170, 255, 0.3);
+}
+
+/* ========================================
+   FOOTER DEL MÓDULO
+   ======================================== */
+
+.modulo-footer {
+  background: linear-gradient(180deg, #282828 0%, #1e1e1e 100%);
+  padding: 6px 16px;
+  border-top: 1px solid #444;
+  display: flex;
+  justify-content: center;
+}
+
+.info-text {
+  font-size: 10px;
+  color: #999;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+  .modulo-header {
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+  
+  .modulo-titulo {
+    font-size: 12px;
+  }
+}
