@@ -44,6 +44,9 @@
       <thead>
         <tr class="tabla-encabezado-transversal">
           <th class="columna-evento-tipo">Tipo de Evento</th>
+          <!-- Columna TOTAL -->
+          <th class="columna-total-header">TOTAL</th>
+
           <th
             *ngFor="let fotocelula of estadisticasFiltradas()"
             class="columna-fotocelula"
@@ -52,8 +55,6 @@
               <strong>{{ fotocelula.fotocelulaNombre }}</strong>
             </div>
           </th>
-          <!-- Columna TOTAL al extremo derecho -->
-          <th class="columna-total-header">TOTAL</th>
         </tr>
       </thead>
       <tbody>
@@ -62,6 +63,13 @@
           <td class="columna-evento-tipo">
             <span class="evento-tipo-nombre" [style.color]="getColorTipo(tipo)">
               ● {{ tipo | uppercase }}
+            </span>
+          </td>
+
+          <!-- Celda TOTAL: suma de este tipo en todas las fotocélulas visibles -->
+          <td class="columna-total-valor">
+            <span class="valor-total" [style.color]="getColorTipo(tipo)">
+              {{ getTotalPorTipo(tipo) }}
             </span>
           </td>
 
@@ -77,13 +85,6 @@
               'intensidad-4': !esEventoMaximo(fotocelula, tipo) && fotocelula[tipo] > 75  && tipo !== 'atiempo'
             }">
             <span class="valor-numero">{{ fotocelula[tipo] }}</span>
-          </td>
-
-          <!-- Celda TOTAL: suma de este tipo en todas las fotocélulas visibles -->
-          <td class="columna-total-valor">
-            <span class="valor-total" [style.color]="getColorTipo(tipo)">
-              {{ getTotalPorTipo(tipo) }}
-            </span>
           </td>
 
         </tr>
