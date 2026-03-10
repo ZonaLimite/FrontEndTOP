@@ -50,7 +50,7 @@
           <th
             *ngFor="let fotocelula of estadisticasFiltradas()"
             class="columna-fotocelula"
-            title="{{ fotocelula.moduloNombre }}">
+            title="{{ fotocelula.fotocelulaId }}">
             <div class="encabezado-fotocelula">
               <strong>{{ fotocelula.fotocelulaNombre }}</strong>
             </div>
@@ -105,7 +105,7 @@
       </div>
       <div *ngFor="let evento of historial().slice(0, 50)" class="evento-item">
         <span class="evento-timestamp">{{ evento.timestamp | date: 'HH:mm:ss' }}</span>
-        <span class="evento-modulo">{{ evento.moduloNombre }}</span>
+        <!--<span class="evento-modulo">{{ evento.moduloNombre }}</span> -->
         <span class="evento-fotocelula">{{ evento.fotocelulaNombre }}</span>
         <span class="evento-tipo" [style.color]="getColorTipo(evento.tipo)">
           ● {{ evento.tipo | uppercase }}

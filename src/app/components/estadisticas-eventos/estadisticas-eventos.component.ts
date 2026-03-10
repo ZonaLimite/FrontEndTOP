@@ -22,11 +22,13 @@ export class EstadisticasEventosComponent {
 
   /** Signal de filtros activos */
   filtrosActivos = signal<Record<TipoEvento, boolean>>({
+    activacion: false,
+    desactivacion: false,
     atiempo: true,
     retraso: true,
     adelanto: true,
     apparition: true,
-    desaparicion: true
+    desaparicion: true,
   });
 
   /** Signal para mostrar/ocultar historial */
@@ -67,7 +69,7 @@ export class EstadisticasEventosComponent {
    */
   totalesPorTipo = computed(() => {
     const totales: Record<TipoEvento, number> = {
-      atiempo: 0, retraso: 0, adelanto: 0, apparition: 0, desaparicion: 0
+      activacion:0, desactivacion:0, atiempo: 0, retraso: 0, adelanto: 0, apparition: 0, desaparicion: 0
     };
     for (const est of this.estadisticasFiltradas()) {
       for (const tipo of this.tiposEventos) {
@@ -122,6 +124,8 @@ export class EstadisticasEventosComponent {
 
   getColorTipo(tipo: TipoEvento): string {
     const colores: Record<TipoEvento, string> = {
+      activacion: '#00aa00',
+      desactivacion: '#00aa00',
       atiempo:      '#00aa00',
       retraso:      '#ffcc00',
       adelanto:     '#00ccff',

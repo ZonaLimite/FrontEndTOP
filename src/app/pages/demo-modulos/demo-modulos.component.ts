@@ -55,7 +55,7 @@ export class DemoModulosComponent implements OnInit {
       alto: 150,
       orientacion: 'horizontal',
       fotocelulas: [
-        { id: 'MRK-01', nombre: 'MRK-01', x: 85, y: 60, tamano: 'pequeno', orientacion: 'row' },
+        { id: 'MRK-B1', nombre: 'MRK-B1', x: 85, y: 60, tamano: 'pequeno', orientacion: 'row' },
         { id: 'TV-01', nombre: 'TV-01', x: 20, y: 60, tamano: 'pequeno', orientacion: 'row' },
       ]
     },
@@ -66,7 +66,7 @@ export class DemoModulosComponent implements OnInit {
       alto: 150,
       orientacion: 'horizontal',
       fotocelulas: [
-        { id: 'ADQ-01', nombre: 'ADQ-01', x: 83, y: 60, tamano: 'pequeno', orientacion: 'row' }
+        { id: 'Input_1', nombre: 'ADQ-01', x: 83, y: 60, tamano: 'pequeno', orientacion: 'row' }
       ]  
     },
     {
@@ -76,9 +76,9 @@ export class DemoModulosComponent implements OnInit {
       alto: 150,
       orientacion: 'horizontal',
       fotocelulas: [
-        { id: 'MER-01', nombre: 'MER-01', x: 83, y: 23, tamano: 'pequeno', orientacion: 'row' },
-        { id: 'MER-02', nombre: 'MER-02', x: 30, y: 60, tamano: 'pequeno', orientacion: 'row' },
-        { id: 'MER-03', nombre: 'MER-03', x: 83, y: 88, tamano: 'pequeno', orientacion: 'row' },
+        { id: 'MER-B2', nombre: 'MER-B2', x: 83, y: 23, tamano: 'pequeno', orientacion: 'row' },
+        { id: 'MER-B3', nombre: 'MER-B3', x: 30, y: 60, tamano: 'pequeno', orientacion: 'row' },
+        { id: 'MER-B1', nombre: 'MER-B1', x: 83, y: 88, tamano: 'pequeno', orientacion: 'row' },
       ]  
     },
     {
@@ -88,7 +88,7 @@ export class DemoModulosComponent implements OnInit {
       alto: 53,
       orientacion: 'horizontal',
       fotocelulas: [
-        { id: 'EXT-01', nombre: 'EXT-01', x: 88, y: 66, tamano: 'pequeno', orientacion: 'row' },
+        { id: 'EXT-B1', nombre: 'EXT-B1', x: 88, y: 66, tamano: 'pequeno', orientacion: 'row' },
       ]  
     },  
     {
@@ -98,7 +98,7 @@ export class DemoModulosComponent implements OnInit {
       alto: 120,
       orientacion: 'vertical',
       fotocelulas: [
-        { id: 'FED-01', nombre: 'FED-01', x: 50, y: 37, tamano: 'pequeno', orientacion: 'row' },
+        { id: 'FE1', nombre: 'FE1', x: 50, y: 37, tamano: 'pequeno', orientacion: 'row' },
       ]  
     },
     {
@@ -108,7 +108,7 @@ export class DemoModulosComponent implements OnInit {
       alto: 120,
       orientacion: 'vertical',
       fotocelulas: [
-        { id: 'FED-02', nombre: 'FED-02', x: 50, y: 30, tamano: 'pequeno', orientacion: 'row' },
+        { id: 'FE2', nombre: 'FE2', x: 50, y: 30, tamano: 'pequeno', orientacion: 'row' },
       ]  
     }
   ];
@@ -211,7 +211,7 @@ export class DemoModulosComponent implements OnInit {
 
   //Simular seguimiento de todas las fotocelulas
   simularSeguimientoEnTodosModulos() {  
-    const orderFotocelulas : string[] = ['FED-02','EXT-01','MER-01','MER-02','ADQ-01','MRK-01','TV-01','CUL-B1','CUL-B3','CUL-B5','INJ-B1','INJ-B2','INJ-B3'];
+    const orderFotocelulas : string[] = ['FE2','EXT-B1','MER-B2','MER-B3','Input_1','MRK-B1','TV-B1','CUL-B1','CUL-B3','CUL-B5','INJ-B1','INJ-B2','INJ-B3'];
 
     orderFotocelulas.forEach((fotocelulaId, index) => {
       setTimeout(() => {
@@ -230,7 +230,6 @@ export class DemoModulosComponent implements OnInit {
       fotocelulaId: string){
         this.lineasTransporte.first.modulosCoordsComponents.forEach(modulo =>
           modulo.getAllFotocelulas().forEach(fc => { 
-            console.log(`Simulando evento en modulo ${modulo.getNombreModulo()} fotocélula ${fc.fotocelulaId} contra ${fotocelulaId}`);         
             if (fc.fotocelulaId === fotocelulaId) {
               modulo.setOcultado(fc.fotocelulaId, true);  
               setTimeout(() => {
@@ -251,17 +250,12 @@ export class DemoModulosComponent implements OnInit {
         let evento : any ;
         this.lineasTransporte.first.modulosCoordsComponents.forEach(modulo =>
           modulo.getAllFotocelulas().forEach(fc => { 
-            console.log(`Simulando disparo evento en modulo ${modulo.getNombreModulo()} fotocélula ${fc.fotocelulaId} contra ${fotocelulaId}`);         
             if (fc.fotocelulaId === fotocelulaId) {
               evento = this.eventos[Math.floor(Math.random() * this.eventos.length)];
               modulo.simularEvento(fc.fotocelulaId, evento);  
-              setTimeout(() => {
-                modulo.setOcultado(fc.fotocelulaId, false);
-              }, 200);
             }
           })
         );  
-      
   }  
  
 

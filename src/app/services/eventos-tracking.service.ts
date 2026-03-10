@@ -10,8 +10,6 @@ export interface EventoContable {
   fotocelulaNombre: string;
   tipo: TipoEvento;
   timestamp: Date;
-  moduloId: string;
-  moduloNombre: string;
 }
 
 /**
@@ -23,6 +21,8 @@ export interface ContadoresEvento {
   adelanto: number;
   apparition: number;
   desaparicion: number;
+  activacion: number;
+  desactivacion: number;  
 }
 
 /**
@@ -31,8 +31,6 @@ export interface ContadoresEvento {
 export interface EstadisticasFotocelula extends ContadoresEvento {
   fotocelulaId: string;
   fotocelulaNombre: string;
-  moduloId: string;
-  moduloNombre: string;
   total: number;
   ultimoEvento?: Date;
   historialCompleto: EventoContable[];
@@ -78,40 +76,6 @@ export class EventosTrackingService {
   readonly historial = signal<EventoContable[]>([]);
 
   /**
-   * computed(): estadísticas agrupadas por módulo con totales.
-   * Equivale al antiguo BehaviorSubject<EstadisticasModulo[]> + pipe(map(...)).
-   * Se recalcula automáticamente solo cuando estadisticas() cambia.
-   */
-  readonly estadisticasPorModulo = computed<EstadisticasModulo[]>(() => {
-    const modulosMap = new Map<string, EstadisticasModulo>();
-
-    for (const est of this.estadisticas()) {
-      if (!modulosMap.has(est.moduloId)) {
-        modulosMap.set(est.moduloId, {
-          moduloId: est.moduloId,
-          moduloNombre: est.moduloNombre,
-          fotocelulas: [],
-          totalesModulo: {
-            atiempo: 0,
-            retraso: 0,
-            adelanto: 0,
-            apparition: 0,
-            desaparicion: 0
-          }
-        });
-      }
-      const mod = modulosMap.get(est.moduloId)!;
-      mod.fotocelulas.push(est);
-      mod.totalesModulo.atiempo      += est.atiempo;
-      mod.totalesModulo.retraso      += est.retraso;
-      mod.totalesModulo.adelanto     += est.adelanto;
-      mod.totalesModulo.apparition   += est.apparition;
-      mod.totalesModulo.desaparicion += est.desaparicion;
-    }
-    return Array.from(modulosMap.values());
-  });
-
-  /**
    * computed(): fotocélulas que tienen algún retraso registrado.
    * Útil para paneles de alertas o destacar módulos problemáticos.
    */
@@ -125,7 +89,7 @@ export class EventosTrackingService {
    */
   readonly eventoMasFrecuente = computed<TipoEvento | null>(() => {
     const totales: ContadoresEvento = {
-      atiempo: 0, retraso: 0, adelanto: 0, apparition: 0, desaparicion: 0
+      atiempo: 0, retraso: 0, adelanto: 0, apparition: 0, desaparicion: 0, activacion: 0, desactivacion: 0
     };
     for (const est of this.estadisticas()) {
       totales.atiempo      += est.atiempo;
@@ -133,6 +97,8 @@ export class EventosTrackingService {
       totales.adelanto     += est.adelanto;
       totales.apparition   += est.apparition;
       totales.desaparicion += est.desaparicion;
+      totales.activacion   += est.activacion; 
+      totales.desactivacion += est.desactivacion;
     }
     const [tipo, valor] = Object.entries(totales)
       .reduce((prev, curr) => curr[1] > prev[1] ? curr : prev);
@@ -147,8 +113,6 @@ export class EventosTrackingService {
   private eventoEntrante$ = new Subject<{
     fotocelulaId: string;
     fotocelulaNombre: string;
-    moduloId: string;
-    moduloNombre: string;
     tipo: TipoEvento;
   }>();
 
@@ -157,7 +121,6 @@ export class EventosTrackingService {
     this.eventoEntrante$.subscribe(ev => {
       this.procesarEvento(
         ev.fotocelulaId, ev.fotocelulaNombre,
-        ev.moduloId, ev.moduloNombre,
         ev.tipo
       );
     });
@@ -173,12 +136,11 @@ export class EventosTrackingService {
   inyectarEventoWebSocket(
     fotocelulaId: string,
     fotocelulaNombre: string,
-    moduloId: string,
-    moduloNombre: string,
     tipo: TipoEvento
   ): void {
+    //Ahora necesitamos acceder a las interfaces de 
     this.eventoEntrante$.next({
-      fotocelulaId, fotocelulaNombre, moduloId, moduloNombre, tipo
+      fotocelulaId, fotocelulaNombre, tipo
     });
   }
 
@@ -188,11 +150,9 @@ export class EventosTrackingService {
   registrarEvento(
     fotocelulaId: string,
     fotocelulaNombre: string,
-    moduloId: string,
-    moduloNombre: string,
     tipo: TipoEvento
   ): void {
-    this.procesarEvento(fotocelulaId, fotocelulaNombre, moduloId, moduloNombre, tipo);
+    this.procesarEvento(fotocelulaId, fotocelulaNombre, tipo);
   }
 
   /**
@@ -243,13 +203,12 @@ export class EventosTrackingService {
     if (estadisticas.length === 0) return '';
 
     const headers = [
-      'Módulo', 'Fotocélula',
+      'Fotocélula',
       'Atiempo', 'Retraso', 'Adelanto', 'Apparition', 'Desaparición',
       'Total', 'Último Evento'
     ];
 
     const rows = estadisticas.map(est => [
-      est.moduloNombre,
       est.fotocelulaNombre,
       est.atiempo.toString(),
       est.retraso.toString(),
@@ -289,21 +248,19 @@ export class EventosTrackingService {
 
   /**
    * Lógica común de procesamiento de eventos.
-   * Actualiza el Map interno y dispara los Signals.
+   * Actualiza el Map interno y dispara los Signals.(Estadisticas)
    */
   private procesarEvento(
     fotocelulaId: string,
     fotocelulaNombre: string,
-    moduloId: string,
-    moduloNombre: string,
     tipo: TipoEvento
   ): void {
     let est = this.mapEstadisticas.get(fotocelulaId);
-
+    console.log('Procesando evento ' + tipo + "de Fotocelula : "+ fotocelulaNombre);
     if (!est) {
       est = {
-        fotocelulaId, fotocelulaNombre, moduloId, moduloNombre,
-        atiempo: 0, retraso: 0, adelanto: 0, apparition: 0, desaparicion: 0,
+        fotocelulaId, fotocelulaNombre,
+        activacion: 0, desactivacion: 0, atiempo: 0, retraso: 0, adelanto: 0, apparition: 0, desaparicion: 0,
         total: 0,
         historialCompleto: []
       };
@@ -316,7 +273,7 @@ export class EventosTrackingService {
 
     const evento: EventoContable = {
       fotocelulaId, fotocelulaNombre, tipo,
-      timestamp: new Date(), moduloId, moduloNombre
+      timestamp: new Date()
     };
     est.historialCompleto.push(evento);
 

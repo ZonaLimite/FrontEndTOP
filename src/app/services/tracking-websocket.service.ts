@@ -1,30 +1,16 @@
-import { Injectable, signal, computed, inject, OnDestroy } from '@angular/core';
+import { Injectable, signal, computed, inject, OnDestroy, ViewChildren, QueryList } from '@angular/core';
 import { Client, IStompSocket, IFrame, IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { EventosTrackingService } from './eventos-tracking.service';
 import { TipoEvento } from '../models/modulo-transporte.model';
 import { ResultEngine } from '../models/resultEngine';
 import { Traces } from '../models/traces';
+import { EventoFotocelula, TraceProcessorService } from './trace-processor.service';
+import { LineaTransporteComponent } from '../components/linea-transporte/linea-transporte.component';
+import { ModuloTransporteCoordsComponent } from '../components/modulo-transporte-coords/modulo-transporte-coords.component';
 
 declare var configuraciones: any;
 
-// ─── Modelos de mensajes de tracking ────────────────────────────────────────
-
-/**
- * Estructura esperada en el campo data de una Traces de tipo tracking.
- * 
- * Ejemplo de mensaje JSON que emite el Engine en /channel/traces:
- * {
- *   "tipoResult": "tracking",
- *   "data": "{\"fotocelulaId\":\"INJ-B1\",\"fotocelulaNombre\":\"INJ-B1\",
- *             \"moduloId\":\"INJ-01\",\"moduloNombre\":\"Inyector\",
- *             \"tipoEvento\":\"PasoATiempo\"}"
- * }
- * 
- * Alternativa delimitada por '|' si el Engine no emite JSON:
- * { "tipoResult": "tracking", "data": "INJ-B1|INJ-B1|INJ-01|Inyector|PasoATiempo" }
- * → en ese caso ajustar _handleTrace() para usar split('|')
- */
 export interface TrackingPayload {
   fotocelulaId:     string;
   fotocelulaNombre: string;
@@ -78,8 +64,12 @@ const MAPA_EVENTOS: Record<string, TipoEvento> = {
 @Injectable({ providedIn: 'root' })
 export class TrackingWebsocketService implements OnDestroy {
 
+ // Referencia al componente hijo <app-linea-transporte>
+  lineasTransporte! : QueryList<ModuloTransporteCoordsComponent>
+  
   // ─── Dependencias ──────────────────────────────────────────────────────────
   private trackingService = inject(EventosTrackingService);
+  private traceProcessorService = inject(TraceProcessorService);
 
   // ─── Cliente STOMP ────────────────────────────────────────────────────────
   private client: Client;
@@ -377,39 +367,40 @@ export class TrackingWebsocketService implements OnDestroy {
   private _handleTrace(trace: Traces): void {
     this.mensajesRecibidos.update(n => n + 1);
 
-    // Filtrar trazas que no sean de tracking
-    if (trace.tipoResult !== 'tracking') {
-      console.log('[WS-Tracking] Traza no-tracking ignorada:', trace.tipoResult);
-      return;
+    // Filtrar trazas que sean de tracking
+    if (trace.tipoResult == 'eventTrace') {
+       this.handleTracking(trace.data);
     }
+  }
 
-    try {
-      const payload: TrackingPayload = JSON.parse(trace.data);
-      const tipoEvento = this._mapearTipoEvento(payload.tipoEvento);
-
-      if (!tipoEvento) {
-        console.warn('[WS-Tracking] TipoEvento desconocido recibido:', payload.tipoEvento);
-        this.trackingDesconocidos.update(n => n + 1);
-        return;
-      }
-
-      // ✅ Punto de cruce WebSocket → Signals:
-      // Inyecta el evento en EventosTrackingService.
-      // Desde aquí el evento fluye automáticamente a todos los componentes
-      // suscritos via computed() sin ningún código adicional.
-      this.trackingService.inyectarEventoWebSocket(
-        payload.fotocelulaId,
-        payload.fotocelulaNombre,
-        payload.moduloId,
-        payload.moduloNombre,
-        tipoEvento
-      );
+/**
+ * 
+ * @param trace 
+ * @returns 
+ */
+  private handleTracking(trace: string) {
+       try {
+        const eventosFotocelulas : EventoFotocelula[] | null  = this.traceProcessorService.analizarTraza(trace);
+        if (eventosFotocelulas) {
+          eventosFotocelulas.forEach(caso => {
+            //Renderizar 
+            this.simularTriggerinEvent(caso.fotocelula, caso.evento)
+       
+            //Actualizar capa Estadistica
+            this.trackingService.inyectarEventoWebSocket(
+              caso.fotocelula,
+              caso.fotocelula,
+              caso.evento
+            );
+          });
+        }
 
       this.trackingRecibidos.update(n => n + 1);
 
     } catch (e) {
-      console.error('[WS-Tracking] Error parseando payload de tracking:', trace.data, e);
+      console.error('[WS-Tracking] Error parseando payload de tracking:', trace, e);
     }
+
   }
 
   /**
@@ -429,4 +420,26 @@ export class TrackingWebsocketService implements OnDestroy {
     this.conectado.set(false);
     this.linkedTop.set(false);
   }
+
+    /**
+   * Simula un evento en una fotocélula de un módulo específico (Ambos modos)
+   */
+      /**
+   * Simula un evento en una fotocelula específica 
+   * @param fotocelulaId 
+   */
+    public simularTriggerinEvent(
+        fotocelulaId: string, evento: any){
+          this.lineasTransporte.forEach(modulo =>
+            modulo.getAllFotocelulas().forEach(fc => { 
+
+              if (fc.fotocelulaId === fotocelulaId) {
+                //console.log(`Simulando disparo evento ${evento} en modulo ${modulo.getNombreModulo()} fotocélula ${fc.fotocelulaId}`);         
+                modulo.simularEvento(fc.fotocelulaId, evento);  
+              }
+            })
+          );  
+    }  
+
+
 }

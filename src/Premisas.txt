@@ -1,0 +1,72 @@
+      Necesito desarrollar un algoritmo que analice un string "trace" y determine que
+      trazas son aquellas que hacen mencion a eventos de ocultacion o desocultacion de fotocelula.
+      "trace" es un string que contiene una traza de otro sistema
+      Vamos a desarrollar un algoritmo que analize el contenido de trace y valide cual de cada una de esas
+      lineas de traza representa comandos de activacion/desactivacion de fotocelulas
+
+      el string trace es una cadena con contenido de traza que hay que analizar, para detectar que
+      trazas son aquellas que hacen mencion a eventos de ocultacion o desocultacion de fotocelula.
+
+      // Ejemplos de trazas relevantes para este tratamiento seran como las siguientes :
+      /**
+        C30200020 18:07:09:231 INF IL1_FE2_ - rootOnFeedingReport(), MailPiece created 0x73de444, Id=4001B256 ApxId=193
+        C30100040 18:07:09:231 INF IL1_MERG - TakeMailPiece() from FE2, MP:4001B256 RxSlot=1731434934,223 diff=-4
+        C30100040 18:07:09:334 INF IL1_MERG - BeltConveyor FE 4001B256 sur EXT-B1 a 54860677
+        C30100040 18:07:09:404 INF IL1_MERG - BeltConveyor RE 4001B256 sur EXT-B1 a 54860898
+        C30100040 18:07:09:810 INF IL1_MERG - BeltConveyor FE 4001B256 sur MER-B2 a 54862177
+        C30100040 18:07:09:882 INF IL1_MERG - BeltConveyor RE 4001B256 sur MER-B2 a 54862403
+        C30100040 18:07:10:097 INF IL1_MERG - BeltConveyor posUpdate : Pli 4001B256 plus devant MER-V3 a 54863084
+        C30100040 18:07:10:255 INF IL1_MERG - BeltConveyor posUpdate : Pli 4001B256 devant Output_1 a 54863582
+        C30100040 18:07:10:255 INF IL1_MAIN - BeltConveyor onTakeMailPiece : Pli 4001B256 sur Input_1 a 55026985
+        C30100040 18:07:10:324 INF IL1_MAIN - BeltConveyor RE 4001B256 sur Input_1 a 55027205
+        C30100040 18:07:10:596 INF IL1_MAIN - BeltConveyor posUpdate : Pli 4001B256 devant PosDPBarCodeReader a 55028062
+        C30100040 18:07:10:668 INF IL1_MAIN - BeltConveyor posUpdate : Pli 4001B256 plus devant PosDPBarCodeReader a 55028289
+        C30100040 18:07:10:674 INF IL1_MAIN - BeltConveyor FE 4001B256 sur MRK-B1 a 55028308
+        C30100040 18:07:10:744 INF IL1_MAIN - BeltConveyor RE 4001B256 sur MRK-B1 a 55028528
+        C30100040 18:07:11:018 INF IL1_MAIN - BeltConveyor posUpdate : Pli 4001B256 devant PosDPBarCodeReaderVerif a 55029391
+        C30100040 18:07:11:088 INF IL1_MAIN - BeltConveyor posUpdate : Pli 4001B256 plus devant PosDPBarCodeReaderVerif a 55029612
+        C30100040 18:07:11:094 INF IL1_MAIN - BeltConveyor FE 4001B256 sur CUL-B1 a 55029631
+        C30100040 18:07:11:168 INF IL1_MAIN - BeltConveyor RE 4001B256 sur CUL-B1 a 55029864
+        C30100040 18:07:11:176 INF IL1_MAIN - BeltConveyor FE 4001B256 sur CUL-B2 a 55029889
+        C30100040 18:07:11:250 INF IL1_MAIN - BeltConveyor RE 4001B256 sur CUL-B2 a 55030122
+        C30100040 18:07:11:268 INF IL1_MAIN - BeltConveyor FE 4001B256 sur CUL-B5 a 55030179
+        C30100040 18:07:11:316 INF IL1_MAIN - BeltConveyor clearTrackingPoint : Pli 4001B256 plus sur CUL-B5 a 55030330
+        **/
+
+      Las trazas que incorporan la cadena "RE" indican la activacion ("ocultacion") de una fotocelula
+      Las trazas que incorporan la cadena "FE" indican la desactivacion ("desocultacion") de una fotocelula
+
+      Las trazas que incorporan la cadena "clearTrackingPoint" indican, igualmente, la desactivacion ("desocultacion") de una fotocelula
+      Las trazas que incorporan la cadena "onTakeMailPiece" indican, igualmente, la activacion ("ocultacion") de una fotocelula
+      En este tipo de trazas el nombre de la fotocelula va a continuacion de la cadena "sur" 
+
+      Por ejemplo la siguiente cadena :
+        C30100040 18:07:11:268 INF IL1_MAIN - BeltConveyor FE 4001B256 sur CUL-B5 a 55030179
+      puede interpretarse como "activacion de fotocelula "CUL-B5" porque contiene "RE" y "sur CUL-B5"
+
+      Hay un caso especial en las cadenas que incorporan la cadena "TakeMailPiece()".
+      En ese caso la fotocelula es la que aparece a continuacion de "TakeMailPiece()" despues de la cadena "from"
+      Por ejemplo la cadena:
+        C30100040 18:07:09:231 INF IL1_FE2_ - rootOnFeedingReport(), MailPiece created 0x73de444, Id=4001B256 ApxId=193
+      puede interpretarse como "activacion de fotocelula "FE2" porque contiene "TakeMailPiece()" y "from FE2"
+
+      necesito desarrollar un metodo que reciba como parametro el string "trace" y devuelva como respuesta 
+      un array de objetos. Cada objeto debe tener la siguiente estructura, representando cada evento de activacion/desactivacion
+      de fotocelula detectado:
+
+        {
+          fotocelula: string,
+          evento: 'activacion' | 'desactivacion'
+        }
+      o 
+        null, si no hay deteccion de activacion/desactivacion de fotocelulas en el string trace.
+
+      Desarrolla este algoritmo solo en typescript, sin usar librerias externas, sobre un nuevo servicio
+      sobre la carpeta "services", llamado  "TraceProcessorService".
+
+
+
+
+
+
+

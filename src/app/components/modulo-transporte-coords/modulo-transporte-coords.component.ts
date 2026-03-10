@@ -64,7 +64,7 @@ export class ModuloTransporteCoordsComponent implements AfterViewInit {
    */
   simularEvento(
     fotocelulaId: string, 
-    tipo: 'atiempo' | 'retraso' | 'adelanto' | 'apparition' | 'desaparicion'
+    tipo: 'activacion' | 'desactivacion' | 'atiempo' | 'retraso' | 'adelanto' | 'apparition' | 'desaparicion'
   ) {
     const fotocelula = this.fotocelulas.find((fc, index) => 
       this.config.fotocelulas[index].id === fotocelulaId
@@ -82,7 +82,7 @@ export class ModuloTransporteCoordsComponent implements AfterViewInit {
    */
   simularEventosMultiples(
     fotocelulaIds: string[],
-    tipo: 'atiempo' | 'retraso' | 'adelanto' | 'apparition' | 'desaparicion'
+    tipo: 'activacion' | 'desactivacion' | 'atiempo' | 'retraso' | 'adelanto' | 'apparition' | 'desaparicion'
   ) {
     fotocelulaIds.forEach(id => {
       this.simularEvento(id, tipo);

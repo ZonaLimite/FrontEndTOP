@@ -2,7 +2,7 @@
 // MODELO PARA CONFIGURACIÓN DE FOTOCÉLULAS
 // ============================================
 
-export type TipoEvento = 'atiempo' | 'retraso' | 'adelanto' | 'apparition' | 'desaparicion';
+export type TipoEvento = 'activacion' | 'desactivacion' | 'atiempo' | 'retraso' | 'adelanto' | 'apparition' | 'desaparicion';
 export type TamanoFotocelula = 'pequeno' | 'normal' | 'mediano' | 'grande';
 
 // ============================================

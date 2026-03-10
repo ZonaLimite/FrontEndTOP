@@ -40,6 +40,8 @@ export class LineaTransporteComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     if (this.modoCoords) {
+      //Una vez renderizado todos los modulos pasamos la referencia de instanciacion al servicio para que pueda usar los modulos
+      this.ws.lineasTransporte = this.modulosCoordsComponents;
       console.log(`Línea de transporte "${this.titulo}" (MODO COORDENADAS) inicializada con ${this.modulosCoordsConfig.length} módulos`);
     } 
   }
@@ -90,7 +92,7 @@ export class LineaTransporteComponent implements AfterViewInit {
   public simularEventoEnModulo(
     moduloId: string, 
     fotocelulaId: string, 
-    tipo: 'atiempo' | 'retraso' | 'adelanto' | 'apparition' | 'desaparicion'
+    tipo: 'activacion' | 'desactivacion' | 'atiempo' | 'retraso' | 'adelanto' | 'apparition' | 'desaparicion'
   ) {
  
     // Buscar en módulos Coords

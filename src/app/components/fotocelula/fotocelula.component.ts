@@ -3,7 +3,7 @@ import { EventosTrackingService } from '../../services/eventos-tracking.service'
 
 interface EventoTracking {
   id: number;
-  tipo: 'atiempo' | 'retraso' | 'adelanto' | 'apparition' | 'desaparicion';
+  tipo: 'activacion' | 'desactivacion' | 'atiempo' | 'retraso' | 'adelanto' | 'apparition' | 'desaparicion';
 }
 
 @Component({
@@ -27,25 +27,30 @@ export class FotocelulaComponent {
 
   constructor(private trackingService: EventosTrackingService) {}
 
-  mostrarEvento(tipo: 'atiempo' | 'retraso' | 'adelanto' | 'apparition' | 'desaparicion') {
+  mostrarEvento(tipo: 'activacion' | 'desactivacion' | 'atiempo' | 'retraso' | 'adelanto' | 'apparition' | 'desaparicion') {
     const id = this.counter++;
     const nuevoEvento: EventoTracking = { id, tipo };
     
-    this.eventosActivos.push(nuevoEvento);
+    if(tipo === 'activacion' || tipo === 'desactivacion') {
+     if(tipo   === 'activacion'){
+      this.ocultado = true;
+      console.log(`Evento ${tipo} en ${this.nombreFotocelula}`);
+     }else{
+      this.ocultado = false;
+     }
+    }else{
+      this.eventosActivos.push(nuevoEvento);
+    }
 
     // Registrar el evento en el servicio de tracking
     // Usar IDs generados si no se proporcionan explícitamente
     const fotocelulaId = this.fotocelulaId || this.nombreFotocelula;
-    const moduloId = this.moduloId || 'default-modulo';
-    const moduloNombre = this.moduloNombre || 'Módulo';
-
-    this.trackingService.registrarEvento(
-      fotocelulaId,
-      this.nombreFotocelula,
-      moduloId,
-      moduloNombre,
-      tipo
-    );
+   
+    //this.trackingService.registrarEvento(
+    //  fotocelulaId,
+    //  this.nombreFotocelula,
+    //  tipo
+    //);
 
     // Eliminar el evento después de que termine la animación (2s)
     setTimeout(() => {
