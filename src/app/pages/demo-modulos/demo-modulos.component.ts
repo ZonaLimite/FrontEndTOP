@@ -1,8 +1,9 @@
-import { AfterViewInit, Component, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, inject, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { ModuloGridConfig, ModuloCoordsConfig } from '../../models/modulo-transporte.model';
 import { LineaTransporteComponent } from '../../components/linea-transporte/linea-transporte.component';
 import { ModuloLineaCoordsConfig } from '../../models/modulo-transporte.model';
 import { ModuloTransporteCoordsComponent } from '../../components/modulo-transporte-coords/modulo-transporte-coords.component';
+import { EventosTrackingService } from '../../services/eventos-tracking.service';
 
 @Component({
   selector: 'app-demo-modulos',
@@ -16,7 +17,10 @@ export class DemoModulosComponent implements OnInit {
 
   // Referencia al componente hijo <app-linea-transporte>
   @ViewChildren(LineaTransporteComponent) lineasTransporte!: QueryList<LineaTransporteComponent>;
-
+ 
+  // ─── Dependencias ──────────────────────────────────────────────────────────
+  private trackingService = inject(EventosTrackingService);
+  
   // ==========================================
   // EJEMPLOS DE CONFIGURACIÓN Declarativa - PATRÓN COORDS
   // ==========================================
@@ -203,7 +207,14 @@ export class DemoModulosComponent implements OnInit {
         modulo.config.fotocelulas.forEach(fotocelula => {
           const eventoAleatorio = this.eventos[Math.floor(Math.random() * this.eventos.length)];
           console.log(`Simulando evento: ${eventoAleatorio} en ${modulo.getNombreModulo()} - ${fotocelula.nombre}`);
+          
           modulo.simularEvento(fotocelula.id, eventoAleatorio);
+          
+          this.trackingService.inyectarEventoWebSocket(
+            fotocelula.id,
+            fotocelula.id,
+            eventoAleatorio
+          );
         });
       });
     });
@@ -252,7 +263,15 @@ export class DemoModulosComponent implements OnInit {
           modulo.getAllFotocelulas().forEach(fc => { 
             if (fc.fotocelulaId === fotocelulaId) {
               evento = this.eventos[Math.floor(Math.random() * this.eventos.length)];
-              modulo.simularEvento(fc.fotocelulaId, evento);  
+              modulo.simularEvento(fc.fotocelulaId, evento);
+
+              //Actualizar capa Estadistica
+              this.trackingService.inyectarEventoWebSocket(
+                fc.fotocelulaId,
+                fc.fotocelulaId,
+                evento
+              );
+
             }
           })
         );  
