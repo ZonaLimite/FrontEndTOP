@@ -12,19 +12,19 @@ import { EventosTrackingService } from '../../services/eventos-tracking.service'
   styleUrls: ['./demo-modulos.component.css']
 })
 export class DemoModulosComponent implements OnInit {
-  eventos: ('atiempo' | 'retraso' | 'adelanto' | 'apparition' | 'desaparicion')[] = 
+  eventos: ('atiempo' | 'retraso' | 'adelanto' | 'apparition' | 'desaparicion')[] =
     ['atiempo', 'retraso', 'adelanto', 'apparition', 'desaparicion'];
 
   // Referencia al componente hijo <app-linea-transporte>
   @ViewChildren(LineaTransporteComponent) lineasTransporte!: QueryList<LineaTransporteComponent>;
- 
+
   // ─── Dependencias ──────────────────────────────────────────────────────────
   private trackingService = inject(EventosTrackingService);
-  
+
   // ==========================================
   // EJEMPLOS DE CONFIGURACIÓN Declarativa - PATRÓN COORDS
   // ==========================================
-  
+
   modulosCoordsEjemplo: ModuloCoordsConfig[] = [
     {
       id: 'INJ-01',
@@ -47,9 +47,9 @@ export class DemoModulosComponent implements OnInit {
       fotocelulas: [
         { id: 'CUL-B5', nombre: 'CUL-B5', x: 15, y: 60, tamano: 'pequeno', orientacion: 'row' },
         { id: 'CUL-B4', nombre: 'CUL-B4', x: 35, y: 30, tamano: 'pequeno', orientacion: 'row' },
-        { id: 'CUL-B3', nombre: 'CUL-B3', x: 55, y: 60, tamano: 'pequeno', orientacion: 'row' },
-       // { id: 'CUL-B2', nombre: 'CUL-B2', x: 86, y: 45, tamano: 'pequeno', orientacion: 'row' },
-        { id: 'CUL-B1', nombre: 'CUL-B1', x: 86, y: 60, tamano: 'pequeno', orientacion: 'row' },                
+        { id: 'CUL-B2', nombre: 'CUL-B2', x: 55, y: 60, tamano: 'pequeno', orientacion: 'row' },
+        // { id: 'CUL-B2', nombre: 'CUL-B2', x: 86, y: 45, tamano: 'pequeno', orientacion: 'row' },
+        { id: 'CUL-B1', nombre: 'CUL-B1', x: 86, y: 60, tamano: 'pequeno', orientacion: 'row' },
       ]
     },
     {
@@ -59,8 +59,8 @@ export class DemoModulosComponent implements OnInit {
       alto: 150,
       orientacion: 'horizontal',
       fotocelulas: [
-        { id: 'MRK-B1', nombre: 'MRK-B1', x: 85, y: 60, tamano: 'pequeno', orientacion: 'row' },
-        { id: 'TV-01', nombre: 'TV-01', x: 20, y: 60, tamano: 'pequeno', orientacion: 'row' },
+        { id: 'MRK-B1', nombre: 'MRK-B1', x: 85, y: 60, tamano: 'pequeno', orientacion: 'row' }//,
+        //{ id: 'TV-01', nombre: 'TV-01', x: 20, y: 60, tamano: 'pequeno', orientacion: 'row' },
       ]
     },
     {
@@ -71,58 +71,58 @@ export class DemoModulosComponent implements OnInit {
       orientacion: 'horizontal',
       fotocelulas: [
         { id: 'Input_1', nombre: 'ADQ-01', x: 83, y: 60, tamano: 'pequeno', orientacion: 'row' }
-      ]  
+      ]
     },
     {
-      id: 'MER-01' ,
+      id: 'MER-01',
       nombre: 'Convergencia',
       ancho: 140,
       alto: 150,
       orientacion: 'horizontal',
       fotocelulas: [
         { id: 'MER-B2', nombre: 'MER-B2', x: 83, y: 23, tamano: 'pequeno', orientacion: 'row' },
-        { id: 'MER-B3', nombre: 'MER-B3', x: 30, y: 60, tamano: 'pequeno', orientacion: 'row' },
-        { id: 'MER-B1', nombre: 'MER-B1', x: 83, y: 88, tamano: 'pequeno', orientacion: 'row' },
-      ]  
+        //{ id: 'MER-V3', nombre: 'MER-V3', x: 30, y: 60, tamano: 'pequeno', orientacion: 'row' },
+        { id: 'MER-B3', nombre: 'MER-B3', x: 83, y: 88, tamano: 'pequeno', orientacion: 'row' },
+      ]
     },
     {
-      id: 'EXT-01' ,
+      id: 'EXT-01',
       nombre: 'Extension',
       ancho: 200,
       alto: 53,
       orientacion: 'horizontal',
       fotocelulas: [
         { id: 'EXT-B1', nombre: 'EXT-B1', x: 88, y: 66, tamano: 'pequeno', orientacion: 'row' },
-      ]  
-    },  
+      ]
+    },
     {
-      id: 'FED-01' ,
+      id: 'FED-01',
       nombre: 'Feeder1',
       ancho: 80,
       alto: 120,
       orientacion: 'vertical',
       fotocelulas: [
         { id: 'FE1', nombre: 'FE1', x: 50, y: 37, tamano: 'pequeno', orientacion: 'row' },
-      ]  
+      ]
     },
     {
-      id: 'FED-02' ,
+      id: 'FED-02',
       nombre: 'Feeder2',
       ancho: 80,
       alto: 120,
       orientacion: 'vertical',
       fotocelulas: [
         { id: 'FE2', nombre: 'FE2', x: 50, y: 30, tamano: 'pequeno', orientacion: 'row' },
-      ]  
+      ]
     }
   ];
-// ==========================================
+  // ==========================================
   // EJEMPLO 1: Posicionamiento Modulos con Coordenadas Absolutas
   // ==========================================
   modulosLineaEntrada: ModuloLineaCoordsConfig[] = [];
 
-  constructor() {}
-//inicializamos estructuras con los modulos declarados
+  constructor() { }
+  //inicializamos estructuras con los modulos declarados
   ngOnInit() {
     //Configuramos los módulos con coordenadas para la línea de entrada    
     //el border de modulo es de 2 px, por eso se suma 2 a la posición para evitar solapamiento con el borde de la línea
@@ -130,7 +130,7 @@ export class DemoModulosComponent implements OnInit {
     if (modulo) {
       this.modulosLineaEntrada.push({
         config: modulo,
-        x: 10 ,
+        x: 10,
         y: 50
       });
     }
@@ -138,7 +138,7 @@ export class DemoModulosComponent implements OnInit {
     if (modulo2) {
       this.modulosLineaEntrada.push({
         config: modulo2,
-        x: 170 + 2, 
+        x: 170 + 2,
         y: 50
       });
     }
@@ -186,30 +186,30 @@ export class DemoModulosComponent implements OnInit {
     if (modulo8) {
       this.modulosLineaEntrada.push({
         config: modulo8,
-        x: 1020  + 2,
+        x: 1020 + 2,
         y: 50
       });
     }
 
   }
-  
-  
+
+
   // ==========================================
   // MÉTODOS DE PRUEBA
   // ==========================================
- 
+
   //Método para simular eventos en todas fotocélulas  
 
   simularEventosEnTodosModulos() {
-    
+
     this.lineasTransporte.forEach(linea => {
       linea.modulosCoordsComponents.forEach(modulo => {
         modulo.config.fotocelulas.forEach(fotocelula => {
           const eventoAleatorio = this.eventos[Math.floor(Math.random() * this.eventos.length)];
           console.log(`Simulando evento: ${eventoAleatorio} en ${modulo.getNombreModulo()} - ${fotocelula.nombre}`);
-          
+
           modulo.simularEvento(fotocelula.id, eventoAleatorio);
-          
+
           this.trackingService.inyectarEventoWebSocket(
             fotocelula.id,
             fotocelula.id,
@@ -221,62 +221,62 @@ export class DemoModulosComponent implements OnInit {
   }
 
   //Simular seguimiento de todas las fotocelulas
-  simularSeguimientoEnTodosModulos() {  
-    const orderFotocelulas : string[] = ['FE2','EXT-B1','MER-B2','MER-B3','Input_1','MRK-B1','TV-B1','CUL-B1','CUL-B3','CUL-B5','INJ-B1','INJ-B2','INJ-B3'];
+  simularSeguimientoEnTodosModulos() {
+    const orderFotocelulas: string[] = ['FE2', 'EXT-B1', 'MER-B2', 'MER-B3', 'Input_1', 'MRK-B1', 'TV-B1', 'CUL-B1', 'CUL-B3', 'CUL-B5', 'INJ-B1', 'INJ-B2', 'INJ-B3'];
 
     orderFotocelulas.forEach((fotocelulaId, index) => {
       setTimeout(() => {
         this.simularOcultacionEnFotocelula(fotocelulaId)
         this.simularTriggerinEvent(fotocelulaId);
-      }, 500 * index);  
-    });  
+      }, 500 * index);
+    });
   }
 
-    /**
-   * Simula el enecendido de una fotocelula durante 150ms
-   * @param moduloId Simula el enecendido de una fotocelula durante 100ms
-   * @param fotocelulaId 
-   */
+  /**
+ * Simula el enecendido de una fotocelula durante 150ms
+ * @param moduloId Simula el enecendido de una fotocelula durante 100ms
+ * @param fotocelulaId 
+ */
   public simularOcultacionEnFotocelula(
-      fotocelulaId: string){
-        this.lineasTransporte.first.modulosCoordsComponents.forEach(modulo =>
-          modulo.getAllFotocelulas().forEach(fc => { 
-            if (fc.fotocelulaId === fotocelulaId) {
-              modulo.setOcultado(fc.fotocelulaId, true);  
-              setTimeout(() => {
-                modulo.setOcultado(fc.fotocelulaId, false);
-              }, 200);
-            }
-          })
-        );  
-      
-  }  
+    fotocelulaId: string) {
+    this.lineasTransporte.first.modulosCoordsComponents.forEach(modulo =>
+      modulo.getAllFotocelulas().forEach(fc => {
+        if (fc.fotocelulaId === fotocelulaId) {
+          modulo.setOcultado(fc.fotocelulaId, true);
+          setTimeout(() => {
+            modulo.setOcultado(fc.fotocelulaId, false);
+          }, 200);
+        }
+      })
+    );
 
-    /**
-   * Simula el disparo de un evento en una fotocelula específica 
-   * @param fotocelulaId 
-   */
+  }
+
+  /**
+ * Simula el disparo de un evento en una fotocelula específica 
+ * @param fotocelulaId 
+ */
   public simularTriggerinEvent(
-      fotocelulaId: string){
-        let evento : any ;
-        this.lineasTransporte.first.modulosCoordsComponents.forEach(modulo =>
-          modulo.getAllFotocelulas().forEach(fc => { 
-            if (fc.fotocelulaId === fotocelulaId) {
-              evento = this.eventos[Math.floor(Math.random() * this.eventos.length)];
-              modulo.simularEvento(fc.fotocelulaId, evento);
+    fotocelulaId: string) {
+    let evento: any;
+    this.lineasTransporte.first.modulosCoordsComponents.forEach(modulo =>
+      modulo.getAllFotocelulas().forEach(fc => {
+        if (fc.fotocelulaId === fotocelulaId) {
+          evento = this.eventos[Math.floor(Math.random() * this.eventos.length)];
+          modulo.simularEvento(fc.fotocelulaId, evento);
 
-              //Actualizar capa Estadistica
-              this.trackingService.inyectarEventoWebSocket(
-                fc.fotocelulaId,
-                fc.fotocelulaId,
-                evento
-              );
+          //Actualizar capa Estadistica
+          this.trackingService.inyectarEventoWebSocket(
+            fc.fotocelulaId,
+            fc.fotocelulaId,
+            evento
+          );
 
-            }
-          })
-        );  
-  }  
- 
+        }
+      })
+    );
+  }
+
 
 
 }  

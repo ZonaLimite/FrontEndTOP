@@ -25,27 +25,31 @@ export class FotocelulaComponent {
   eventosActivos: EventoTracking[] = [];
   private counter: number = 0;
 
-  constructor(private trackingService: EventosTrackingService) {}
+  constructor(private trackingService: EventosTrackingService) { }
 
   mostrarEvento(tipo: 'activacion' | 'desactivacion' | 'atiempo' | 'retraso' | 'adelanto' | 'apparition' | 'desaparicion') {
     const id = this.counter++;
     const nuevoEvento: EventoTracking = { id, tipo };
-    
-    if(tipo === 'activacion' || tipo === 'desactivacion') {
-     if(tipo   === 'activacion'){
-      this.ocultado = true;
-      console.log(`Evento ${tipo} en ${this.nombreFotocelula}`);
-     }else{
-      this.ocultado = false;
-     }
-    }else{
+
+    if (tipo === 'activacion' || tipo === 'desactivacion') {
+      if (tipo === 'activacion') {
+        this.ocultado = true;
+        console.log(`Evento ${tipo} en ${this.nombreFotocelula}`);
+        setTimeout(() => {
+          this.ocultado = false;
+        }, 80); // apagamos automaticamente la fotocelula
+
+      } else {
+        this.ocultado = false;
+      }
+    } else {
       this.eventosActivos.push(nuevoEvento);
     }
 
     // Registrar el evento en el servicio de tracking
     // Usar IDs generados si no se proporcionan explícitamente
     const fotocelulaId = this.fotocelulaId || this.nombreFotocelula;
-   
+
     //this.trackingService.registrarEvento(
     //  fotocelulaId,
     //  this.nombreFotocelula,
