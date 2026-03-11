@@ -12,27 +12,27 @@ import { ModuloTransporteCoordsComponent } from '../components/modulo-transporte
 declare var configuraciones: any;
 
 export interface TrackingPayload {
-  fotocelulaId:     string;
+  fotocelulaId: string;
   fotocelulaNombre: string;
-  moduloId:         string;
-  moduloNombre:     string;
-  tipoEvento:       string; // string crudo del Engine → se mapea a TipoEvento
+  moduloId: string;
+  moduloNombre: string;
+  tipoEvento: string; // string crudo del Engine → se mapea a TipoEvento
 }
 
 // ─── Mapa de traducción: nombre en Engine → TipoEvento interno ───────────────
 // Ajustar los literales de la izquierda según lo que emita realmente el Engine
 const MAPA_EVENTOS: Record<string, TipoEvento> = {
-  'PasoATiempo'      : 'atiempo',
-  'EnvioRetrasado'   : 'retraso',
-  'EnvioAdelantado'  : 'adelanto',
-  'AparicionDeEnvio' : 'apparition',
+  'PasoATiempo': 'atiempo',
+  'EnvioRetrasado': 'retraso',
+  'EnvioAdelantado': 'adelanto',
+  'AparicionDeEnvio': 'apparition',
   'DesaparicionEnvio': 'desaparicion',
   // Aliases por si el Engine usa los mismos literales internos
-  'atiempo'          : 'atiempo',
-  'retraso'          : 'retraso',
-  'adelanto'         : 'adelanto',
-  'apparition'       : 'apparition',
-  'desaparicion'     : 'desaparicion',
+  'atiempo': 'atiempo',
+  'retraso': 'retraso',
+  'adelanto': 'adelanto',
+  'apparition': 'apparition',
+  'desaparicion': 'desaparicion',
 };
 
 /**
@@ -64,9 +64,9 @@ const MAPA_EVENTOS: Record<string, TipoEvento> = {
 @Injectable({ providedIn: 'root' })
 export class TrackingWebsocketService implements OnDestroy {
 
- // Referencia al componente hijo <app-linea-transporte>
-  lineasTransporte! : QueryList<ModuloTransporteCoordsComponent>
-  
+  // Referencia al componente hijo <app-linea-transporte>
+  lineasTransporte!: QueryList<ModuloTransporteCoordsComponent>
+
   // ─── Dependencias ──────────────────────────────────────────────────────────
   private trackingService = inject(EventosTrackingService);
   private traceProcessorService = inject(TraceProcessorService);
@@ -90,9 +90,9 @@ export class TrackingWebsocketService implements OnDestroy {
 
   /** Texto de estado legible para mostrar en la UI */
   readonly estadoTexto = computed(() => {
-    if (this.errorConexion())  return `Error: ${this.errorConexion()}`;
-    if (!this.conectado())     return 'Desconectado';
-    if (!this.linkedTop())     return 'Conectado — sin link TOP';
+    if (this.errorConexion()) return `Error: ${this.errorConexion()}`;
+    if (!this.conectado()) return 'Desconectado';
+    if (!this.linkedTop()) return 'Conectado — sin link TOP';
     return 'Conectado y enlazado a TOP';
   });
 
@@ -100,10 +100,10 @@ export class TrackingWebsocketService implements OnDestroy {
   // SIGNALS DE DATOS DE CONTROL (combos de la UI)
   // ═══════════════════════════════════════════════════════════════════════════
 
-  readonly dataMaquinas         = signal<string[]>([]);
-  readonly dataSistemas         = signal<string[]>([]);
-  readonly dataModulos          = signal<string[]>([]);
-  readonly dataListeners        = signal<string[]>([]);
+  readonly dataMaquinas = signal<string[]>([]);
+  readonly dataSistemas = signal<string[]>([]);
+  readonly dataModulos = signal<string[]>([]);
+  readonly dataListeners = signal<string[]>([]);
   readonly dataListenersActivos = signal<string[]>([]);
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -111,17 +111,17 @@ export class TrackingWebsocketService implements OnDestroy {
   // ═══════════════════════════════════════════════════════════════════════════
 
   /** Total de mensajes recibidos por ambos canales */
-  readonly mensajesRecibidos  = signal<number>(0);
+  readonly mensajesRecibidos = signal<number>(0);
 
   /** Total de trazas de tracking procesadas correctamente */
-  readonly trackingRecibidos  = signal<number>(0);
+  readonly trackingRecibidos = signal<number>(0);
 
   /** Total de trazas con tipoEvento no reconocido en el MAPA_EVENTOS */
   readonly trackingDesconocidos = signal<number>(0);
 
   constructor() {
     this.urlEngine = configuraciones.urlBaseEngine + 'topwebsocket';
-    this.client    = new Client();
+    this.client = new Client();
     this._configurarCliente();
   }
 
@@ -157,10 +157,10 @@ export class TrackingWebsocketService implements OnDestroy {
    * @param modulo   Módulo/consulta seleccionada
    */
   linkarTop(maquina: string, sistema: string, modulo: string): void {
-    this.enviarComando('adjustnumtop',   [maquina]);
-    this.enviarComando('selectSistema',  [sistema]);
+    this.enviarComando('adjustnumtop', [maquina]);
+    this.enviarComando('selectSistema', [sistema]);
     this.enviarComando('selectConsulta', [modulo]);
-    this.enviarComando('conectar',       []);
+    this.enviarComando('conectar', []);
   }
 
   /**
@@ -200,8 +200,8 @@ export class TrackingWebsocketService implements OnDestroy {
    * @param textListener Cadena de búsqueda rápida
    */
   incluirListenerRapido(textListener: string): void {
-    this.enviarComando('incluirListenerRapido',  [textListener]);
-    this.enviarComando('doClickListenerrapido',  []);
+    this.enviarComando('incluirListenerRapido', [textListener]);
+    this.enviarComando('doClickListenerrapido', []);
   }
 
   /**
@@ -209,10 +209,10 @@ export class TrackingWebsocketService implements OnDestroy {
    * Equivale a refreshComboMaquinas() en remotengine.
    */
   refrescarCombos(): void {
-    this.enviarComando('maquinas',         []);
-    this.enviarComando('sistemas',         []);
-    this.enviarComando('modulos',          ['IL']);
-    this.enviarComando('listeners',        []);
+    this.enviarComando('maquinas', []);
+    this.enviarComando('sistemas', []);
+    this.enviarComando('modulos', ['IL']);
+    this.enviarComando('listeners', []);
     this.enviarComando('listenersActivos', []);
   }
 
@@ -369,31 +369,32 @@ export class TrackingWebsocketService implements OnDestroy {
 
     // Filtrar trazas que sean de tracking
     if (trace.tipoResult == 'eventTrace') {
-       this.handleTracking(trace.data);
+      this.handleTracking(trace.data);
     }
   }
 
-/**
- * 
- * @param trace 
- * @returns 
- */
+  /**
+   * 
+   * @param trace 
+   * @returns 
+   */
   private handleTracking(trace: string) {
-       try {
-        const eventosFotocelulas : EventoFotocelula[] | null  = this.traceProcessorService.analizarTraza(trace);
-        if (eventosFotocelulas) {
-          eventosFotocelulas.forEach(caso => {
-            //Renderizar 
-            this.simularTriggerinEvent(caso.fotocelula, caso.evento)
-       
-            //Actualizar capa Estadistica
-            this.trackingService.inyectarEventoWebSocket(
-              caso.fotocelula,
-              caso.fotocelula,
-              caso.evento
-            );
-          });
-        }
+    try {
+      const eventosFotocelulas: EventoFotocelula[] | null = this.traceProcessorService.analizarTraza(trace);
+      if (eventosFotocelulas) {
+        eventosFotocelulas.forEach(caso => {
+          //Renderizar 
+          this.simularTriggerinEvent(caso.fotocelula, caso.evento);
+          this.simularTriggerinEvent(caso.fotocelula, "atiempo");
+
+          //Actualizar capa Estadistica
+          //this.trackingService.inyectarEventoWebSocket(
+          //  caso.fotocelula,
+          //  caso.fotocelula,
+          //  caso.evento
+          //);
+        });
+      }
 
       this.trackingRecibidos.update(n => n + 1);
 
@@ -421,25 +422,25 @@ export class TrackingWebsocketService implements OnDestroy {
     this.linkedTop.set(false);
   }
 
-    /**
-   * Simula un evento en una fotocélula de un módulo específico (Ambos modos)
-   */
-      /**
-   * Simula un evento en una fotocelula específica 
-   * @param fotocelulaId 
-   */
-    public simularTriggerinEvent(
-        fotocelulaId: string, evento: any){
-          this.lineasTransporte.forEach(modulo =>
-            modulo.getAllFotocelulas().forEach(fc => { 
+  /**
+ * Simula un evento en una fotocélula de un módulo específico (Ambos modos)
+ */
+  /**
+* Simula un evento en una fotocelula específica 
+* @param fotocelulaId 
+*/
+  public simularTriggerinEvent(
+    fotocelulaId: string, evento: any) {
+    this.lineasTransporte.forEach(modulo =>
+      modulo.getAllFotocelulas().forEach(fc => {
 
-              if (fc.fotocelulaId === fotocelulaId) {
-                //console.log(`Simulando disparo evento ${evento} en modulo ${modulo.getNombreModulo()} fotocélula ${fc.fotocelulaId}`);         
-                modulo.simularEvento(fc.fotocelulaId, evento);  
-              }
-            })
-          );  
-    }  
+        if (fc.fotocelulaId === fotocelulaId) {
+          //console.log(`Simulando disparo evento ${evento} en modulo ${modulo.getNombreModulo()} fotocélula ${fc.fotocelulaId}`);         
+          modulo.simularEvento(fc.fotocelulaId, evento);
+        }
+      })
+    );
+  }
 
 
 }

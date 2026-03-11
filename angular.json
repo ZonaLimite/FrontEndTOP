@@ -27,7 +27,8 @@
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
-              "zone.js","src/polyfills.ts"
+              "zone.js",
+              "src/polyfills.ts"
             ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
@@ -68,7 +69,7 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "port": 4200,
-            "host": "192.168.1.59"
+            "host": "localhost"
           },
           "configurations": {
             "production": {

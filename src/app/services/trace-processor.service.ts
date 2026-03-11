@@ -19,9 +19,12 @@ export interface EventoFotocelula {
  * ─────────────────────────────────────────────────────────────────
  * 1. "BeltConveyor RE ... sur <NOMBRE>"  → activación   (ocultación)
  * 2. "BeltConveyor FE ... sur <NOMBRE>"  → desactivación (desocultación)
- * 3. "onTakeMailPiece ... sur <NOMBRE>"  → activación   (ocultación)
+ * 3. "MAIN - BeltConveyor onTakeMailPiece ... sur <NOMBRE>"  → activación   (ocultación)
  * 4. "clearTrackingPoint ... sur <NOMBRE>"→ desactivación (desocultación)
  * 5. "TakeMailPiece() from <NOMBRE>"     → activación   (ocultación)
+ * 6. "ACC_ - occulted    from <NOMBRE>"     → activación   (ocultación)
+ * 7. "LE_PLI_EST_EN_DEHORS_DE_SON_PAS sur <NOMBRE> ! : diff=<VALOR>ms"
+ *    → retraso (si VALOR < 0) | adelanto (si VALOR > 0)
  */
 @Injectable({
   providedIn: 'root'
@@ -45,11 +48,11 @@ export class TraceProcessorService {
     /BeltConveyor\s+FE\s+\S+\s+sur\s+(\S+)/;
 
   /**
-   * Detecta trazas con "onTakeMailPiece ... sur <fotocelula>"
+   * Detecta trazas con "MAIN - BeltConveyor onTakeMailPiece ... sur <fotocelula>"
    * → activación (ocultación)
    */
   private static readonly REGEX_ON_TAKE =
-    /onTakeMailPiece\s*.*?\s+sur\s+(\S+)/;
+    /MAIN - BeltConveyor onTakeMailPiece\s*.*?\s+sur\s+(\S+)/;
 
   /**
    * Detecta trazas con "clearTrackingPoint ... sur <fotocelula>"
@@ -65,6 +68,21 @@ export class TraceProcessorService {
    */
   private static readonly REGEX_TAKE_FROM =
     /TakeMailPiece\(\)\s+from\s+(\S+)/;
+
+  /**
+   * Detecta trazas con "ACC_ - occulted    from <fotocelula>
+   * -> activacion (ocultacion)
+   * Caso especial: la fotocélula se extrae de "from <nombre>
+   */
+  private static readonly REGEX_ACC_OCCULTED =
+    /ACC_ - occulted    from\s+(\S+)/;
+
+  /**
+   * Detecta trazas con "LE_PLI_EST_EN_DEHORS_DE_SON_PAS sur <NOMBRE> ! : diff=<VALOR>ms"
+   * → retraso (si valor < 0) | adelanto (si valor > 0)
+   */
+  private static readonly REGEX_PLI_DEHORS =
+    /LE_PLI_EST_EN_DEHORS_DE_SON_PAS\s+sur\s+(\S+)\s+!\s*:\s*diff=([+-]?\d+(?:\.\d+)?)\s*ms/;
 
   // ─── API pública ────────────────────────────────────────────────────────
 
@@ -135,23 +153,6 @@ export class TraceProcessorService {
       };
     }
 
-    // 3. clearTrackingPoint ... sur <fotocelula> → desactivación
-    const matchClear = linea.match(TraceProcessorService.REGEX_CLEAR);
-    if (matchClear) {
-      return {
-        fotocelula: this.limpiarNombreFotocelula(matchClear[1]),
-        evento: 'desactivacion'
-      };
-    }
-
-    // 4. BeltConveyor RE ... sur <fotocelula> → activación
-    const matchRE = linea.match(TraceProcessorService.REGEX_RE);
-    if (matchRE) {
-      return {
-        fotocelula: this.limpiarNombreFotocelula(matchRE[1]),
-        evento: 'desactivacion'
-      };
-    }
 
     // 5. BeltConveyor FE ... sur <fotocelula> → desactivación
     const matchFE = linea.match(TraceProcessorService.REGEX_FE);
@@ -159,6 +160,26 @@ export class TraceProcessorService {
       return {
         fotocelula: this.limpiarNombreFotocelula(matchFE[1]),
         evento: 'activacion'
+      };
+    }
+    // 6. Caso especial: la fotocélula se extrae de "from <nombre>
+    // "ACC_ - occulted    from <NOMBRE>"     → activación   (ocultación)
+    const matchAccOcculted = linea.match(TraceProcessorService.REGEX_ACC_OCCULTED);
+    if (matchAccOcculted) {
+      return {
+        fotocelula: this.limpiarNombreFotocelula(matchAccOcculted[1]),
+        evento: 'activacion'
+      };
+    }
+
+    // 7. LE_PLI_EST_EN_DEHORS_DE_SON_PAS sur <NOMBRE> ! : diff=<VALOR>ms
+    //    → retraso (valor < 0) | adelanto (valor > 0)
+    const matchPliDehors = linea.match(TraceProcessorService.REGEX_PLI_DEHORS);
+    if (matchPliDehors) {
+      const valor = parseFloat(matchPliDehors[2]);
+      return {
+        fotocelula: this.limpiarNombreFotocelula(matchPliDehors[1]),
+        evento: valor < 0 ? 'retraso' : 'adelanto'
       };
     }
 
