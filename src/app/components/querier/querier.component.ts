@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
+import { TableViewerCommonComponent } from '../tableviewercommon/tableviewercommon.component';
 import { GLOBAL } from '../../services/global';
 
 declare var configuraciones: any;
