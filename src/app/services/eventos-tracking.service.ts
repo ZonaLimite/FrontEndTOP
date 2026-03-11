@@ -22,7 +22,7 @@ export interface ContadoresEvento {
   apparition: number;
   desaparicion: number;
   activacion: number;
-  desactivacion: number;  
+  desactivacion: number;
 }
 
 /**
@@ -92,12 +92,12 @@ export class EventosTrackingService {
       atiempo: 0, retraso: 0, adelanto: 0, apparition: 0, desaparicion: 0, activacion: 0, desactivacion: 0
     };
     for (const est of this.estadisticas()) {
-      totales.atiempo      += est.atiempo;
-      totales.retraso      += est.retraso;
-      totales.adelanto     += est.adelanto;
-      totales.apparition   += est.apparition;
+      totales.atiempo += est.atiempo;
+      totales.retraso += est.retraso;
+      totales.adelanto += est.adelanto;
+      totales.apparition += est.apparition;
       totales.desaparicion += est.desaparicion;
-      totales.activacion   += est.activacion; 
+      totales.activacion += est.activacion;
       totales.desactivacion += est.desactivacion;
     }
     const [tipo, valor] = Object.entries(totales)
@@ -220,7 +220,7 @@ export class EventosTrackingService {
     ]);
 
     const headerLine = headers.join(',');
-    const dataLines  = rows.map(row => row.map(cell => `"${cell}"`).join(','));
+    const dataLines = rows.map(row => row.map(cell => `"${cell}"`).join(','));
     return [headerLine, ...dataLines].join('\n');
   }
 
@@ -235,7 +235,7 @@ export class EventosTrackingService {
     }
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
-    const url  = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
     link.setAttribute('download', nombreArchivo);
     link.style.visibility = 'hidden';
@@ -256,7 +256,7 @@ export class EventosTrackingService {
     tipo: TipoEvento
   ): void {
     let est = this.mapEstadisticas.get(fotocelulaId);
-    console.log('Procesando evento ' + tipo + "de Fotocelula : "+ fotocelulaNombre);
+    console.log('Procesando evento ' + tipo + "de Fotocelula : " + fotocelulaNombre);
     if (!est) {
       est = {
         fotocelulaId, fotocelulaNombre,
