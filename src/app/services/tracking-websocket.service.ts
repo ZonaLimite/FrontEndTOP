@@ -381,18 +381,19 @@ export class TrackingWebsocketService implements OnDestroy {
   private handleTracking(trace: string) {
     try {
       const eventosFotocelulas: EventoFotocelula[] | null = this.traceProcessorService.analizarTraza(trace);
+      //console.log("Analizando traza " + trace)  
       if (eventosFotocelulas) {
         eventosFotocelulas.forEach(caso => {
           //Renderizar 
           this.simularTriggerinEvent(caso.fotocelula, caso.evento);
-          this.simularTriggerinEvent(caso.fotocelula, "atiempo");
+          //this.simularTriggerinEvent(caso.fotocelula, "atiempo");
 
           //Actualizar capa Estadistica
-          //this.trackingService.inyectarEventoWebSocket(
-          //  caso.fotocelula,
-          //  caso.fotocelula,
-          //  caso.evento
-          //);
+          this.trackingService.inyectarEventoWebSocket(
+            caso.fotocelula,
+            caso.fotocelula,
+            caso.evento
+          );
         });
       }
 

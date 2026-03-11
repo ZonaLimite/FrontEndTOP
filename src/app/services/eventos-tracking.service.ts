@@ -67,13 +67,35 @@ export class EventosTrackingService {
   // ─── Fuente de verdad interna ─────────────────────────────────────────────
   private mapEstadisticas = new Map<string, EstadisticasFotocelula>();
 
+  /**
+   * Orden fijo de fotocélulas: coincide con la disposición física/gráfica.
+   * [id, nombreVisible]
+   */
+  private readonly ordenFotocelulas: [string, string][] = [
+    ['INJ-B3', 'INJ-B3'],
+    ['INJ-B2', 'INJ-B2'],
+    ['INJ-B1', 'INJ-B1'],
+    ['CUL-B5', 'CUL-B5'],
+    ['CUL-B3', 'CUL-B3'],
+    ['CUL-B2', 'CUL-B2'],
+    ['CUL-B1', 'CUL-B1'],
+    ['MRK-B1', 'MRK-B1'],
+    ['ACQ-B1', 'ACQ-B1'],
+    ['MER-B3', 'MER-B3'],
+    ['MER-B2', 'MER-B2'],
+    ['FE1',    'FE1'],
+    ['EXT-B1', 'EXT-B1'],
+    ['FE2',    'FE2'],
+  ];
+  public historial : EventoContable[] = []
+
   // ─── SIGNALS: estado observable sin BehaviorSubject ──────────────────────
 
   /** Signal principal con todas las estadísticas por fotocélula */
   readonly estadisticas = signal<EstadisticasFotocelula[]>([]);
 
   /** Signal del historial global de eventos (más reciente primero) */
-  readonly historial = signal<EventoContable[]>([]);
+  //readonly historial = signal<EventoContable[]>([]);
 
   /**
    * computed(): fotocélulas que tienen algún retraso registrado.
@@ -117,6 +139,9 @@ export class EventosTrackingService {
   }>();
 
   constructor() {
+    // Pre-inicializar el mapa con el orden gráfico deseado (valores a 0)
+    this.inicializarMapaOrdenado();
+
     // Único .subscribe() del servicio: convierte eventos WebSocket en Signals
     this.eventoEntrante$.subscribe(ev => {
       this.procesarEvento(
@@ -124,7 +149,29 @@ export class EventosTrackingService {
         ev.tipo
       );
     });
+    setInterval(() => {
+          this.actualizarRenderizado()
+    }, 1000); //Refresh renderizado
+
     console.log('EventosTrackingService inicializado (Signals + RxJS WebSocket)');
+  }
+
+  /**
+   * Pre-puebla mapEstadisticas con claves en el orden gráfico fijo.
+   * Todos los contadores arrancan a 0.
+   */
+  private inicializarMapaOrdenado(): void {
+    for (const [id, nombre] of this.ordenFotocelulas) {
+      this.mapEstadisticas.set(id, {
+        fotocelulaId: id,
+        fotocelulaNombre: nombre,
+        activacion: 0, desactivacion: 0,
+        atiempo: 0, retraso: 0, adelanto: 0,
+        apparition: 0, desaparicion: 0,
+        total: 0,
+        historialCompleto: []
+      });
+    }
   }
 
   // ─── API pública ──────────────────────────────────────────────────────────
@@ -138,10 +185,32 @@ export class EventosTrackingService {
     fotocelulaNombre: string,
     tipo: TipoEvento
   ): void {
-    //Ahora necesitamos acceder a las interfaces de 
-    this.eventoEntrante$.next({
-      fotocelulaId, fotocelulaNombre, tipo
-    });
+    //Ahora necesitamos acceder a las interfaces : 
+
+    // mediante observables para conducir la llamada al metodo de calculo y actualizacion : procesarEvento()
+    //this.eventoEntrante$.next({
+    //  fotocelulaId, fotocelulaNombre, tipo
+    //});
+
+    // o  
+
+    // Llamada directa al metodo de calculo y actualizacion : procesarEvento()
+    this.procesarEvento(
+      fotocelulaId, fotocelulaNombre,
+      tipo
+    );
+    // ✅ Actualizar Signals — notifica automáticamente a computed() y templates
+    //this.actualizarRenderizado(tipo);
+  }  
+
+  /**
+   * Actualizacion de renderiazacion dinamica de tablas d estadisticas
+   * 
+   **/  
+  actualizarRenderizado(){
+    this.estadisticas.set(Array.from(this.mapEstadisticas.values()));
+    //console.log("Actualizando renderizado ... cada 1000")
+    //this.historial.update(h => [evento, ...h]); // más reciente primero
   }
 
   /**
@@ -176,7 +245,9 @@ export class EventosTrackingService {
   limpiarEstadisticas(): void {
     this.mapEstadisticas.clear();
     this.estadisticas.set([]);
-    this.historial.set([]);
+    //this.historial.set([]);
+    this.historial = [];
+    this.inicializarMapaOrdenado();
     console.log('Estadísticas de eventos limpiadas');
   }
 
@@ -248,7 +319,7 @@ export class EventosTrackingService {
 
   /**
    * Lógica común de procesamiento de eventos.
-   * Actualiza el Map interno y dispara los Signals.(Estadisticas)
+   * Actualiza el Map interno y (dispara los Signals.(Estadisticas))
    */
   private procesarEvento(
     fotocelulaId: string,
@@ -266,7 +337,8 @@ export class EventosTrackingService {
       };
       this.mapEstadisticas.set(fotocelulaId, est);
     }
-
+    
+    // Tratamiento contadores estadisticos de eventos
     est[tipo]++;
     est.total++;
     est.ultimoEvento = new Date();
@@ -276,9 +348,10 @@ export class EventosTrackingService {
       timestamp: new Date()
     };
     est.historialCompleto.push(evento);
+    this.historial.unshift(evento);
+    if (this.historial.length > 500) this.historial.pop(); // No registramos mas de 500 por rendimiento
+    this.mapEstadisticas.set(fotocelulaId,est);
+   
 
-    // ✅ Actualizar Signals — notifica automáticamente a computed() y templates
-    this.estadisticas.set(Array.from(this.mapEstadisticas.values()));
-    this.historial.update(h => [evento, ...h]); // más reciente primero
   }
 }

@@ -100,10 +100,12 @@
     </div>
 
     <div class="historial-lista">
-      <div *ngIf="historial().length === 0" class="historial-vacio">
+      <!--<div *ngIf="historial().length === 0" class="historial-vacio"> -->
+      <div *ngIf="historial.length === 0" class="historial-vacio"> 
         No hay historial disponible
       </div>
-      <div *ngFor="let evento of historial().slice(0, 50)" class="evento-item">
+      <!--<div *ngFor="let evento of historial().slice(0, 50)" class="evento-item">-->
+        <div *ngFor="let evento of historial.slice(0, 50)" class="evento-item">
         <span class="evento-timestamp">{{ evento.timestamp | date: 'HH:mm:ss' }}</span>
         <!--<span class="evento-modulo">{{ evento.moduloNombre }}</span> -->
         <span class="evento-fotocelula">{{ evento.fotocelulaNombre }}</span>

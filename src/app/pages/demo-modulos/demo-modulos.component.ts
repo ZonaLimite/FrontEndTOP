@@ -46,7 +46,7 @@ export class DemoModulosComponent implements OnInit {
       orientacion: 'horizontal',
       fotocelulas: [
         { id: 'CUL-B5', nombre: 'CUL-B5', x: 15, y: 60, tamano: 'pequeno', orientacion: 'row' },
-        { id: 'CUL-B4', nombre: 'CUL-B4', x: 35, y: 30, tamano: 'pequeno', orientacion: 'row' },
+        { id: 'CUL-B3', nombre: 'CUL-B3', x: 35, y: 30, tamano: 'pequeno', orientacion: 'row' },
         { id: 'CUL-B2', nombre: 'CUL-B2', x: 55, y: 60, tamano: 'pequeno', orientacion: 'row' },
         // { id: 'CUL-B2', nombre: 'CUL-B2', x: 86, y: 45, tamano: 'pequeno', orientacion: 'row' },
         { id: 'CUL-B1', nombre: 'CUL-B1', x: 86, y: 60, tamano: 'pequeno', orientacion: 'row' },
@@ -64,13 +64,13 @@ export class DemoModulosComponent implements OnInit {
       ]
     },
     {
-      id: 'ADQ-01',
+      id: 'ACQ-01',
       nombre: 'Adquisicion',
       ancho: 140,
       alto: 150,
       orientacion: 'horizontal',
       fotocelulas: [
-        { id: 'Input_1', nombre: 'ADQ-01', x: 83, y: 60, tamano: 'pequeno', orientacion: 'row' }
+        { id: 'ACQ-B1', nombre: 'ACQ-B1', x: 83, y: 60, tamano: 'pequeno', orientacion: 'row' }
       ]
     },
     {
@@ -150,7 +150,7 @@ export class DemoModulosComponent implements OnInit {
         y: 50
       });
     }
-    const modulo4 = this.modulosCoordsEjemplo.find(m => m.id === "ADQ-01");
+    const modulo4 = this.modulosCoordsEjemplo.find(m => m.id === "ACQ-01");
     if (modulo4) {
       this.modulosLineaEntrada.push({
         config: modulo4,

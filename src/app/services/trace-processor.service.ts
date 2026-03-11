@@ -129,6 +129,9 @@ export class TraceProcessorService {
    *  3. clearTrackingPoint ... sur ...
    *  4. BeltConveyor RE ... sur ...
    *  5. BeltConveyor FE ... sur ...
+   *  6. ACC_ - occulted    from <NOMBRE>     → activación   (ocultación)
+   *  7. LE_PLI_EST_EN_DEHORS_DE_SON_PAS sur <NOMBRE> ! : diff=<VALOR>ms"
+   *    → retraso (si VALOR < 0) | adelanto (si VALOR > 0)
    */
   private procesarLinea(linea: string): EventoFotocelula | null {
     if (!linea) {

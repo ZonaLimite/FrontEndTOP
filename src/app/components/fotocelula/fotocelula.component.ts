@@ -29,12 +29,13 @@ export class FotocelulaComponent {
 
   mostrarEvento(tipo: 'activacion' | 'desactivacion' | 'atiempo' | 'retraso' | 'adelanto' | 'apparition' | 'desaparicion') {
     const id = this.counter++;
-    const nuevoEvento: EventoTracking = { id, tipo };
+
 
     if (tipo === 'activacion' || tipo === 'desactivacion') {
       if (tipo === 'activacion') {
         this.ocultado = true;
-        console.log(`Evento ${tipo} en ${this.nombreFotocelula}`);
+        //console.log(`Evento ${tipo} en ${this.nombreFotocelula}`);
+    
         setTimeout(() => {
           this.ocultado = false;
         }, 80); // apagamos automaticamente la fotocelula
@@ -43,6 +44,7 @@ export class FotocelulaComponent {
         this.ocultado = false;
       }
     } else {
+      const nuevoEvento: EventoTracking = { id, tipo };
       this.eventosActivos.push(nuevoEvento);
     }
 
