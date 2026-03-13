@@ -10,13 +10,14 @@
               <input type="text" class="form-control" #nombre="ngModel" name="fechaIni" [(ngModel)]="formQuerySignal().fechaIni" id="fechaIni">
             </div>
             <div class="col-md-6 mb-2" >
+              <label for="horaIni" class="form-label">HoraIni</label>
+              <input type="text" class="form-control"  #nombre="ngModel" name="horaIni" [(ngModel)]="formQuerySignal().horaIni" id="horaIni">
+          </div>    
+
+            <div class="col-md-6 mb-2" >
               <label for="fechaFin" class="form-label">Fech.Fin</label>
               <input type="text" class="form-control" #nombre="ngModel" name="fechaFin" [(ngModel)]="formQuerySignal().fechaFin" id="fechaFin">
             </div>
-            <div class="col-md-6 mb-2" >
-                <label for="horaIni" class="form-label">HoraIni</label>
-                <input type="text" class="form-control"  #nombre="ngModel" name="horaIni" [(ngModel)]="formQuerySignal().horaIni" id="horaIni">
-            </div>    
             <div class="col-md-6 mb-2" >                
                 <label for="horaFin" class="form-label">HoraFin</label>
                 <input type="text" class="form-control"  #nombre="ngModel" name="horaFin" [(ngModel)]="formQuerySignal().horaFin" id="horaFin">

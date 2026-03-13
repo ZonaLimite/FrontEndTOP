@@ -12,6 +12,10 @@ export class QueryParam{
         public maquina1: boolean,
         public maquina2: boolean,
         public apiFault: ApiFaults,
-        public labelheader: string
+        public labelheader: string,
+        public fechaIniUtc: string,
+        public fechaFinUtc: string,
+        public horaIniUtc: string,
+        public horaFinUtc: string, 
     ){}
 }

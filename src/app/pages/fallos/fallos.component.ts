@@ -39,6 +39,9 @@ export class FallosComponent implements OnInit {
   public listItemsConcepto:ApiFaults[]=
             [new ApiFaults('ETACS','api/faults/ejGroupBy',[]),
              new ApiFaults('FRACASOS ENTRADA','api/faults/etifGroupBy',[]),
+             new ApiFaults('FALLOS ELECTROIMAN','api/faults/uefGroupBy',[]),
+             new ApiFaults('CUBA MAL CERRADA','api/faults/bnpcGroupBy',[]),
+             new ApiFaults('CUBA MAL ABIERTA','api/faults/cnobGroupBy',[]),
             ];
 
   //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
@@ -56,9 +59,9 @@ export class FallosComponent implements OnInit {
     this.verMaquina2=filter.maquina2;
     
     this.urlCommon=configuraciones.urlBase + filter.apiFault.faultApi+"?";
-    
-    if(filter.fechaIni != "" ) this.urlCommon += "fecha='"+filter.fechaIni+"' AND '"+filter.fechaFin+"'";
-    if(filter.horaIni != "") this.urlCommon += "&hora='"+filter.horaIni+"' AND '"+filter.horaFin+"'";
+    if(filter.fechaIni != "" && filter.horaIni !="") this.urlCommon += "fecha='"+filter.fechaIniUtc+" "+filter.horaIniUtc+"' AND '"+filter.fechaFinUtc+" " + filter.horaFinUtc+"'";
+    if(filter.fechaIni != "" && filter.horaIni =="") this.urlCommon += "fecha='"+filter.fechaIniUtc+"' AND '"+filter.fechaFinUtc+"'";
+    if(filter.horaIni != "" && filter.fechaIni == "" ) this.urlCommon += "&hora='"+filter.horaIniUtc+"' AND '"+filter.horaFinUtc+"'";
 
     if(filter.turno !="")  this.urlCommon += "&turno="+filter.turno;
     if(filter.programa != "")  this.urlCommon += "&programa="+filter.programa;

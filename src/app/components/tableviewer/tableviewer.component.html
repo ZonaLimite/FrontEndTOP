@@ -23,10 +23,10 @@
             <!---<tr class="table-active">-->
             <tr *ngFor="let item of rows; let i=index" [class.table-active]="i==indexRow" (dblclick)="this.handleClick(i)">
               <th scope="row">{{i}}</th>
-              <td>{{item.ddate}}</td>
-              <td>{{item.htime}}</td>
-              <td>{{item.sshift}}</td>
-              <td>{{item.sexploitationplan}}</td>
+              <td>{{item.fecha}}</td>
+              <td>{{item.hora}}</td>
+              <td>{{item.turno}}</td>
+              <td>{{item.programa}}</td>
               <td>{{item.extraidas}}</td>
             </tr>
           </tbody>

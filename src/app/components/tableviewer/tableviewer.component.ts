@@ -6,7 +6,9 @@ import { ApiFaults } from '../../models/apiFaults';
 
 
 //Exportar un signal para los sidebar
-export var misignal = signal<QueryParam>(new QueryParam("","","","","","",true, true,new ApiFaults("","",[]),""));
+export var misignal = signal<QueryParam>(new QueryParam("","","","","","",true, true,new ApiFaults("","",[]),"","","","",""));
+//Exportar un signal para el footer
+export var logger = signal<string>("tableviewer arrancando");
 
 @Component({
   selector: 'tableviewer',
@@ -39,14 +41,7 @@ export class TableviewerComponent {
   
   setInterval(() =>{
       if(this.urlRest!=""){
-        this.resultsetService.resultsetFromRest(this.urlRest).subscribe(
-          {
-            next: (result) => {
-              this.rows = result;
-            }  ,
-            error: (e) => console.error(e)/*,
-            complete: () => /*console.info('complete') */
-        });
+        this.requestService (this.urlRest);
       }
     }, 10000)
    
@@ -56,25 +51,47 @@ export class TableviewerComponent {
   //la contruccion y aporte de parametros para la consulta
   //Se apoya en un signal que es consumido en el componente sidebar.
   handleClick(index:number){
-    //this.isession.emit(this.rows[index].isessionnumber);
+   
     this.indexRow=index;
     
-    let fechaIni =  this.rows[index].ddate;
-    let fechaFin = this.rows[index].ddate;
-    let horaIni =  this.rows[index].htime;
-    let horaFin = this.rows[index].htime;
-    let turno = this.rows[index].sshift;
-    let programa = this.rows[index].sexploitationplan;
-    let maquina = this.rows[index].imachineid;
+    let fechaIni =  this.rows[index].fecha;
+    let fechaFin = this.rows[index].fecha;
+    let horaIni =  this.rows[index].hora;
+    let horaFin = this.rows[index].hora;
+    let turno = this.rows[index].turno;
+    let programa = this.rows[index].programa;
+    let maquina = this.rows[index].machineid;
     let maquina1:boolean = false;
     let maquina2:boolean= false;
     if (maquina==4) maquina1=true;
     if (maquina==5) maquina2=true;
+    let copyApiFaults:ApiFaults = misignal().apiFault;
 
-    let paramQuerySidebar = new QueryParam(fechaIni,fechaFin,horaIni,horaFin,turno,programa,maquina1,maquina2,new ApiFaults('ETACS','api/faults/ejGroupBy',[]),"");
+    //let paramQuerySidebar = new QueryParam(fechaIni,fechaFin,horaIni,horaFin,turno,programa,maquina1,maquina2,new ApiFaults('ETACS','api/faults/ejGroupBy',[]),"","","","","");
+    let paramQuerySidebar = new QueryParam(fechaIni,fechaFin,horaIni,horaFin,turno,programa,maquina1,maquina2,copyApiFaults,"","","","","");
     
     misignal.set(paramQuerySidebar);//set signal value
  
+  }
+
+  private requestService (url : string){
+      //logger.set(" Requiriendo servicio ... " + this.urlRest);
+      this.resultsetService.resultsetFromRest(url).subscribe(
+      {
+        next: (result) => {
+          if(result==null){
+            logger.set("Recibido null ... " + this.urlRest);//set signal value
+            //this.rows=[];  
+          }else{
+            this.rows = result;                
+          }
+        },
+        error: (e) => {
+          logger.set("Error resultService ... " + this.urlRest)//set signal value
+          console.log(e);
+        }/**,  
+        complete: () =>  //logger.set(" Completado servicio ... " + this.urlRest)//set signal value**/
+    });
   }
 }
 
