@@ -60,7 +60,7 @@ export class EstadisticasEventosComponent {
   );
 
   /** Acceso directo al historial del servicio */
-  historial = this.trackingService.historial;
+  historial = this.trackingService.getHistorial();
 
   /**
    * computed(): suma de cada tipo de evento sobre todas las fotocélulas visibles.
@@ -102,9 +102,7 @@ export class EstadisticasEventosComponent {
   }
 
   limpiarEstadisticas(): void {
-    if (confirm('¿Estás seguro de que deseas limpiar todas las estadísticas?')) {
-      this.trackingService.limpiarEstadisticas();
-    }
+    this.trackingService.limpiarEstadisticas();
   }
 
   exportarCSV(): void {

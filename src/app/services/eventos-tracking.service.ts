@@ -82,17 +82,21 @@ export class EventosTrackingService {
     ['MRK-B1', 'MRK-B1'],
     ['ACQ-B1', 'ACQ-B1'],
     ['MER-B3', 'MER-B3'],
-    ['MER-B2', 'MER-B2'],
+    ['MER-B1', 'MER-B1'],  
     ['FE1',    'FE1'],
+    ['MER-B2', 'MER-B2'],
     ['EXT-B1', 'EXT-B1'],
     ['FE2',    'FE2'],
   ];
-  public historial : EventoContable[] = []
+
 
   // ─── SIGNALS: estado observable sin BehaviorSubject ──────────────────────
 
   /** Signal principal con todas las estadísticas por fotocélula */
   readonly estadisticas = signal<EstadisticasFotocelula[]>([]);
+
+  //Es el historial de eventos que se muestra en el estadisticas-eventos
+  historial : EventoContable[];
 
   /** Signal del historial global de eventos (más reciente primero) */
   //readonly historial = signal<EventoContable[]>([]);
@@ -127,6 +131,22 @@ export class EventosTrackingService {
     return valor > 0 ? (tipo as TipoEvento) : null;
   });
 
+
+  /**
+   *  Get de historial
+   */
+  getHistorial(): EventoContable[] {
+    return this.historial;
+  }
+
+  /**
+   *  Reset de historial
+   */
+  resetHistorial() {
+     this.historial.splice(0); // Vaciar in-place, sin romper la referencia
+  }
+
+
   // ─── RxJS: SOLO para la entrada del WebSocket ────────────────────────────
   /**
    * Subject interno que actúa como puerta de entrada desde STOMP/SockJS.
@@ -141,6 +161,7 @@ export class EventosTrackingService {
   constructor() {
     // Pre-inicializar el mapa con el orden gráfico deseado (valores a 0)
     this.inicializarMapaOrdenado();
+    this.historial = [];
 
     // Único .subscribe() del servicio: convierte eventos WebSocket en Signals
     this.eventoEntrante$.subscribe(ev => {
@@ -243,10 +264,10 @@ export class EventosTrackingService {
    * Limpia todas las estadísticas y resetea los signals.
    */
   limpiarEstadisticas(): void {
-    this.mapEstadisticas.clear();
+    this.mapEstadisticas.clear(); 
     this.estadisticas.set([]);
     //this.historial.set([]);
-    this.historial = [];
+    this.resetHistorial();
     this.inicializarMapaOrdenado();
     console.log('Estadísticas de eventos limpiadas');
   }
@@ -348,10 +369,8 @@ export class EventosTrackingService {
       timestamp: new Date()
     };
     est.historialCompleto.push(evento);
-    this.historial.unshift(evento);
-    if (this.historial.length > 500) this.historial.pop(); // No registramos mas de 500 por rendimiento
+    this.getHistorial().unshift(evento);
+    if (this.getHistorial().length > 500) this.getHistorial().pop(); // No registramos mas de 500 por rendimiento
     this.mapEstadisticas.set(fotocelulaId,est);
-   
-
   }
 }
