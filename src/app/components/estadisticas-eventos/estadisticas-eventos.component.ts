@@ -79,6 +79,53 @@ export class EstadisticasEventosComponent {
     return totales;
   });
 
+  /**
+   * computed(): calcula la fotocélula con el valor máximo para cada tipo de evento.
+   * En caso de empate, se selecciona la fotocélula cuyo último evento sea más antiguo.
+   * Se utiliza para resaltar la celda máxima de cada fila (tipo de evento).
+   */
+  maximosPorTipo = computed(() => {
+    const maximos: Record<TipoEvento, { id: string | null, max: number, timestamp: Date | null }> = {
+      activacion: { id: null, max: 0, timestamp: null },
+      desactivacion: { id: null, max: 0, timestamp: null },
+      atiempo: { id: null, max: 0, timestamp: null },
+      retraso: { id: null, max: 0, timestamp: null },
+      adelanto: { id: null, max: 0, timestamp: null },
+      apparition: { id: null, max: 0, timestamp: null },
+      desaparicion: { id: null, max: 0, timestamp: null }
+    };
+
+    for (const est of this.estadisticasFiltradas()) {
+      for (const tipo of this.tiposEventos) {
+        const valorActual = est[tipo];
+        if (valorActual === 0) continue;
+
+        const maxActual = maximos[tipo];
+        const timestampEst = est.ultimoEvento || null;
+
+        if (valorActual > maxActual.max) {
+          // Supera el máximo actual
+          maxActual.max = valorActual;
+          maxActual.id = est.fotocelulaId;
+          maxActual.timestamp = timestampEst;
+        } else if (valorActual === maxActual.max && maxActual.max > 0) {
+          // Empate: gana el que tenga el timestamp más antiguo (menor valor)
+          if (timestampEst && maxActual.timestamp) {
+            if (timestampEst.getTime() < maxActual.timestamp.getTime()) {
+              maxActual.id = est.fotocelulaId;
+              maxActual.timestamp = timestampEst;
+            }
+          } else if (timestampEst && !maxActual.timestamp) {
+             // Fallback por si acaso el actual no tiene timestamp (raro pero posible)
+             maxActual.id = est.fotocelulaId;
+             maxActual.timestamp = timestampEst;
+          }
+        }
+      }
+    }
+    return maximos;
+  });
+
   // ─── Acciones ─────────────────────────────────────────────────────────────
 
   toggleFiltro(tipo: TipoEvento): void {
@@ -135,15 +182,9 @@ export class EstadisticasEventosComponent {
 
   esEventoMaximo(fotocelula: EstadisticasFotocelula, tipo: TipoEvento): boolean {
     const tiposExcluidos: TipoEvento[] = ['atiempo'];
-    let valorMax = 0;
-    let eventoMax: TipoEvento | null = null;
-    for (const t of this.tiposEventos) {
-      if (tiposExcluidos.includes(t)) continue;
-      if (fotocelula[t] > valorMax) {
-        valorMax = fotocelula[t];
-        eventoMax = t;
-      }
-    }
-    return eventoMax === tipo;
+    if (tiposExcluidos.includes(tipo)) return false;
+
+    const maximo = this.maximosPorTipo()[tipo];
+    return maximo.max > 0 && maximo.id === fotocelula.fotocelulaId;
   }
 }
