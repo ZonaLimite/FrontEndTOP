@@ -26,6 +26,7 @@ export interface EventoFotocelula {
  * 7. "LE_PLI_EST_EN_DEHORS_DE_SON_PAS sur <NOMBRE> ! : diff=<VALOR>ms"
  *    → retraso (si VALOR < 0) | adelanto (si VALOR > 0)
  * 8. ": apparition <IdCarta> sur <NOMBRE>" → apparition
+ * 9. ": disapparition <IdCarta> sur <NOMBRE>" → desaparicion
  
  */
 @Injectable({
@@ -92,6 +93,13 @@ export class TraceProcessorService {
    */
   private static readonly REGEX_APPARITION =
     /:\s*apparition\s+\S+\s+sur\s+(\S+)/;
+
+  /**
+   * Detecta trazas con ": disapparition <IdCarta> sur <NOMBRE>"
+   * → desaparicion
+   */
+  private static readonly REGEX_DISAPPARITION =
+    /:\s*disapparition\s+\S+\s+sur\s+(\S+)/;
 
   // ─── API pública ────────────────────────────────────────────────────────
 
@@ -207,6 +215,15 @@ export class TraceProcessorService {
       return {
         fotocelula: this.limpiarNombreFotocelula(matchApparition[2]),
         evento: 'apparition'
+      };
+    }
+
+    // 9. : disapparition <IdCarta> sur <NOMBRE> → desaparicion
+    const matchDisapparition = linea.match(TraceProcessorService.REGEX_DISAPPARITION);
+    if (matchDisapparition) {
+      return {
+        fotocelula: this.limpiarNombreFotocelula(matchDisapparition[2]),
+        evento: 'desaparicion'
       };
     }
 
