@@ -41,7 +41,7 @@ export class EstadisticasEventosComponent {
    * Se recalcula si cambian las estadísticas del servicio O los filtros.
    */
   estadisticasFiltradas = computed(() => {
-    const stats   = this.trackingService.estadisticas();
+    const stats = this.trackingService.estadisticas();
     const filtros = this.filtrosActivos();
     return stats.map(est => ({
       ...est,
@@ -59,8 +59,8 @@ export class EstadisticasEventosComponent {
     this.tiposEventos.filter(t => this.filtrosActivos()[t])
   );
 
-  /** Acceso directo al historial del servicio */
-  historial = this.trackingService.getHistorial();
+  /** Acceso directo al signal de historial del servicio */
+  historial = this.trackingService.signal_historial;
 
   /**
    * computed(): suma de cada tipo de evento sobre todas las fotocélulas visibles.
@@ -69,7 +69,7 @@ export class EstadisticasEventosComponent {
    */
   totalesPorTipo = computed(() => {
     const totales: Record<TipoEvento, number> = {
-      activacion:0, desactivacion:0, atiempo: 0, retraso: 0, adelanto: 0, apparition: 0, desaparicion: 0
+      activacion: 0, desactivacion: 0, atiempo: 0, retraso: 0, adelanto: 0, apparition: 0, desaparicion: 0
     };
     for (const est of this.estadisticasFiltradas()) {
       for (const tipo of this.tiposEventos) {
@@ -124,10 +124,10 @@ export class EstadisticasEventosComponent {
     const colores: Record<TipoEvento, string> = {
       activacion: '#00aa00',
       desactivacion: '#00aa00',
-      atiempo:      '#00aa00',
-      retraso:      '#ffcc00',
-      adelanto:     '#00ccff',
-      apparition:   '#ff00ff',
+      atiempo: '#00aa00',
+      retraso: '#ffcc00',
+      adelanto: '#00ccff',
+      apparition: '#ff00ff',
       desaparicion: '#ff3333'
     };
     return colores[tipo];

@@ -67,6 +67,29 @@ export class EventosTrackingService {
   // ─── Fuente de verdad interna ─────────────────────────────────────────────
   private mapEstadisticas = new Map<string, EstadisticasFotocelula>();
 
+  //Es el historial de eventos que se muestra en el estadisticas-eventos
+  private historial: EventoContable[];
+
+  constructor() {
+    // Pre-inicializar el mapa con el orden gráfico deseado (valores a 0)
+    this.inicializarMapaOrdenado();
+    this.historial = [];
+
+    // Único .subscribe() del servicio: convierte eventos WebSocket en Signals
+    this.eventoEntrante$.subscribe(ev => {
+      this.procesarEvento(
+        ev.fotocelulaId, ev.fotocelulaNombre,
+        ev.tipo
+      );
+    });
+
+    setInterval(() => {
+      this.actualizarRenderizadoEstadisticas()
+    }, 2000); //Refresh renderizado mediante signals
+
+    console.log('EventosTrackingService inicializado (Signals + RxJS WebSocket)');
+  }
+
   /**
    * Orden fijo de fotocélulas: coincide con la disposición física/gráfica.
    * [id, nombreVisible]
@@ -82,11 +105,11 @@ export class EventosTrackingService {
     ['MRK-B1', 'MRK-B1'],
     ['ACQ-B1', 'ACQ-B1'],
     ['MER-B3', 'MER-B3'],
-    ['MER-B1', 'MER-B1'],  
-    ['FE1',    'FE1'],
+    ['MER-B1', 'MER-B1'],
+    ['FE1', 'FE1'],
     ['MER-B2', 'MER-B2'],
     ['EXT-B1', 'EXT-B1'],
-    ['FE2',    'FE2'],
+    ['FE2', 'FE2'],
   ];
 
 
@@ -95,11 +118,9 @@ export class EventosTrackingService {
   /** Signal principal con todas las estadísticas por fotocélula */
   readonly estadisticas = signal<EstadisticasFotocelula[]>([]);
 
-  //Es el historial de eventos que se muestra en el estadisticas-eventos
-  historial : EventoContable[];
 
   /** Signal del historial global de eventos (más reciente primero) */
-  //readonly historial = signal<EventoContable[]>([]);
+  readonly signal_historial = signal<EventoContable[]>([]);
 
   /**
    * computed(): fotocélulas que tienen algún retraso registrado.
@@ -136,14 +157,14 @@ export class EventosTrackingService {
    *  Get de historial
    */
   getHistorial(): EventoContable[] {
-    return this.historial;
+    return this.signal_historial();
   }
 
   /**
    *  Reset de historial
    */
   resetHistorial() {
-     this.historial.splice(0); // Vaciar in-place, sin romper la referencia
+    this.historial.splice(0); // Vaciar in-place, sin romper la referencia
   }
 
 
@@ -158,24 +179,6 @@ export class EventosTrackingService {
     tipo: TipoEvento;
   }>();
 
-  constructor() {
-    // Pre-inicializar el mapa con el orden gráfico deseado (valores a 0)
-    this.inicializarMapaOrdenado();
-    this.historial = [];
-
-    // Único .subscribe() del servicio: convierte eventos WebSocket en Signals
-    this.eventoEntrante$.subscribe(ev => {
-      this.procesarEvento(
-        ev.fotocelulaId, ev.fotocelulaNombre,
-        ev.tipo
-      );
-    });
-    setInterval(() => {
-          this.actualizarRenderizado()
-    }, 1000); //Refresh renderizado
-
-    console.log('EventosTrackingService inicializado (Signals + RxJS WebSocket)');
-  }
 
   /**
    * Pre-puebla mapEstadisticas con claves en el orden gráfico fijo.
@@ -222,16 +225,24 @@ export class EventosTrackingService {
     );
     // ✅ Actualizar Signals — notifica automáticamente a computed() y templates
     //this.actualizarRenderizado(tipo);
-  }  
+  }
 
   /**
    * Actualizacion de renderiazacion dinamica de tablas d estadisticas
    * 
-   **/  
-  actualizarRenderizado(){
+   **/
+  actualizarRenderizadoEstadisticas() {
     this.estadisticas.set(Array.from(this.mapEstadisticas.values()));
     //console.log("Actualizando renderizado ... cada 1000")
-    //this.historial.update(h => [evento, ...h]); // más reciente primero
+    this.signal_historial.set([...this.historial]); // Copia nueva → el signal detecta el cambio de referencia
+  }
+
+  /**
+   * Actualizacion de renderiazacion dinamica de tablas d estadisticas
+   * 
+   **/
+  actualizarRenderizadoHistorial() {
+    this.signal_historial.set([...this.historial]); // Copia nueva → el signal detecta el cambio de referencia
   }
 
   /**
@@ -264,7 +275,7 @@ export class EventosTrackingService {
    * Limpia todas las estadísticas y resetea los signals.
    */
   limpiarEstadisticas(): void {
-    this.mapEstadisticas.clear(); 
+    this.mapEstadisticas.clear();
     this.estadisticas.set([]);
     //this.historial.set([]);
     this.resetHistorial();
@@ -358,7 +369,7 @@ export class EventosTrackingService {
       };
       this.mapEstadisticas.set(fotocelulaId, est);
     }
-    
+
     // Tratamiento contadores estadisticos de eventos
     est[tipo]++;
     est.total++;
@@ -369,8 +380,10 @@ export class EventosTrackingService {
       timestamp: new Date()
     };
     est.historialCompleto.push(evento);
-    this.getHistorial().unshift(evento);
-    if (this.getHistorial().length > 500) this.getHistorial().pop(); // No registramos mas de 500 por rendimiento
-    this.mapEstadisticas.set(fotocelulaId,est);
+
+    this.historial.unshift(evento);
+    if (this.historial.length > 500) this.historial.pop(); // No registramos mas de 500 por rendimiento
+
+    this.mapEstadisticas.set(fotocelulaId, est);
   }
 }

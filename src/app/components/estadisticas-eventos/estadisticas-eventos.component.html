@@ -5,10 +5,7 @@
     <div class="filtros-contenedor">
 
       <label *ngFor="let tipo of tiposEventos" class="filtro-label">
-        <input
-          type="checkbox"
-          [checked]="filtrosActivos()[tipo]"
-          (change)="toggleFiltro(tipo)">
+        <input type="checkbox" [checked]="filtrosActivos()[tipo]" (change)="toggleFiltro(tipo)">
         <span class="filtro-nombre" [style.color]="getColorTipo(tipo)">
           {{ tipo | uppercase }}
         </span>
@@ -47,9 +44,7 @@
           <!-- Columna TOTAL -->
           <th class="columna-total-header">TOTAL</th>
 
-          <th
-            *ngFor="let fotocelula of estadisticasFiltradas()"
-            class="columna-fotocelula"
+          <th *ngFor="let fotocelula of estadisticasFiltradas()" class="columna-fotocelula"
             title="{{ fotocelula.fotocelulaId }}">
             <div class="encabezado-fotocelula">
               <strong>{{ fotocelula.fotocelulaNombre }}</strong>
@@ -73,10 +68,7 @@
             </span>
           </td>
 
-          <td
-            *ngFor="let fotocelula of estadisticasFiltradas()"
-            class="columna-valor-fotocelula"
-            [ngClass]="{
+          <td *ngFor="let fotocelula of estadisticasFiltradas()" class="columna-valor-fotocelula" [ngClass]="{
               'evento-maximo-highlight': esEventoMaximo(fotocelula, tipo),
               'intensidad-0': !esEventoMaximo(fotocelula, tipo) && fotocelula[tipo] === 0 && tipo !== 'atiempo',
               'intensidad-1': !esEventoMaximo(fotocelula, tipo) && fotocelula[tipo] > 0   && fotocelula[tipo] <= 25 && tipo !== 'atiempo',
@@ -101,11 +93,11 @@
 
     <div class="historial-lista">
       <!--<div *ngIf="historial().length === 0" class="historial-vacio"> -->
-      <div *ngIf="historial.length === 0" class="historial-vacio"> 
+      <div *ngIf="historial().length === 0" class="historial-vacio">
         No hay historial disponible
       </div>
       <!--<div *ngFor="let evento of historial().slice(0, 50)" class="evento-item">-->
-        <div *ngFor="let evento of historial.slice(0, 50)" class="evento-item">
+      <div *ngFor="let evento of historial().slice(0, 50)" class="evento-item">
         <span class="evento-timestamp">{{ evento.timestamp | date: 'HH:mm:ss' }}</span>
         <!--<span class="evento-modulo">{{ evento.moduloNombre }}</span> -->
         <span class="evento-fotocelula">{{ evento.fotocelulaNombre }}</span>

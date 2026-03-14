@@ -25,6 +25,8 @@ export interface EventoFotocelula {
  * 6. "ACC_ - occulted    from <NOMBRE>"     → activación   (ocultación)
  * 7. "LE_PLI_EST_EN_DEHORS_DE_SON_PAS sur <NOMBRE> ! : diff=<VALOR>ms"
  *    → retraso (si VALOR < 0) | adelanto (si VALOR > 0)
+ * 8. ": apparition <IdCarta> sur <NOMBRE>" → apparition
+ 
  */
 @Injectable({
   providedIn: 'root'
@@ -83,6 +85,13 @@ export class TraceProcessorService {
    */
   private static readonly REGEX_PLI_DEHORS =
     /LE_PLI_EST_EN_DEHORS_DE_SON_PAS\s+sur\s+(\S+)\s+!\s*:\s*diff=([+-]?\d+(?:\.\d+)?)\s*ms/;
+
+  /**
+   * Detecta trazas con ": apparition <IdCarta> sur <NOMBRE>"
+   * → apparition
+   */
+  private static readonly REGEX_APPARITION =
+    /:\s*apparition\s+\S+\s+sur\s+(\S+)/;
 
   // ─── API pública ────────────────────────────────────────────────────────
 
@@ -150,6 +159,12 @@ export class TraceProcessorService {
     // 2. onTakeMailPiece ... sur <fotocelula> → activación
     const matchOnTake = linea.match(TraceProcessorService.REGEX_ON_TAKE);
     if (matchOnTake) {
+      if (matchOnTake[1].includes("Input_1")) {
+        return {
+          fotocelula: this.limpiarNombreFotocelula("ACQ-B1"),
+          evento: 'activacion'
+        };
+      }
       return {
         fotocelula: this.limpiarNombreFotocelula(matchOnTake[1]),
         evento: 'activacion'
@@ -186,6 +201,15 @@ export class TraceProcessorService {
       };
     }
 
+    // 8. : apparition <IdCarta> sur <NOMBRE> → apparition
+    const matchApparition = linea.match(TraceProcessorService.REGEX_APPARITION);
+    if (matchApparition) {
+      return {
+        fotocelula: this.limpiarNombreFotocelula(matchApparition[2]),
+        evento: 'apparition'
+      };
+    }
+
     return null;
   }
 
@@ -194,6 +218,7 @@ export class TraceProcessorService {
    * (comas, puntos, puntos y coma que pudieran ir pegados al final).
    */
   private limpiarNombreFotocelula(nombre: string): string {
-    return nombre.replace(/[,;.]+$/, '');
+    return nombre.replace(/[,;.]+$/, '')
+
   }
 }
