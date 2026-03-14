@@ -212,8 +212,14 @@ export class TraceProcessorService {
     // 8. : apparition <IdCarta> sur <NOMBRE> → apparition
     const matchApparition = linea.match(TraceProcessorService.REGEX_APPARITION);
     if (matchApparition) {
+      if (matchApparition[1].includes("Input_1")) {
+        return {
+          fotocelula: this.limpiarNombreFotocelula("ACQ-B1"),
+          evento: 'apparition'
+        };
+      }
       return {
-        fotocelula: this.limpiarNombreFotocelula(matchApparition[2]),
+        fotocelula: this.limpiarNombreFotocelula(matchApparition[1]),
         evento: 'apparition'
       };
     }
@@ -221,12 +227,17 @@ export class TraceProcessorService {
     // 9. : disapparition <IdCarta> sur <NOMBRE> → desaparicion
     const matchDisapparition = linea.match(TraceProcessorService.REGEX_DISAPPARITION);
     if (matchDisapparition) {
+      if (matchDisapparition[1].includes("Input_1")) {
+        return {
+          fotocelula: this.limpiarNombreFotocelula("ACQ-B1"),
+          evento: 'desaparicion'
+        };
+      }
       return {
-        fotocelula: this.limpiarNombreFotocelula(matchDisapparition[2]),
+        fotocelula: this.limpiarNombreFotocelula(matchDisapparition[1]),
         evento: 'desaparicion'
       };
-    }
-
+    }  
     return null;
   }
 
