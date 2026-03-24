@@ -86,9 +86,19 @@
 
   <!-- Historial expandible -->
   <div class="historial-seccion" *ngIf="mostrarHistorial()">
-    <div class="historial-header">
-      <h3>📜 Historial Completo de Eventos</h3>
-      <small>Últimos 50 eventos</small>
+    <div class="historial-header" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <h3 style="margin: 0;">📜 Historial Completo de Eventos</h3>
+        <label class="filtro-label" style="margin: 0;">
+          <input type="checkbox" id="checkEventActivation" name="checkEventActivation" 
+                 [checked]="checkEventActivation()" 
+                 (change)="toggleEventActivation()">
+          <span style="font-size: 10px; color: #aaa; text-transform: uppercase; font-weight: 600; letter-spacing: 0.2px;">
+            Mostrar evento activacion
+          </span>
+        </label>
+      </div>
+      <small style="margin: 0;">Últimos 50 eventos</small>
     </div>
 
     <div class="historial-lista">

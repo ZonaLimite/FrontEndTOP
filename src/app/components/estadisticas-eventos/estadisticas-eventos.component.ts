@@ -59,8 +59,17 @@ export class EstadisticasEventosComponent {
     this.tiposEventos.filter(t => this.filtrosActivos()[t])
   );
 
-  /** Acceso directo al signal de historial del servicio */
-  historial = this.trackingService.signal_historial;
+  /** Signal para filtrar solo eventos de activación en el historial */
+  checkEventActivation = signal(false);
+
+  /** Historial computado que filtra los eventos 'activacion' si el checkbox NO está activo */
+  historial = computed(() => {
+    const todos = this.trackingService.signal_historial();
+    if (!this.checkEventActivation()) {
+      return todos.filter(e => e.tipo !== 'activacion');
+    }
+    return todos;
+  });
 
   /**
    * computed(): suma de cada tipo de evento sobre todas las fotocélulas visibles.
@@ -146,6 +155,10 @@ export class EstadisticasEventosComponent {
 
   toggleHistorial(): void {
     this.mostrarHistorial.update(v => !v);
+  }
+
+  toggleEventActivation(): void {
+    this.checkEventActivation.update(v => !v);
   }
 
   limpiarEstadisticas(): void {
