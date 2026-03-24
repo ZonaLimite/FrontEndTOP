@@ -1,14 +1,9 @@
-:host{
-    display:block;
+:host {
+    display: block;
     grid-area: header;
 }
 
 #menu {
-    height: 100%;
+    height: 26px;
     font-size: 2vh;
 }
-
-
-
-
-

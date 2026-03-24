@@ -35,10 +35,10 @@ export class FotocelulaComponent {
       if (tipo === 'activacion') {
         this.ocultado = true;
         //console.log(`Evento ${tipo} en ${this.nombreFotocelula}`);
-    
+
         setTimeout(() => {
           this.ocultado = false;
-        }, 80); // apagamos automaticamente la fotocelula
+        }, 70); // apagamos automaticamente la fotocelula
 
       } else {
         this.ocultado = false;
