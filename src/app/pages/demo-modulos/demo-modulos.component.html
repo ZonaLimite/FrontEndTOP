@@ -1,30 +1,70 @@
 <div class="demo-container">
-  
 
   <!-- ========================================
-       SECCIÓN 2: PATRÓN COORDENADAS
+       SELECTOR DE ENFOQUE
+       ======================================== -->
+  <div class="selector-enfoque">
+    <button
+      class="btn-enfoque"
+      [class.activo]="enfoqueActivo() === 'tracking'"
+      (click)="cambiarEnfoque('tracking')"
+      title="Ver estadísticas de Tracking">
+      📡 Tracking
+    </button>
+    <button
+      class="btn-enfoque"
+      [class.activo]="enfoqueActivo() === 'rechazo'"
+      (click)="cambiarEnfoque('rechazo')"
+      title="Ver estadísticas de Rechazos">
+      ❌ Rechazo
+    </button>
+  </div>
+
+  <!-- ========================================
+       SECCIÓN: ESTADÍSTICAS (conmutadas por enfoque)
        ======================================== -->
   <section class="demo-section">
-      <app-estadisticas-eventos></app-estadisticas-eventos>
-      <app-linea-transporte
-          [modoCoords]="true"
-          [modulosCoordsConfig]="modulosLineaEntrada"
-          [anchoLinea]="1150"
-          [altoLinea]="300"
-          [titulo]="'LINEA-01'">
 
-      </app-linea-transporte>
+    <!-- Enfoque Tracking -->
+    <app-estadisticas-eventos
+      *ngIf="enfoqueActivo() === 'tracking'">
+    </app-estadisticas-eventos>
 
+    <!-- Enfoque Rechazo -->
+    <app-estadisticas-rechazo
+      *ngIf="enfoqueActivo() === 'rechazo'">
+    </app-estadisticas-rechazo>
 
-     <!-- Estadísticas y Controls -->
+    <!-- Línea de transporte visual (siempre visible) -->
+    <app-linea-transporte
+      [modoCoords]="true"
+      [modulosCoordsConfig]="modulosLineaEntrada"
+      [anchoLinea]="1150"
+      [altoLinea]="300"
+      [titulo]="'LINEA-01'">
+    </app-linea-transporte>
+
+    <!-- Estadísticas y Controls -->
     <div class="seccion-estadisticas">
       <div class="controls">
-        <button (click)="simularEventosEnTodosModulos()" class="btn-simular">
-        🎲 Simular Evento Aleatorio
-        </button>
-        <button (click)="simularSeguimientoEnTodosModulos()" class="btn-simular">
-        🎲 Simular Seguimiento  
-        </button>
+
+        <!-- Botones de simulación Tracking -->
+        <ng-container *ngIf="enfoqueActivo() === 'tracking'">
+          <button (click)="simularEventosEnTodosModulos()" class="btn-simular">
+            🎲 Simular Evento Aleatorio
+          </button>
+          <button (click)="simularSeguimientoEnTodosModulos()" class="btn-simular">
+            🎲 Simular Seguimiento
+          </button>
+        </ng-container>
+
+        <!-- Botón de simulación Rechazo -->
+        <ng-container *ngIf="enfoqueActivo() === 'rechazo'">
+          <button (click)="simularTrazasRechazo()" class="btn-simular btn-simular-rechazo">
+            🎲 Simular Trazas REJET
+          </button>
+        </ng-container>
+
       </div>
     </div>
 

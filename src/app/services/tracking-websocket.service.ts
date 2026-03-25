@@ -8,6 +8,8 @@ import { Traces } from '../models/traces';
 import { EventoFotocelula, TraceProcessorService } from './trace-processor.service';
 import { LineaTransporteComponent } from '../components/linea-transporte/linea-transporte.component';
 import { ModuloTransporteCoordsComponent } from '../components/modulo-transporte-coords/modulo-transporte-coords.component';
+import { RechazoProcessorService } from './rechazo-processor.service';
+import { RechazosEstadoService } from './rechazos-estado.service';
 
 declare var configuraciones: any;
 
@@ -70,6 +72,8 @@ export class TrackingWebsocketService implements OnDestroy {
   // ─── Dependencias ──────────────────────────────────────────────────────────
   private trackingService = inject(EventosTrackingService);
   private traceProcessorService = inject(TraceProcessorService);
+  private rechazoProcessor = inject(RechazoProcessorService);
+  private rechazosEstadoService = inject(RechazosEstadoService);
 
   // ─── Cliente STOMP ────────────────────────────────────────────────────────
   private client: Client;
@@ -370,6 +374,7 @@ export class TrackingWebsocketService implements OnDestroy {
     // Filtrar trazas que sean de tracking
     if (trace.tipoResult == 'eventTrace') {
       this.handleTracking(trace.data);
+      this.procesarTrazasRechazo(trace.data);
     }
   }
 
@@ -381,7 +386,7 @@ export class TrackingWebsocketService implements OnDestroy {
   private handleTracking(trace: string) {
     try {
       const eventosFotocelulas: EventoFotocelula[] | null = this.traceProcessorService.analizarTraza(trace);
-      //console.log("Analizando traza " + trace)  
+
       if (eventosFotocelulas) {
         eventosFotocelulas.forEach(caso => {
           //Renderizar 
@@ -404,6 +409,21 @@ export class TrackingWebsocketService implements OnDestroy {
     }
 
   }
+
+  /**
+ * Analiza un bloque de trazas en busca de eventos REJET y los
+ * registra en el servicio de estado de rechazos.
+ *
+ * @param trazas - String multilínea con trazas a analizar
+ */
+  procesarTrazasRechazo(trazas: string): void {
+    const eventos = this.rechazoProcessor.analizarTraza(trazas);
+    if (eventos && eventos.length > 0) {
+      this.rechazosEstadoService.registrarRechazos(eventos);
+      //console.log(`DemoModulosComponent: ${eventos.length} rechazo(s) registrado(s)`);
+    }
+  }
+
 
   /**
    * Traduce el nombre de evento tal como llega del Engine

@@ -1,0 +1,69 @@
+** Especificacion **
+El componente "estadisticas-eventos" se utiliza para registrar y supervisar determinados eventos de un sistema de seguimiento de fotocelulas.
+
+Ya se ha desarrollado una parte de esta feature para permitir filtrar determinados eventos sobre un flujo de trazas (string representando trazas emitidas de distintos sistemas) basados en el tracking
+Se requiere ahora complementar este componente para manejar ahora otro tipo de enfoque diferente a el de tracking.
+
+Este enfoque va a tratar de gestionar los eventos de tipo "Rechazo".
+
+Vamos a incluir este nuevo enfoque sobre la plantilla estadisticas-eventos, de tal manera quepodemos observar el enfoque de tracking o el enfoque de Rechazo.
+
+ En este enfoque de Rechazo,trataremos de encontrar en cada traza a analizar los tres siguientes apartados de informacion:
+
+ - KEY, token que contiene, la cadena "- REJET" y un descriptor del sistema al que pertenece (Primer Token) 
+ - DENOMINACION, nombre o tipo del rechazo encontrado (segundo Token)
+ - INFO, Un tercer apartado con informacion complementaria (tercer Token)
+
+ Podemos decir que las lineas de traza que contengan la clave "- REJET," van a estar estructurados en tres tokens (delimitados por coma) con los apartados descritos anteriormente. 
+
+ Ejemplos de trazas con clave REJET,
+    Ejemplo 1: 
+        "15:15:36:033 WRN IL1_MAIN - REJET, ANNULATION_SC, pli 400218A1"
+            Esta traza es de tipo: REJET,  porque incluye la cadena "- REJET" y pertenece al sistema IL1 (primer token)
+            Este rechazo se denomina: ANNULATION_SC (segundo token)
+            Este rechazo dispone de esta informacion: pli 400218A1 (tercer token)
+
+    Ejemplo 2:
+        "06:19:35:985 WRN IL1_MAIN - REJET, CONVOYAGE, pli 400181E2 LE_PLI_EST_EN_DEHORS_DE_SON_PAS sur CUL-B1 ! : diff=-603084229 ms"
+            Esta traza es de tipo: REJET, porque incluye la cadena "- REJET" y pertenece al sistema IL1 (primer token)
+            Este rechazo se denomina : CONVOYAGE (segundo token)
+            Este rechazo dispone de esta informacion : pli 400181E2 LE_PLI_EST_EN_DEHORS_DE_SON_PAS sur CUL-B1 ! : diff=-603084229 ms (tercer token)
+
+    Ejemplo 3:  
+        "06:18:58:045 WRN IL1_____ - REJET, LONGUEUR_LONG, pli 4001818D EN_DEHORS_DU_SPECTRE : 130000<504000<420000, index convoyeur 0"
+            Esta traza es de tipo: REJET, porque incluye la cadena "- REJET" y pertenece al sistema IL1 (primer token)
+            Este rechazo se denomina : LONGUEUR_LONG (segundo token)
+            Este rechazo dispone de esta informacion : pli 400181E2 LE_PLI_EST_EN_DEHORS_DE_SON_PAS sur CUL-B1 ! : diff=-603084229 ms (tercer token) 
+
+Todas las trazas que cumplan con estas premisas de estructura seran consideradas trazas de Rechazo y se registraran basandose en los diferentes tipos
+de Rechazo detectados indizados por el apartado DENOMINACION y el sistema al que pertenecen 
+Asi que cada registro elaborado estara constituido por el token SISTEMA,DENOMINACION,INFO,KEY
+
+* Servicios de analisis de trazas *
+El componente estadisticas-eventos ya esta utilizando los algoritmos proporcionados por el servicio "trace-processor.service" para analizar las trazas de tipo Tracking.
+Diferenciar un nuevo servicio para analizar las trazas de tipo "Rechazo". Este servicio analizara 
+las trazas para detectar distintos tipos de rechazo encontrados. Los rechazos no estan restringidos
+a una serie de ellos definidos, sino que podran ir registrandose cualquier denominacion de rechazo
+encontrado y podran ser agrupados por dicha denominacion del rechazo encontrado y sistema al que pertenecen. 
+ Las trazas pueden provenir de distintos sistemas. Es necsario que dentro del token KEY se analize si la traza
+ pertenece a un sistema u otro. Normalmente dentro del KEY se encuentra el nombre del sistema.
+ Por lo tanto el servicio de analisis de trazas debera ser capaz de identificar ademas de la  
+ DENOMINACION del rechazo y la INFO asociada, el SISTEMA al que pertenece la traza.
+  Los dos sistemas actualmente posibles son "IL1" y "IL2". 
+ 
+
+
+* Renderizacion de las plantillas * 
+
+ Modificar la plantilla demo-modulos.component para que permita visualizar los dos tipos de enfoque actuales especificados:
+  Tracking -> (Estadisticas-eventos) 
+  o 
+  Rechazo -> (con el nuevo componente denominado "estadisticas-rechazo")
+
+* Especificacion de la renderizacion de la plantilla "Estadisticas-rechazo" *
+ La plantilla estadisticas-rechazo contara con un sumario en tiempo real de los Rechazos detectados. El sumario puede visualizarse mediante una tabla actualizada en tiempo real con los rechazos que se van detectando y un computo ordenado y totalizado por tipo de rechazo.
+ De manera similar a el componente estadisticas-eventos tambien dispondra de una tabla historial.
+ Por lo tanto habra una tabla sumarizada agrupada por la denominacion de los rechazos encontrados y otra (visible u oculta a peticion) del historial en el tiempo que se ha ido detectando. 
+ 
+
+

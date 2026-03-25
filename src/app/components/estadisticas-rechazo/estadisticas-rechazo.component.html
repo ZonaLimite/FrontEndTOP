@@ -1,0 +1,111 @@
+<div class="rechazos-container">
+
+  <!-- ── Barra de acciones ─────────────────────────────────────── -->
+  <div class="panel-acciones">
+    <div class="acciones-contenedor">
+
+      <span class="titulo-panel">❌ Estadísticas de Rechazos</span>
+
+      <button class="btn btn-limpiar" (click)="limpiarEstadisticas()" title="Borrar todas las estadísticas">
+        🔄 Limpiar
+      </button>
+
+      <button class="btn btn-exportar" (click)="exportarCSV()" title="Descargar como CSV">
+        📥 Descargar CSV
+      </button>
+
+      <button class="btn-historial" (click)="toggleHistorial()" title="Mostrar/Ocultar historial">
+        📜 {{ mostrarHistorial() ? 'Ocultar' : 'Mostrar' }} Historial
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ── Tabla de resumen ───────────────────────────────────────── -->
+  <div class="tabla-contenedor">
+
+    <div *ngIf="resumen().length === 0" class="tabla-vacia">
+      <p>No hay rechazos registrados aún</p>
+      <small>Las trazas que contengan "- REJET" aparecerán aquí</small>
+    </div>
+
+    <table *ngIf="resumen().length > 0" class="rechazos-tabla">
+      <thead>
+        <tr class="tabla-encabezado">
+          <th class="col-denominacion">DENOMINACIÓN</th>
+          <th class="col-count">COUNT</th>
+          <th class="col-info">ÚLTIMA INFO</th>
+          <th class="col-timestamp">ÚLTIMO EVENTO</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let registro of resumen()"
+            class="tabla-fila"
+            [ngClass]="getClaseIntensidad(registro)">
+
+          <!-- Denominación -->
+          <td class="col-denominacion">
+            <span class="denominacion-nombre"
+                  [class.denominacion-maxima]="esMaximo(registro)">
+              {{ registro.denominacion }}
+            </span>
+          </td>
+
+          <!-- Count con highlight de máximo -->
+          <td class="col-count"
+              [ngClass]="{ 'evento-maximo-highlight': esMaximo(registro) }">
+            <span class="valor-count">{{ registro.count }}</span>
+          </td>
+
+          <!-- Última info (texto largo, se trunca con ellipsis) -->
+          <td class="col-info">
+            <span class="info-texto" [title]="registro.ultimaInfo">
+              {{ registro.ultimaInfo }}
+            </span>
+          </td>
+
+          <!-- Timestamp del último evento -->
+          <td class="col-timestamp">
+            <span class="timestamp">
+              {{ registro.ultimoEvento | date: 'HH:mm:ss' }}
+            </span>
+          </td>
+
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="fila-total">
+          <td class="col-denominacion total-label">TOTAL</td>
+          <td class="col-count total-valor">{{ totalRechazos() }}</td>
+          <td class="col-info"></td>
+          <td class="col-timestamp"></td>
+        </tr>
+      </tfoot>
+    </table>
+
+  </div>
+
+  <!-- ── Historial expandible ───────────────────────────────────── -->
+  <div class="historial-seccion" *ngIf="mostrarHistorial()">
+
+    <div class="historial-header">
+      <h3>📜 Historial de Rechazos</h3>
+      <small>Últimos 50 eventos · {{ historial().length }} en memoria</small>
+    </div>
+
+    <div class="historial-lista">
+
+      <div *ngIf="historial().length === 0" class="historial-vacio">
+        No hay historial disponible
+      </div>
+
+      <div *ngFor="let entrada of historial().slice(0, 50)" class="historial-item">
+        <span class="hist-timestamp">{{ entrada.timestamp | date: 'HH:mm:ss' }}</span>
+        <span class="hist-denominacion">{{ entrada.denominacion }}</span>
+        <span class="hist-info" [title]="entrada.info">{{ entrada.info }}</span>
+      </div>
+
+    </div>
+  </div>
+
+</div>

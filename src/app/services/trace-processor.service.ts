@@ -99,7 +99,7 @@ export class TraceProcessorService {
    * → desaparicion
    */
   private static readonly REGEX_DISAPPARITION =
-    /:\s*disapparition\s+\S+\s+sur\s+(\S+)/;
+    /:\s*disparition\s+\S+\s+sur\s+(\S+)/;
 
   // ─── API pública ────────────────────────────────────────────────────────
 
@@ -237,7 +237,7 @@ export class TraceProcessorService {
         fotocelula: this.limpiarNombreFotocelula(matchDisapparition[1]),
         evento: 'desaparicion'
       };
-    }  
+    }
     return null;
   }
 

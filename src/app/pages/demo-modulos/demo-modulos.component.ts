@@ -1,9 +1,13 @@
-import { AfterViewInit, Component, inject, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, inject, OnInit, QueryList, ViewChildren, signal } from '@angular/core';
 import { ModuloGridConfig, ModuloCoordsConfig } from '../../models/modulo-transporte.model';
 import { LineaTransporteComponent } from '../../components/linea-transporte/linea-transporte.component';
 import { ModuloLineaCoordsConfig } from '../../models/modulo-transporte.model';
 import { ModuloTransporteCoordsComponent } from '../../components/modulo-transporte-coords/modulo-transporte-coords.component';
 import { EventosTrackingService } from '../../services/eventos-tracking.service';
+// ── NUEVO ──────────────────────────────────────────────────────────────────
+import { RechazoProcessorService } from '../../services/rechazo-processor.service';
+import { RechazosEstadoService } from '../../services/rechazos-estado.service';
+// ──────────────────────────────────────────────────────────────────────────
 
 @Component({
   selector: 'app-demo-modulos',
@@ -19,7 +23,15 @@ export class DemoModulosComponent implements OnInit {
   @ViewChildren(LineaTransporteComponent) lineasTransporte!: QueryList<LineaTransporteComponent>;
 
   // ─── Dependencias ──────────────────────────────────────────────────────────
-  private trackingService = inject(EventosTrackingService);
+  private trackingService      = inject(EventosTrackingService);
+  // ── NUEVO ──────────────────────────────────────────────────────────────────
+  private rechazoProcessor     = inject(RechazoProcessorService);
+  private rechazosEstadoService = inject(RechazosEstadoService);
+  // ──────────────────────────────────────────────────────────────────────────
+
+  // ─── Signal local: enfoque activo ─────────────────────────────────────────
+  /** Controla qué panel de estadísticas se muestra */
+  enfoqueActivo = signal<'tracking' | 'rechazo'>('tracking');
 
   // ==========================================
   // EJEMPLOS DE CONFIGURACIÓN Declarativa - PATRÓN COORDS
@@ -48,7 +60,6 @@ export class DemoModulosComponent implements OnInit {
         { id: 'CUL-B5', nombre: 'CUL-B5', x: 15, y: 60, tamano: 'pequeno', orientacion: 'row' },
         { id: 'CUL-B3', nombre: 'CUL-B3', x: 35, y: 30, tamano: 'pequeno', orientacion: 'row' },
         { id: 'CUL-B2', nombre: 'CUL-B2', x: 55, y: 60, tamano: 'pequeno', orientacion: 'row' },
-        // { id: 'CUL-B2', nombre: 'CUL-B2', x: 86, y: 45, tamano: 'pequeno', orientacion: 'row' },
         { id: 'CUL-B1', nombre: 'CUL-B1', x: 86, y: 60, tamano: 'pequeno', orientacion: 'row' },
       ]
     },
@@ -59,8 +70,7 @@ export class DemoModulosComponent implements OnInit {
       alto: 150,
       orientacion: 'horizontal',
       fotocelulas: [
-        { id: 'MRK-B1', nombre: 'MRK-B1', x: 85, y: 60, tamano: 'pequeno', orientacion: 'row' }//,
-        //{ id: 'TV-01', nombre: 'TV-01', x: 20, y: 60, tamano: 'pequeno', orientacion: 'row' },
+        { id: 'MRK-B1', nombre: 'MRK-B1', x: 85, y: 60, tamano: 'pequeno', orientacion: 'row' }
       ]
     },
     {
@@ -81,7 +91,6 @@ export class DemoModulosComponent implements OnInit {
       orientacion: 'horizontal',
       fotocelulas: [
         { id: 'MER-B2', nombre: 'MER-B2', x: 83, y: 23, tamano: 'pequeno', orientacion: 'row' },
-        //{ id: 'MER-V3', nombre: 'MER-V3', x: 30, y: 60, tamano: 'pequeno', orientacion: 'row' },
         { id: 'MER-B3', nombre: 'MER-B3', x: 83, y: 88, tamano: 'pequeno', orientacion: 'row' },
       ]
     },
@@ -116,100 +125,105 @@ export class DemoModulosComponent implements OnInit {
       ]
     }
   ];
+
   // ==========================================
   // EJEMPLO 1: Posicionamiento Modulos con Coordenadas Absolutas
   // ==========================================
   modulosLineaEntrada: ModuloLineaCoordsConfig[] = [];
 
   constructor() { }
+
   //inicializamos estructuras con los modulos declarados
   ngOnInit() {
-    //Configuramos los módulos con coordenadas para la línea de entrada    
-    //el border de modulo es de 2 px, por eso se suma 2 a la posición para evitar solapamiento con el borde de la línea
     const modulo = this.modulosCoordsEjemplo.find(m => m.id === "INJ-01");
     if (modulo) {
-      this.modulosLineaEntrada.push({
-        config: modulo,
-        x: 10,
-        y: 50
-      });
+      this.modulosLineaEntrada.push({ config: modulo, x: 10, y: 50 });
     }
     const modulo2 = this.modulosCoordsEjemplo.find(m => m.id === "CUL-01");
     if (modulo2) {
-      this.modulosLineaEntrada.push({
-        config: modulo2,
-        x: 170 + 2,
-        y: 50
-      });
+      this.modulosLineaEntrada.push({ config: modulo2, x: 170 + 2, y: 50 });
     }
     const modulo3 = this.modulosCoordsEjemplo.find(m => m.id === "MRK-01");
     if (modulo3) {
-      this.modulosLineaEntrada.push({
-        config: modulo3,
-        x: 372 + 2,
-        y: 50
-      });
+      this.modulosLineaEntrada.push({ config: modulo3, x: 372 + 2, y: 50 });
     }
     const modulo4 = this.modulosCoordsEjemplo.find(m => m.id === "ACQ-01");
     if (modulo4) {
-      this.modulosLineaEntrada.push({
-        config: modulo4,
-        x: 534 + 2,
-        y: 50
-      });
+      this.modulosLineaEntrada.push({ config: modulo4, x: 534 + 2, y: 50 });
     }
     const modulo5 = this.modulosCoordsEjemplo.find(m => m.id === "MER-01");
     if (modulo5) {
-      this.modulosLineaEntrada.push({
-        config: modulo5,
-        x: 676 + 2,
-        y: 50
-      });
+      this.modulosLineaEntrada.push({ config: modulo5, x: 676 + 2, y: 50 });
     }
     const modulo7 = this.modulosCoordsEjemplo.find(m => m.id === "EXT-01");
     if (modulo7) {
-      this.modulosLineaEntrada.push({
-        config: modulo7,
-        x: 818 + 2,
-        y: 50
-      });
+      this.modulosLineaEntrada.push({ config: modulo7, x: 818 + 2, y: 50 });
     }
     const modulo6 = this.modulosCoordsEjemplo.find(m => m.id === "FED-01");
     if (modulo6) {
-      this.modulosLineaEntrada.push({
-        config: modulo6,
-        x: 818 + 2,
-        y: 138
-      });
+      this.modulosLineaEntrada.push({ config: modulo6, x: 818 + 2, y: 138 });
     }
     const modulo8 = this.modulosCoordsEjemplo.find(m => m.id === "FED-02");
     if (modulo8) {
-      this.modulosLineaEntrada.push({
-        config: modulo8,
-        x: 1020 + 2,
-        y: 50
-      });
+      this.modulosLineaEntrada.push({ config: modulo8, x: 1020 + 2, y: 50 });
     }
-
   }
 
+  // ==========================================
+  // SELECTOR DE ENFOQUE
+  // ==========================================
+
+  /**
+   * Cambia el enfoque activo entre Tracking y Rechazo.
+   */
+  cambiarEnfoque(enfoque: 'tracking' | 'rechazo'): void {
+    this.enfoqueActivo.set(enfoque);
+  }
 
   // ==========================================
-  // MÉTODOS DE PRUEBA
+  // MÉTODOS DE RECHAZO
   // ==========================================
 
-  //Método para simular eventos en todas fotocélulas  
+  /**
+   * Analiza un bloque de trazas en busca de eventos REJET y los
+   * registra en el servicio de estado de rechazos.
+   *
+   * @param trazas - String multilínea con trazas a analizar
+   */
+  procesarTrazasRechazo(trazas: string): void {
+    const eventos = this.rechazoProcessor.analizarTraza(trazas);
+    if (eventos && eventos.length > 0) {
+      this.rechazosEstadoService.registrarRechazos(eventos);
+      console.log(`DemoModulosComponent: ${eventos.length} rechazo(s) registrado(s)`);
+    }
+  }
+
+  /**
+   * Simula la llegada de trazas REJET de ejemplo para pruebas en desarrollo.
+   */
+  simularTrazasRechazo(): void {
+    const trazasEjemplo = [
+      '15:15:36:033 WRN IL1_MAIN - REJET, ANNULATION_SC, pli 400218A1',
+      '06:19:35:985 WRN IL1_MAIN - REJET, CONVOYAGE, pli 400181E2 LE_PLI_EST_EN_DEHORS_DE_SON_PAS sur CUL-B1 ! : diff=-603084229 ms',
+      '06:18:58:045 WRN IL1_____ - REJET, LONGUEUR_LONG, pli 4001818D EN_DEHORS_DU_SPECTRE : 130000<504000<420000, index convoyeur 0',
+      '06:20:10:112 WRN IL1_MAIN - REJET, ANNULATION_SC, pli 400219B2',
+      '06:21:05:774 WRN IL1_MAIN - REJET, CONVOYAGE, pli 400220C3 LE_PLI_EST_EN_DEHORS_DE_SON_PAS sur CUL-B2 ! : diff=120345 ms',
+    ].join('\n');
+
+    this.procesarTrazasRechazo(trazasEjemplo);
+  }
+
+  // ==========================================
+  // MÉTODOS DE PRUEBA (TRACKING — sin cambios)
+  // ==========================================
 
   simularEventosEnTodosModulos() {
-
     this.lineasTransporte.forEach(linea => {
       linea.modulosCoordsComponents.forEach(modulo => {
         modulo.config.fotocelulas.forEach(fotocelula => {
           const eventoAleatorio = this.eventos[Math.floor(Math.random() * this.eventos.length)];
           console.log(`Simulando evento: ${eventoAleatorio} en ${modulo.getNombreModulo()} - ${fotocelula.nombre}`);
-
           modulo.simularEvento(fotocelula.id, eventoAleatorio);
-
           this.trackingService.inyectarEventoWebSocket(
             fotocelula.id,
             fotocelula.id,
@@ -220,25 +234,18 @@ export class DemoModulosComponent implements OnInit {
     });
   }
 
-  //Simular seguimiento de todas las fotocelulas
   simularSeguimientoEnTodosModulos() {
     const orderFotocelulas: string[] = ['FE2', 'EXT-B1', 'MER-B2', 'MER-B3', 'Input_1', 'MRK-B1', 'TV-B1', 'CUL-B1', 'CUL-B3', 'CUL-B5', 'INJ-B1', 'INJ-B2', 'INJ-B3'];
 
     orderFotocelulas.forEach((fotocelulaId, index) => {
       setTimeout(() => {
-        this.simularOcultacionEnFotocelula(fotocelulaId)
+        this.simularOcultacionEnFotocelula(fotocelulaId);
         this.simularTriggerinEvent(fotocelulaId);
       }, 500 * index);
     });
   }
 
-  /**
- * Simula el enecendido de una fotocelula durante 150ms
- * @param moduloId Simula el enecendido de una fotocelula durante 100ms
- * @param fotocelulaId 
- */
-  public simularOcultacionEnFotocelula(
-    fotocelulaId: string) {
+  public simularOcultacionEnFotocelula(fotocelulaId: string) {
     this.lineasTransporte.first.modulosCoordsComponents.forEach(modulo =>
       modulo.getAllFotocelulas().forEach(fc => {
         if (fc.fotocelulaId === fotocelulaId) {
@@ -249,34 +256,22 @@ export class DemoModulosComponent implements OnInit {
         }
       })
     );
-
   }
 
-  /**
- * Simula el disparo de un evento en una fotocelula específica 
- * @param fotocelulaId 
- */
-  public simularTriggerinEvent(
-    fotocelulaId: string) {
+  public simularTriggerinEvent(fotocelulaId: string) {
     let evento: any;
     this.lineasTransporte.first.modulosCoordsComponents.forEach(modulo =>
       modulo.getAllFotocelulas().forEach(fc => {
         if (fc.fotocelulaId === fotocelulaId) {
           evento = this.eventos[Math.floor(Math.random() * this.eventos.length)];
           modulo.simularEvento(fc.fotocelulaId, evento);
-
-          //Actualizar capa Estadistica
           this.trackingService.inyectarEventoWebSocket(
             fc.fotocelulaId,
             fc.fotocelulaId,
             evento
           );
-
         }
       })
     );
   }
-
-
-
-}  
+}
