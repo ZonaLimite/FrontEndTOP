@@ -153,6 +153,9 @@ export class TrackingWebsocketService implements OnDestroy {
     this.client.deactivate();
   }
 
+  //función de utilidad al final o fuera de la clase
+  private delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+
   /**
    * Solicita al Engine abrir el link con la máquina TOP.
    * Equivale al método linkarTop() de remotengine.
@@ -160,11 +163,15 @@ export class TrackingWebsocketService implements OnDestroy {
    * @param sistema  Sistema seleccionado (ej: "IL")
    * @param modulo   Módulo/consulta seleccionada
    */
-  linkarTop(maquina: string, sistema: string, modulo: string): void {
+  async linkarTop(maquina: string, sistema: string, modulo: string): Promise<void> {
+
     this.enviarComando('adjustnumtop', [maquina]);
+    await this.delay(500); // Pausa de medio segundo
     this.enviarComando('selectSistema', [sistema]);
-    this.enviarComando('selectConsulta', [modulo]);
+    await this.delay(500); // Pausa de medio segundo
     this.enviarComando('conectar', []);
+    await this.delay(500); // Pausa de medio segundo
+    this.enviarComando('selectConsulta', [modulo]);
   }
 
   /**

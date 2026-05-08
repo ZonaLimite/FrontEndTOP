@@ -1,8 +1,8 @@
 import { Component, Input, ViewChildren, QueryList, AfterViewInit, inject } from '@angular/core';
-import { 
-  ModuloGridConfig, 
-  ModuloCoordsConfig, 
-  ModuloLineaCoordsConfig 
+import {
+  ModuloGridConfig,
+  ModuloCoordsConfig,
+  ModuloLineaCoordsConfig
 } from '../../models/modulo-transporte.model';
 import { ModuloTransporteGridComponent } from '../modulo-transporte-grid/modulo-transporte-grid.component';
 import { ModuloTransporteCoordsComponent } from '../modulo-transporte-coords/modulo-transporte-coords.component';
@@ -18,7 +18,7 @@ export class LineaTransporteComponent implements AfterViewInit {
 
   ws = inject(TrackingWebsocketService);
 
- 
+
   // ==========================================
   // MODO COORDENADAS (Posicionamiento Absoluto)
   // ==========================================
@@ -26,24 +26,24 @@ export class LineaTransporteComponent implements AfterViewInit {
   @Input() modulosCoordsConfig: ModuloLineaCoordsConfig[] = [];  // Módulos con coordenadas
   @Input() anchoLinea: number = 800;             // Ancho total en píxeles (modo coords)
   @Input() altoLinea: number = 400;              // Alto total en píxeles (modo coords)
-  
+
   @Input() titulo: string = 'Línea de Transporte';
 
   // Referencias a los componentes de módulos
   @ViewChildren(ModuloTransporteCoordsComponent) modulosCoordsComponents!: QueryList<ModuloTransporteCoordsComponent>;
 
-  constructor() {}
+  constructor() { }
 
-  conectar()  { this.ws.conectar(); }
-  desconectar(){ this.ws.desconectar(); }
-  linkarTop() { this.ws.linkarTop("1","IL","IL:Default"); } // Solo para pruebas
+  conectar() { this.ws.conectar(); }
+  desconectar() { this.ws.desconectar(); }
+  linkarTop() { this.ws.linkarTop("2", "IL", "IL:Linea Entrada1"); } // Solo para pruebas
 
   ngAfterViewInit() {
     if (this.modoCoords) {
       //Una vez renderizado todos los modulos pasamos la referencia de instanciacion al servicio para que pueda usar los modulos
       this.ws.lineasTransporte = this.modulosCoordsComponents;
       console.log(`Línea de transporte "${this.titulo}" (MODO COORDENADAS) inicializada con ${this.modulosCoordsConfig.length} módulos`);
-    } 
+    }
   }
 
   /**
@@ -82,7 +82,7 @@ export class LineaTransporteComponent implements AfterViewInit {
   /**
    * Obtiene la configuración del módulo 
    */
-  getModuloConfig(moduloCoords: ModuloLineaCoordsConfig):  ModuloCoordsConfig {
+  getModuloConfig(moduloCoords: ModuloLineaCoordsConfig): ModuloCoordsConfig {
     return moduloCoords.config;
   }
 
@@ -90,16 +90,16 @@ export class LineaTransporteComponent implements AfterViewInit {
    * Simula un evento en una fotocélula de un módulo específico (Ambos modos)
    */
   public simularEventoEnModulo(
-    moduloId: string, 
-    fotocelulaId: string, 
+    moduloId: string,
+    fotocelulaId: string,
     tipo: 'activacion' | 'desactivacion' | 'atiempo' | 'retraso' | 'adelanto' | 'apparition' | 'desaparicion'
   ) {
- 
+
     // Buscar en módulos Coords
     const moduloCoords = this.modulosCoordsComponents.find(
       (m, index) => m.getIdModulo() === moduloId
     );
-    
+
     if (moduloCoords) {
       moduloCoords.simularEvento(fotocelulaId, tipo);
     }
@@ -111,29 +111,29 @@ export class LineaTransporteComponent implements AfterViewInit {
    * @param fotocelulaId 
    */
   public simularOcultacionEnFotocelula(
-    moduloId: string, 
-    fotocelulaId: string,){
+    moduloId: string,
+    fotocelulaId: string,) {
     // Buscar en módulos Coords
     const moduloCoords = this.modulosCoordsComponents.find(
       (m, index) => m.getIdModulo() === moduloId
     );
-    
+
     if (moduloCoords) {
-      moduloCoords.setOcultado(fotocelulaId, true);  
+      moduloCoords.setOcultado(fotocelulaId, true);
       setTimeout(() => {
         moduloCoords.setOcultado(fotocelulaId, false);
       }, 200);
     }
-  }  
+  }
 
   /**
    * Obtiene la referencia a un módulo por su ID (Ambos modos)
    */
   private obtenerComponenteModulo(moduloId: string): ModuloTransporteGridComponent | ModuloTransporteCoordsComponent | undefined {
-   
+
     // Buscar en módulos Coords (modo lineal)
     const moduloCoords = this.modulosCoordsComponents.find(
-      (m, index) => m.getIdModulo()  === moduloId
+      (m, index) => m.getIdModulo() === moduloId
     );
     if (moduloCoords) return moduloCoords;
 
@@ -149,7 +149,7 @@ export class LineaTransporteComponent implements AfterViewInit {
       this.modulosCoordsConfig.forEach((moduloConfig, index) => {
         const config = moduloConfig.config;
         const fotocelulas = 'fotocelulas' in config ? config.fotocelulas : [];
-        
+
         fotocelulas.forEach((fotocelula: any, fcIndex: number) => {
           setTimeout(() => {
             this.simularEventoEnModulo(config.id, fotocelula.id, 'atiempo');
@@ -160,7 +160,7 @@ export class LineaTransporteComponent implements AfterViewInit {
     }
   }
 
- 
+
   /**
    * Determina si un módulo es de tipo Coords
    */
