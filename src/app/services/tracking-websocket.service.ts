@@ -95,6 +95,9 @@ export class TrackingWebsocketService implements OnDestroy {
   /** true cuando el Engine ha confirmado el link con la máquina TOP (ackConectar) */
   readonly linkedTop = signal<boolean>(false);
 
+  /** Máquina y línea de entrada del último link TOP solicitado; null si no hay ninguno */
+  readonly enlaceTop = signal<{ maquina: string; lineaEntrada: string } | null>(null);
+
   /** Último error de conexión recibido; null si no hay error activo */
   readonly errorConexion = signal<string | null>(null);
 
@@ -168,9 +171,11 @@ export class TrackingWebsocketService implements OnDestroy {
    * Equivale al método linkarTop() de remotengine.
    * @param maquina  Identificador de máquina (ej: "4")
    * @param sistema  Sistema seleccionado (ej: "IL")
-   * @param modulo   Módulo/consulta seleccionada
+   * @param linea_de_entrada Línea de entrada a seleccionar (1, 2 o x)
    */
-  async linkarTop(maquina: string, sistema: string, modulo: string): Promise<void> {
+  async linkarTop(maquina: string, sistema: string, linea_de_entrada: string): Promise<void> {
+
+    this.enlaceTop.set({ maquina, lineaEntrada: linea_de_entrada });
 
     this.enviarComando('adjustnumtop', [maquina]);
     await this.delay(500); // Pausa de medio segundo
@@ -178,7 +183,16 @@ export class TrackingWebsocketService implements OnDestroy {
     await this.delay(500); // Pausa de medio segundo
     this.enviarComando('conectar', []);
     await this.delay(500); // Pausa de medio segundo
-    this.enviarComando('selectConsulta', [modulo]);
+    const consultaMap: Record<string, string> = {
+      '1': 'IL_Linea de entrada1',
+      '2': 'IL_Linea de entrada2',
+    };
+    const expresion = consultaMap[linea_de_entrada];
+    if (!expresion) {
+      console.warn(`[WS-Tracking] linkarTop: línea de entrada desconocida: "${linea_de_entrada}"`);
+      return;
+    }
+    this.enviarComando('selectConsulta', [expresion]);
   }
 
   /**

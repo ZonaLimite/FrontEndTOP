@@ -1,42 +1,98 @@
 <div class="linea-container">
-   
-   <!-- MODO COORDENADAS (Posicionamiento Absoluto) -->
-  <div class="modulos-coords-wrapper" 
-       *ngIf="modoCoords"
-       [style.width.px]="anchoLinea"
-       [style.height.px]="altoLinea">
-    
-    <!-- Grid de fondo para referencia visual (opcional) -->
-    <!--<div class="grid-background"></div>-->
-    
-    <!-- Renderizar cada módulo en sus coordenadas -->
-    <div *ngFor="let moduloCoords of modulosCoordsConfig; trackBy: trackByModulo" 
-         [style.left.px]="moduloCoords.x"
-         [style.top.px]="moduloCoords.y"
-         class="modulo-wrapper">
-      
-      
-      <!-- Módulo tipo Coords -->
-      <app-modulo-transporte-coords 
-        [config]="moduloCoords.config">
-      </app-modulo-transporte-coords>
-      
-      <!-- Marcador de posición (opcional, para debugging) -->
-      <div class="position-marker" 
-           title="X: {{moduloCoords.x}}%, Y: {{moduloCoords.y}}%">
+
+  <!-- Título flotante sobre el borde superior -->
+  <span class="linea-titulo">{{ tituloEnlace() ?? titulo }}</span>
+
+  <div class="linea-body">
+
+    <!-- MODO COORDENADAS (Posicionamiento Absoluto) -->
+    <div class="modulos-coords-wrapper"
+         *ngIf="modoCoords"
+         [style.width.px]="anchoLinea"
+         [style.height.px]="altoLinea">
+
+      <!-- Renderizar cada módulo en sus coordenadas -->
+      <div *ngFor="let moduloCoords of modulosCoordsConfig; trackBy: trackByModulo"
+           [style.left.px]="moduloCoords.x"
+           [style.top.px]="moduloCoords.y"
+           class="modulo-wrapper">
+
+        <!-- Módulo tipo Coords -->
+        <app-modulo-transporte-coords
+          [config]="moduloCoords.config">
+        </app-modulo-transporte-coords>
+
+        <!-- Marcador de posición (opcional, para debugging) -->
+        <div class="position-marker"
+             title="X: {{moduloCoords.x}}%, Y: {{moduloCoords.y}}%">
+        </div>
       </div>
     </div>
-  </div>
-  
-  <div class="colConnection">
-    <!-- Estado de conexión -->
-    <div>{{ ws.estadoTexto() }}</div>
-    <div> Mensajes: {{ ws.mensajesRecibidos() }} | Tracking: {{ ws.trackingRecibidos() }}</div>
 
-    <button (click)="conectar()"   *ngIf="!ws.conectado()">Conectar</button>
-    <button (click)="desconectar()" *ngIf="ws.conectado()">Desconectar</button>
-    <button (click)="linkarTop()"  *ngIf="ws.conectado() && !ws.linkedTop()">Link TOP</button>
-  </div>
+    <!-- ══════════════ PANEL DE CONTROL ══════════════ -->
+    <!-- Ocupa todo el ancho libre a la derecha; su alto nunca supera al de la zona de módulos -->
+    <aside class="ctrl-panel"
+           [style.max-height.px]="modoCoords ? altoLinea : null">
 
+      <!-- Fila superior: estado + estadísticas + conectar/desconectar -->
+      <div class="ctrl-top">
+        <div class="ctrl-status" [class.connected]="ws.conectado()">
+          <span class="ctrl-status-dot"></span>
+          <span class="ctrl-status-text">{{ ws.estadoTexto() }}</span>
+        </div>
+
+        <div class="ctrl-stats">
+          <span>Msg: <b>{{ ws.mensajesRecibidos() }}</b></span>
+          <span>Track: <b>{{ ws.trackingRecibidos() }}</b></span>
+        </div>
+
+        <div class="ctrl-top-actions">
+          <button id="btn-conectar"    class="ctrl-btn btn-connect"    (click)="conectar()"    *ngIf="!ws.conectado()">⚡ Conectar</button>
+          <button id="btn-desconectar" class="ctrl-btn btn-disconnect" (click)="desconectar()" *ngIf="ws.conectado()">✖ Desconectar</button>
+        </div>
+      </div>
+
+      <!-- Formulario Link TOP -->
+      <div class="ctrl-form" *ngIf="ws.conectado() && !ws.linkedTop()">
+        <hr class="ctrl-divider"/>
+        <p class="ctrl-form-title">Link TOP</p>
+
+        <div class="ctrl-form-grid">
+          <div class="ctrl-field">
+            <label class="ctrl-label" for="input-maquina">Máquina</label>
+            <input id="input-maquina" class="ctrl-input" type="text"
+                   [(ngModel)]="linkForm.maquina" placeholder="ej: 2"/>
+          </div>
+
+          <div class="ctrl-field">
+            <label class="ctrl-label" for="input-sistema">Sistema</label>
+            <input id="input-sistema" class="ctrl-input" type="text"
+                   [(ngModel)]="linkForm.sistema" placeholder="ej: IL"/>
+          </div>
+
+          <div class="ctrl-field">
+            <label class="ctrl-label" for="input-linea">Línea entrada</label>
+            <select id="input-linea" class="ctrl-input ctrl-select"
+                    [(ngModel)]="linkForm.lineaEntrada">
+              <option value="1">1 – Línea de entrada 1</option>
+              <option value="2">2 – Línea de entrada 2</option>
+            </select>
+          </div>
+
+          <div class="ctrl-field ctrl-field-action">
+            <button id="btn-linkar" class="ctrl-btn btn-link" (click)="linkarTopForm()">🔗 Link TOP</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estado vinculado -->
+      <div class="ctrl-linked-badge" *ngIf="ws.linkedTop()">
+        <span>🟢 TOP vinculado</span>
+      </div>
+
+    </aside>
+    <!-- ══════════════════════════════════════════════ -->
+
+  </div><!-- /linea-body -->
 
 </div>

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, OnInit, QueryList, ViewChildren, signal } from '@angular/core';
+import { AfterViewInit, Component, inject, isDevMode, OnInit, QueryList, ViewChildren, signal } from '@angular/core';
 import { ModuloGridConfig, ModuloCoordsConfig } from '../../models/modulo-transporte.model';
 import { LineaTransporteComponent } from '../../components/linea-transporte/linea-transporte.component';
 import { ModuloLineaCoordsConfig } from '../../models/modulo-transporte.model';
@@ -23,15 +23,23 @@ export class DemoModulosComponent implements OnInit {
   @ViewChildren(LineaTransporteComponent) lineasTransporte!: QueryList<LineaTransporteComponent>;
 
   // ─── Dependencias ──────────────────────────────────────────────────────────
-  private trackingService      = inject(EventosTrackingService);
+  private trackingService = inject(EventosTrackingService);
   // ── NUEVO ──────────────────────────────────────────────────────────────────
-  private rechazoProcessor     = inject(RechazoProcessorService);
+  private rechazoProcessor = inject(RechazoProcessorService);
   private rechazosEstadoService = inject(RechazosEstadoService);
   // ──────────────────────────────────────────────────────────────────────────
 
   // ─── Signal local: enfoque activo ─────────────────────────────────────────
   /** Controla qué panel de estadísticas se muestra */
   enfoqueActivo = signal<'tracking' | 'rechazo'>('tracking');
+
+  /**
+   * Muestra los botones de simulación (solo para desarrollo).
+   * Por defecto: visibles con `ng serve` / build de desarrollo, ocultos en el build de producción.
+   * Cambiar a true/false para forzarlo.
+   */
+  // mostrarSimulacion = isDevMode();
+  mostrarSimulacion = false;
 
   // ==========================================
   // EJEMPLOS DE CONFIGURACIÓN Declarativa - PATRÓN COORDS
