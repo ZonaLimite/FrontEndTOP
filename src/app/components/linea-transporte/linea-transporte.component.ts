@@ -1,4 +1,5 @@
-import { Component, Input, ViewChildren, QueryList, AfterViewInit, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input, ViewChildren, QueryList, AfterViewInit, OnDestroy, inject } from '@angular/core';
+import { Subscription } from 'rxjs';
 import {
   ModuloGridConfig,
   ModuloCoordsConfig,
@@ -12,9 +13,10 @@ import { TrackingWebsocketService } from '../../services/tracking-websocket.serv
   selector: 'app-linea-transporte',
   standalone: false,
   templateUrl: './linea-transporte.component.html',
-  styleUrls: ['./linea-transporte.component.css']
+  styleUrls: ['./linea-transporte.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LineaTransporteComponent implements AfterViewInit {
+export class LineaTransporteComponent implements AfterViewInit, OnDestroy {
 
   ws = inject(TrackingWebsocketService);
 
@@ -32,6 +34,8 @@ export class LineaTransporteComponent implements AfterViewInit {
   // Referencias a los componentes de módulos
   @ViewChildren(ModuloTransporteCoordsComponent) modulosCoordsComponents!: QueryList<ModuloTransporteCoordsComponent>;
 
+  private cambiosModulosSub?: Subscription;
+
   constructor() { }
 
   conectar() { this.ws.conectar(); }
@@ -40,9 +44,20 @@ export class LineaTransporteComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     if (this.modoCoords) {
-      //Una vez renderizado todos los modulos pasamos la referencia de instanciacion al servicio para que pueda usar los modulos
-      this.ws.lineasTransporte = this.modulosCoordsComponents;
+      //Una vez renderizados todos los modulos los registramos en el servicio para que pueda enrutar los eventos a sus fotocélulas
+      this.ws.registrarLinea(this.modulosCoordsComponents);
+      // Si cambia la lista de módulos se reindexan las fotocélulas
+      this.cambiosModulosSub = this.modulosCoordsComponents.changes.subscribe(() =>
+        this.ws.registrarLinea(this.modulosCoordsComponents)
+      );
       console.log(`Línea de transporte "${this.titulo}" (MODO COORDENADAS) inicializada con ${this.modulosCoordsConfig.length} módulos`);
+    }
+  }
+
+  ngOnDestroy() {
+    this.cambiosModulosSub?.unsubscribe();
+    if (this.modulosCoordsComponents) {
+      this.ws.desregistrarLinea(this.modulosCoordsComponents);
     }
   }
 
@@ -55,28 +70,10 @@ export class LineaTransporteComponent implements AfterViewInit {
 
 
   /**
-   * Obtiene el estilo del contenedor de módulos (Modo Coordenadas - Posicionamiento Absoluto)
+   * trackBy del *ngFor de módulos: reutiliza el DOM de cada módulo por su id
    */
-  getLineaStyleCoords() {
-    return {
-      'position': 'relative',
-      'width': `${this.anchoLinea}px`,
-      'height': `${this.altoLinea}px`,
-      'border': '1px solid #ccc',
-      'background': '#0e0d0d'
-    };
-  }
-
-  /**
-   * Obtiene el estilo de posicionamiento para un módulo en modo coordenadas
-   */
-  getModuloStyleCoords(moduloCoords: ModuloLineaCoordsConfig) {
-    return {
-      'position': 'absolute',
-      'left': `${moduloCoords.x}px`,
-      'top': `${moduloCoords.y}px`
-      //'transform': 'translate(-50%, -50%)'  // Centrar en las coordenadas
-    };
+  trackByModulo(index: number, moduloCoords: ModuloLineaCoordsConfig): string {
+    return moduloCoords.config.id;
   }
 
   /**

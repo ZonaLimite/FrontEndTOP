@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, inject, OnDestroy, ViewChildren, QueryList } from '@angular/core';
+import { Injectable, signal, computed, inject, OnDestroy, ViewChildren, QueryList, NgZone } from '@angular/core';
 import { Client, IStompSocket, IFrame, IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { EventosTrackingService } from './eventos-tracking.service';
@@ -6,10 +6,11 @@ import { TipoEvento } from '../models/modulo-transporte.model';
 import { ResultEngine } from '../models/resultEngine';
 import { Traces } from '../models/traces';
 import { EventoFotocelula, TraceProcessorService } from './trace-processor.service';
-import { LineaTransporteComponent } from '../components/linea-transporte/linea-transporte.component';
 import { ModuloTransporteCoordsComponent } from '../components/modulo-transporte-coords/modulo-transporte-coords.component';
+import { FotocelulaComponent } from '../components/fotocelula/fotocelula.component';
 import { RechazoProcessorService } from './rechazo-processor.service';
 import { RechazosEstadoService } from './rechazos-estado.service';
+import { RenderSchedulerService } from './render-scheduler.service';
 
 declare var configuraciones: any;
 
@@ -66,14 +67,19 @@ const MAPA_EVENTOS: Record<string, TipoEvento> = {
 @Injectable({ providedIn: 'root' })
 export class TrackingWebsocketService implements OnDestroy {
 
-  // Referencia al componente hijo <app-linea-transporte>
-  lineasTransporte!: QueryList<ModuloTransporteCoordsComponent>
+  // ─── Registro de líneas de transporte ──────────────────────────────────────
+  // Cada <app-linea-transporte> registra sus módulos; se indexan las fotocélulas
+  // por id para acceso O(1) al llegar un evento
+  private lineasRegistradas = new Set<QueryList<ModuloTransporteCoordsComponent>>();
+  private indiceFotocelulas = new Map<string, FotocelulaComponent[]>();
 
   // ─── Dependencias ──────────────────────────────────────────────────────────
   private trackingService = inject(EventosTrackingService);
   private traceProcessorService = inject(TraceProcessorService);
   private rechazoProcessor = inject(RechazoProcessorService);
   private rechazosEstadoService = inject(RechazosEstadoService);
+  private ngZone = inject(NgZone);
+  private renderScheduler = inject(RenderSchedulerService);
 
   // ─── Cliente STOMP ────────────────────────────────────────────────────────
   private client: Client;
@@ -140,7 +146,8 @@ export class TrackingWebsocketService implements OnDestroy {
   conectar(): void {
     if (!this.client.active) {
       this.errorConexion.set(null);
-      this.client.activate();
+      // Fuera de la zona: los mensajes del socket no disparan detección de cambios
+      this.ngZone.runOutsideAngular(() => this.client.activate());
     }
   }
 
@@ -249,6 +256,43 @@ export class TrackingWebsocketService implements OnDestroy {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // REGISTRO DE LÍNEAS DE TRANSPORTE
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Registra los módulos de una línea de transporte para recibir eventos.
+   * Llamado por LineaTransporteComponent en ngAfterViewInit.
+   */
+  registrarLinea(modulos: QueryList<ModuloTransporteCoordsComponent>): void {
+    this.lineasRegistradas.add(modulos);
+    this._reconstruirIndiceFotocelulas();
+  }
+
+  /**
+   * Elimina una línea del registro (al destruirse el componente).
+   */
+  desregistrarLinea(modulos: QueryList<ModuloTransporteCoordsComponent>): void {
+    this.lineasRegistradas.delete(modulos);
+    this._reconstruirIndiceFotocelulas();
+  }
+
+  /**
+   * Reconstruye el índice fotocelulaId → componentes a partir de las líneas registradas.
+   */
+  private _reconstruirIndiceFotocelulas(): void {
+    this.indiceFotocelulas.clear();
+    this.lineasRegistradas.forEach(modulos =>
+      modulos.forEach(modulo =>
+        modulo.getAllFotocelulas().forEach(fc => {
+          const lista = this.indiceFotocelulas.get(fc.fotocelulaId);
+          if (lista) lista.push(fc);
+          else this.indiceFotocelulas.set(fc.fotocelulaId, [fc]);
+        })
+      )
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // CONFIGURACIÓN STOMP (privado)
   // ═══════════════════════════════════════════════════════════════════════════
 
@@ -259,7 +303,10 @@ export class TrackingWebsocketService implements OnDestroy {
       new SockJS(this.urlEngine) as IStompSocket;
 
     // ── onConnect ────────────────────────────────────────────────────────────
-    this.client.onConnect = (frame: IFrame) => {
+    // Los callbacks STOMP se ejecutan fuera de la zona de Angular (ver conectar()).
+    // Los de baja frecuencia (estado, control) vuelven a la zona con ngZone.run();
+    // las trazas se procesan en bloque una vez por frame (RenderSchedulerService).
+    this.client.onConnect = (frame: IFrame) => this.ngZone.run(() => {
       console.log('[WS-Tracking] Conectado al Engine:', frame);
       this.conectado.set(true);
       this.errorConexion.set(null);
@@ -267,38 +314,38 @@ export class TrackingWebsocketService implements OnDestroy {
       // Suscripción al canal de control (respuestas de comandos enviados)
       this.client.subscribe('/channel/control', (msg: IMessage) => {
         const result = JSON.parse(msg.body) as ResultEngine;
-        this._handleControl(result);
+        this.ngZone.run(() => this._handleControl(result));
       });
 
       // Suscripción al canal de trazas (eventos de tracking de la máquina)
       this.client.subscribe('/channel/traces', (msg: IMessage) => {
         const trace = JSON.parse(msg.body) as Traces;
-        this._handleTrace(trace);
+        this.renderScheduler.programar(() => this._handleTrace(trace));
       });
 
       // Inicializar combos al conectar
       this.refrescarCombos();
-    };
+    });
 
     // ── onDisconnect ─────────────────────────────────────────────────────────
-    this.client.onDisconnect = (frame: IFrame) => {
+    this.client.onDisconnect = (frame: IFrame) => this.ngZone.run(() => {
       console.log('[WS-Tracking] Desconectado del Engine');
       this._resetEstado();
-    };
+    });
 
     // ── onWebSocketClose ─────────────────────────────────────────────────────
-    this.client.onWebSocketClose = (event: CloseEvent) => {
+    this.client.onWebSocketClose = (event: CloseEvent) => this.ngZone.run(() => {
       console.warn('[WS-Tracking] Socket cerrado:', event.reason);
       this.errorConexion.set(event.reason || 'Conexión cerrada inesperadamente');
       this._resetEstado();
-    };
+    });
 
     // ── onStompError ─────────────────────────────────────────────────────────
-    this.client.onStompError = (frame: IFrame) => {
+    this.client.onStompError = (frame: IFrame) => this.ngZone.run(() => {
       const msg = frame.headers['message'] || 'Error STOMP desconocido';
       console.error('[WS-Tracking] Error STOMP:', msg);
       this.errorConexion.set(msg);
-    };
+    });
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -451,23 +498,12 @@ export class TrackingWebsocketService implements OnDestroy {
   }
 
   /**
- * Simula un evento en una fotocélula de un módulo específico (Ambos modos)
- */
-  /**
-* Simula un evento en una fotocelula específica 
-* @param fotocelulaId 
-*/
+   * Dispara un evento en todas las fotocélulas registradas con ese id
+   * @param fotocelulaId 
+   */
   public simularTriggerinEvent(
     fotocelulaId: string, evento: any) {
-    this.lineasTransporte.forEach(modulo =>
-      modulo.getAllFotocelulas().forEach(fc => {
-
-        if (fc.fotocelulaId === fotocelulaId) {
-          //console.log(`Simulando disparo evento ${evento} en modulo ${modulo.getNombreModulo()} fotocélula ${fc.fotocelulaId}`);         
-          modulo.simularEvento(fc.fotocelulaId, evento);
-        }
-      })
-    );
+    this.indiceFotocelulas.get(fotocelulaId)?.forEach(fc => fc.mostrarEvento(evento));
   }
 
 

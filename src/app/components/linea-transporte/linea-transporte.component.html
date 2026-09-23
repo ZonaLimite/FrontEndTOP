@@ -3,14 +3,16 @@
    <!-- MODO COORDENADAS (Posicionamiento Absoluto) -->
   <div class="modulos-coords-wrapper" 
        *ngIf="modoCoords"
-       [ngStyle]="getLineaStyleCoords()">
+       [style.width.px]="anchoLinea"
+       [style.height.px]="altoLinea">
     
     <!-- Grid de fondo para referencia visual (opcional) -->
     <!--<div class="grid-background"></div>-->
     
     <!-- Renderizar cada módulo en sus coordenadas -->
-    <div *ngFor="let moduloCoords of modulosCoordsConfig" 
-         [ngStyle]="getModuloStyleCoords(moduloCoords)"
+    <div *ngFor="let moduloCoords of modulosCoordsConfig; trackBy: trackByModulo" 
+         [style.left.px]="moduloCoords.x"
+         [style.top.px]="moduloCoords.y"
          class="modulo-wrapper">
       
       

@@ -8,15 +8,17 @@
   </div>-->
 
   <!-- Área de fotocélulas con posicionamiento absoluto -->
-  <!--<div class="modulo-area" [ngStyle]="getModuloStyle()"></div>-->
-  <div [ngStyle]="getModuloStyle()">
+  <div class="modulo-fotocelulas"
+       [style.width.px]="config.ancho"
+       [style.height.px]="config.alto">
     
     <!-- Grid de fondo para referencia visual (opcional) -->
     <!--<div class="grid-background"></div>-->
     
     <!-- Renderizar cada fotocélula en sus coordenadas -->
-    <div *ngFor="let fotocelulaConfig of config.fotocelulas" 
-         [ngStyle]="getFotocelulaStyle(fotocelulaConfig)"
+    <div *ngFor="let fotocelulaConfig of config.fotocelulas; trackBy: trackByFotocelula" 
+         [style.left.%]="fotocelulaConfig.x"
+         [style.top.%]="fotocelulaConfig.y"
          class="fotocelula-wrapper">
       
       <!-- ✅ fotocelulaId, moduloId y moduloNombre correctamente enlazados -->

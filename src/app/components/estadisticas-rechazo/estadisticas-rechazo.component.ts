@@ -1,11 +1,12 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, signal } from '@angular/core';
 import { RechazosEstadoService, RegistroRechazo } from '../../services/rechazos-estado.service';
 
 @Component({
   selector: 'app-estadisticas-rechazo',
   standalone: false,
   templateUrl: './estadisticas-rechazo.component.html',
-  styleUrls: ['./estadisticas-rechazo.component.css']
+  styleUrls: ['./estadisticas-rechazo.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EstadisticasRechazoComponent {
 

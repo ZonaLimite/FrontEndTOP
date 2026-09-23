@@ -87,7 +87,15 @@
    WRAPPER DE FOTOCÉLULAS
    ======================================== */
 
+/* Área de fotocélulas: el tamaño (ancho/alto) llega por binding desde la config */
+.modulo-fotocelulas {
+  position: relative;
+}
+
+/* Posicionada por binding (left/top en %), centrada en sus coordenadas */
 .fotocelula-wrapper {
+  position: absolute;
+  transform: translate(-50%, -50%);
   z-index: 10;
   pointer-events: auto;
 }

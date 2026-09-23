@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy, signal, inject } from '@angular/core';
 import { EventosTrackingService } from '../../services/eventos-tracking.service';
+import { RenderSchedulerService } from '../../services/render-scheduler.service';
 
 interface EventoTracking {
   id: number;
@@ -10,22 +11,37 @@ interface EventoTracking {
   selector: 'app-fotocelula',
   standalone: false,
   templateUrl: './fotocelula.component.html',
-  styleUrls: ['./fotocelula.component.css']
+  styleUrls: ['./fotocelula.component.css'],
+  // OnPush: solo se revisa cuando cambian sus inputs o sus signals (ocultado, eventosActivos)
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FotocelulaComponent {
   @Input() nombreFotocelula: string = 'Fotocélula';
   @Input() fotocelulaId: string = '';  // ID único para tracking
   @Input() moduloId: string = '';      // ID del módulo que contiene esta fotocélula
   @Input() moduloNombre: string = '';  // Nombre del módulo para contexto
-  @Input() ocultado: boolean = true;
+  @Input('ocultado') set ocultadoInicial(valor: boolean) { this.ocultado.set(valor); }
   @Input() tamano: 'pequeno' | 'normal' | 'mediano' | 'grande' = 'normal';
   @Input() orientacion: 'row' | 'column' = 'column';
 
+  // Estado del haz: true → LED rojo encendido (envío tapando la fotocélula)
+  readonly ocultado = signal<boolean>(true);
+
   // Lista de eventos activos para permitir concurrencia
-  eventosActivos: EventoTracking[] = [];
+  readonly eventosActivos = signal<EventoTracking[]>([]);
   private counter: number = 0;
 
+  // Los timers de apagado se ejecutan fuera de la zona y se aplican por frame
+  private renderScheduler = inject(RenderSchedulerService);
+
   constructor(private trackingService: EventosTrackingService) { }
+
+  /**
+   * trackBy de los indicadores: al quitar un evento no se recrean los demás
+   */
+  trackByEvento(index: number, evento: EventoTracking): number {
+    return evento.id;
+  }
 
   mostrarEvento(tipo: 'activacion' | 'desactivacion' | 'atiempo' | 'retraso' | 'adelanto' | 'apparition' | 'desaparicion') {
     const id = this.counter++;
@@ -33,19 +49,24 @@ export class FotocelulaComponent {
 
     if (tipo === 'activacion' || tipo === 'desactivacion') {
       if (tipo === 'activacion') {
-        this.ocultado = true;
+        this.ocultado.set(true);
         //console.log(`Evento ${tipo} en ${this.nombreFotocelula}`);
 
-        setTimeout(() => {
-          this.ocultado = false;
-        }, 70); // apagamos automaticamente la fotocelula
+        this.renderScheduler.despues(70, () => {
+          this.ocultado.set(false);
+        }); // apagamos automaticamente la fotocelula
 
       } else {
-        this.ocultado = false;
+        this.ocultado.set(false);
       }
     } else {
       const nuevoEvento: EventoTracking = { id, tipo };
-      this.eventosActivos.push(nuevoEvento);
+      this.eventosActivos.update(eventos => [...eventos, nuevoEvento]);
+
+      // Eliminar el evento después de que termine la animación (2s)
+      this.renderScheduler.despues(2000, () => {
+        this.eventosActivos.update(eventos => eventos.filter(e => e.id !== id));
+      }); // 2000ms debe coincidir con la duración de la animación CSS
     }
 
     // Registrar el evento en el servicio de tracking
@@ -57,10 +78,5 @@ export class FotocelulaComponent {
     //  this.nombreFotocelula,
     //  tipo
     //);
-
-    // Eliminar el evento después de que termine la animación (2s)
-    setTimeout(() => {
-      this.eventosActivos = this.eventosActivos.filter(e => e.id !== id);
-    }, 2000); // 2000ms debe coincidir con la duración de la animación CSS
   }
 }

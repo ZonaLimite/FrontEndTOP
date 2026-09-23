@@ -68,7 +68,7 @@ export class ModuloTransporteGridComponent implements AfterViewInit {
     const index = this.config.fotocelulas.findIndex(fc => fc.id === fotocelulaId);
     if (index !== -1) {
       const fotocelula = this.fotocelulas.toArray()[index];
-      fotocelula.ocultado = ocultado;
+      fotocelula.ocultado.set(ocultado);
     }
   }
 

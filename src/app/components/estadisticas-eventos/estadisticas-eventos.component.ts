@@ -1,4 +1,4 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, signal } from '@angular/core';
 import { EventosTrackingService, EstadisticasFotocelula } from '../../services/eventos-tracking.service';
 import { TipoEvento } from '../../models/modulo-transporte.model';
 
@@ -6,7 +6,8 @@ import { TipoEvento } from '../../models/modulo-transporte.model';
   selector: 'app-estadisticas-eventos',
   standalone: false,
   templateUrl: './estadisticas-eventos.component.html',
-  styleUrls: ['./estadisticas-eventos.component.css']
+  styleUrls: ['./estadisticas-eventos.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EstadisticasEventosComponent {
 

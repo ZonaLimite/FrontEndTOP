@@ -1,4 +1,4 @@
-import { Component, Input, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
 import { ModuloCoordsConfig, FotocelulaCoordsConfig } from '../../models/modulo-transporte.model';
 import { FotocelulaComponent } from '../fotocelula/fotocelula.component';
 
@@ -6,7 +6,8 @@ import { FotocelulaComponent } from '../fotocelula/fotocelula.component';
   selector: 'app-modulo-transporte-coords',
   standalone: false,
   templateUrl: './modulo-transporte-coords.component.html',
-  styleUrls: ['./modulo-transporte-coords.component.css']
+  styleUrls: ['./modulo-transporte-coords.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ModuloTransporteCoordsComponent implements AfterViewInit {
   @Input() config!: ModuloCoordsConfig;
@@ -35,26 +36,10 @@ export class ModuloTransporteCoordsComponent implements AfterViewInit {
   }
 
   /**
-   * Obtiene el estilo del contenedor del módulo
+   * trackBy del *ngFor de fotocélulas: reutiliza el DOM de cada fotocélula por su id
    */
-  getModuloStyle() {
-    return {
-      'width': `${this.config.ancho}px`,
-      'height': `${this.config.alto}px`,
-      'position': 'relative'
-    };
-  }
-
-  /**
-   * Obtiene el estilo de posicionamiento para cada fotocélula
-   */
-  getFotocelulaStyle(fotocelula: FotocelulaCoordsConfig) {
-    return {
-      'position': 'absolute',
-      'left': `${fotocelula.x}%`,
-      'top': `${fotocelula.y}%`,
-      'transform': 'translate(-50%, -50%)'  // Centrar en las coordenadas
-    };
+  trackByFotocelula(index: number, fotocelula: FotocelulaCoordsConfig): string {
+    return fotocelula.id;
   }
 
   /**
@@ -98,7 +83,7 @@ export class ModuloTransporteCoordsComponent implements AfterViewInit {
     const index = this.config.fotocelulas.findIndex(fc => fc.id === fotocelulaId);
     if (index !== -1) {
       const fotocelula = this.fotocelulas.toArray()[index];
-      fotocelula.ocultado = ocultado;
+      fotocelula.ocultado.set(ocultado);
     }
   }
 
