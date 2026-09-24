@@ -193,31 +193,17 @@ export class TrackingWebsocketService implements OnDestroy {
       return;
     }
     this.enviarComando('selectConsulta', [expresion]);
+
+    /*
+      public void incluirModelFilterAListener(String nameModelFilter) {
+    vis.incluirModelFilterAListenersRemote(nameModelFilter);
   }
 
-  /**
-   * Habilita en el Engine la publicación de trazas de tracking para una línea:
-   * limpia los model filters del listener, incluye los de la línea y activa la publicación.
-   * @param linea Línea de entrada (1 o 2)
-   */
-  async habilitarTrackingListener(linea: string): Promise<void> {
-    const filtrosPorLinea: Record<string, string[]> = {
-      '1': ['L1-Fotocelulas', 'IL1-Rechazos'],
-      '2': ['L2-Fotocelulas', 'IL2-Rechazos'],
-    };
-    const filtros = filtrosPorLinea[linea];
-    if (!filtros) {
-      console.warn(`[WS-Tracking] habilitarTrackingListener: línea desconocida: "${linea}"`);
-      return;
-    }
-
-    this.borrarTodosModelFilterDeListener();
-    await this.delay(500); // Pausa de medio segundo
-    for (const nameModelFilter of filtros) {
-      this.incluirModelFilterAListener(nameModelFilter);
-      await this.delay(500); // Pausa de medio segundo
-    }
-    this.setPublicacionActiva(true);
+  public void borrarModelFilterDeListenerActivos(String nameModelFilterActivo) {
+    ModelFilter modelFilter = vis.getCatalogoModelFilters().get(nameModelFilterActivo);
+    vis.borrarModelFilterDeListener(modelFilter);
+  }
+    */
   }
 
   /**
@@ -250,21 +236,6 @@ export class TrackingWebsocketService implements OnDestroy {
    */
   eliminarListener(listener: string): void {
     this.enviarComando('quitarlistenermodelfilter', [listener]);
-  }
-
-  /**
-   * Elimina todos los model filters del listener remoto del Engine.
-   */
-  borrarTodosModelFilterDeListener(): void {
-    this.enviarComando('borrarTodosModelFilterDeListener', []);
-  }
-
-  /**
-   * Incluye un model filter en el listener remoto del Engine.
-   * @param nameModelFilter Nombre del model filter (ej: "L1-Fotocelulas")
-   */
-  incluirModelFilterAListener(nameModelFilter: string): void {
-    this.enviarComando('incluirModelFilterAListener', [nameModelFilter]);
   }
 
   /**
@@ -439,11 +410,6 @@ export class TrackingWebsocketService implements OnDestroy {
       case 'ackConectar':
         this.linkedTop.set(true);
         console.log('[WS-Tracking] Link TOP establecido');
-        // Con el link confirmado se habilita el listener de tracking de la línea enlazada
-        const enlace = this.enlaceTop();
-        if (enlace) {
-          this.habilitarTrackingListener(enlace.lineaEntrada);
-        }
         break;
 
       case 'ackDesconectar':
