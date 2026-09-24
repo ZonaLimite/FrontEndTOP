@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, inject, OnDestroy, ViewChildren, QueryList, NgZone } from '@angular/core';
+import { Injectable, signal, computed, inject, OnDestroy, QueryList, NgZone } from '@angular/core';
 import { Client, IStompSocket, IFrame, IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { EventosTrackingService } from './eventos-tracking.service';

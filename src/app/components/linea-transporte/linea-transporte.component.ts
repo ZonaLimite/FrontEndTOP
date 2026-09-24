@@ -1,11 +1,6 @@
 import { Component, ChangeDetectionStrategy, Input, ViewChildren, QueryList, AfterViewInit, OnDestroy, inject } from '@angular/core';
 import { Subscription } from 'rxjs';
-import {
-  ModuloGridConfig,
-  ModuloCoordsConfig,
-  ModuloLineaCoordsConfig
-} from '../../models/modulo-transporte.model';
-import { ModuloTransporteGridComponent } from '../modulo-transporte-grid/modulo-transporte-grid.component';
+import { ModuloLineaCoordsConfig } from '../../models/modulo-transporte.model';
 import { ModuloTransporteCoordsComponent } from '../modulo-transporte-coords/modulo-transporte-coords.component';
 import { TrackingWebsocketService } from '../../services/tracking-websocket.service';
 
@@ -36,8 +31,6 @@ export class LineaTransporteComponent implements AfterViewInit, OnDestroy {
 
   private cambiosModulosSub?: Subscription;
 
-  constructor() { }
-
   conectar() { this.ws.conectar(); }
   desconectar() { this.ws.desconectar(); }
   linkarTop() { this.ws.linkarTop("2", "IL", "IL:Linea Entrada1"); } // Solo para pruebas
@@ -62,14 +55,6 @@ export class LineaTransporteComponent implements AfterViewInit, OnDestroy {
   }
 
   /**
-   * Determina si está en modo coordenadas
-   */
-  isModoCoordenadas(): boolean {
-    return this.modoCoords && this.modulosCoordsConfig.length > 0;
-  }
-
-
-  /**
    * trackBy del *ngFor de módulos: reutiliza el DOM de cada módulo por su id
    */
   trackByModulo(index: number, moduloCoords: ModuloLineaCoordsConfig): string {
@@ -77,14 +62,7 @@ export class LineaTransporteComponent implements AfterViewInit, OnDestroy {
   }
 
   /**
-   * Obtiene la configuración del módulo 
-   */
-  getModuloConfig(moduloCoords: ModuloLineaCoordsConfig): ModuloCoordsConfig {
-    return moduloCoords.config;
-  }
-
-  /**
-   * Simula un evento en una fotocélula de un módulo específico (Ambos modos)
+   * Simula un evento en una fotocélula de un módulo específico
    */
   public simularEventoEnModulo(
     moduloId: string,
@@ -92,10 +70,7 @@ export class LineaTransporteComponent implements AfterViewInit, OnDestroy {
     tipo: 'activacion' | 'desactivacion' | 'atiempo' | 'retraso' | 'adelanto' | 'apparition' | 'desaparicion'
   ) {
 
-    // Buscar en módulos Coords
-    const moduloCoords = this.modulosCoordsComponents.find(
-      (m, index) => m.getIdModulo() === moduloId
-    );
+    const moduloCoords = this.modulosCoordsComponents.find(m => m.getIdModulo() === moduloId);
 
     if (moduloCoords) {
       moduloCoords.simularEvento(fotocelulaId, tipo);
@@ -103,17 +78,14 @@ export class LineaTransporteComponent implements AfterViewInit, OnDestroy {
   }
 
   /**
-   * Simula el enecendido de una fotocelula durante 150ms
-   * @param moduloId Simula el enecendido de una fotocelula durante 100ms
-   * @param fotocelulaId 
+   * Simula el encendido del LED rojo de una fotocélula durante 200ms
+   * @param moduloId ID del módulo que contiene la fotocélula
+   * @param fotocelulaId ID de la fotocélula
    */
   public simularOcultacionEnFotocelula(
     moduloId: string,
-    fotocelulaId: string,) {
-    // Buscar en módulos Coords
-    const moduloCoords = this.modulosCoordsComponents.find(
-      (m, index) => m.getIdModulo() === moduloId
-    );
+    fotocelulaId: string) {
+    const moduloCoords = this.modulosCoordsComponents.find(m => m.getIdModulo() === moduloId);
 
     if (moduloCoords) {
       moduloCoords.setOcultado(fotocelulaId, true);
@@ -124,30 +96,15 @@ export class LineaTransporteComponent implements AfterViewInit, OnDestroy {
   }
 
   /**
-   * Obtiene la referencia a un módulo por su ID (Ambos modos)
-   */
-  private obtenerComponenteModulo(moduloId: string): ModuloTransporteGridComponent | ModuloTransporteCoordsComponent | undefined {
-
-    // Buscar en módulos Coords (modo lineal)
-    const moduloCoords = this.modulosCoordsComponents.find(
-      (m, index) => m.getIdModulo() === moduloId
-    );
-    if (moduloCoords) return moduloCoords;
-
-    return undefined;
-  }
-
-  /**
-   * Simula el flujo de un envío a través de todos los módulos (Ambos modos)
+   * Simula el flujo de un envío a través de todos los módulos
    */
   simularFlujoCompleto(retardoMs: number = 1000) {
     if (this.modoCoords) {
-      // Modo coordenadas
       this.modulosCoordsConfig.forEach((moduloConfig, index) => {
         const config = moduloConfig.config;
-        const fotocelulas = 'fotocelulas' in config ? config.fotocelulas : [];
+        const fotocelulas = config.fotocelulas;
 
-        fotocelulas.forEach((fotocelula: any, fcIndex: number) => {
+        fotocelulas.forEach((fotocelula, fcIndex) => {
           setTimeout(() => {
             this.simularEventoEnModulo(config.id, fotocelula.id, 'atiempo');
             this.simularOcultacionEnFotocelula(config.id, fotocelula.id);
@@ -155,13 +112,5 @@ export class LineaTransporteComponent implements AfterViewInit, OnDestroy {
         });
       });
     }
-  }
-
-
-  /**
-   * Determina si un módulo es de tipo Coords
-   */
-  isModuloCoords(modulo: any): modulo is ModuloCoordsConfig {
-    return 'ancho' in modulo && 'alto' in modulo && !('gridRows' in modulo);
   }
 }
