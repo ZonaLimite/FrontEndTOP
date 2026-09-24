@@ -48,8 +48,8 @@
     <div class="seccion-estadisticas">
       <div class="controls">
 
-        <!-- Botones de simulación Tracking -->
-        <ng-container *ngIf="enfoqueActivo() === 'tracking'">
+        <!-- Botones de simulación Tracking (solo desarrollo, ver mostrarSimulacion) -->
+        <ng-container *ngIf="mostrarSimulacion && enfoqueActivo() === 'tracking'">
           <button (click)="simularEventosEnTodosModulos()" class="btn-simular">
             🎲 Simular Evento Aleatorio
           </button>
@@ -58,8 +58,8 @@
           </button>
         </ng-container>
 
-        <!-- Botón de simulación Rechazo -->
-        <ng-container *ngIf="enfoqueActivo() === 'rechazo'">
+        <!-- Botón de simulación Rechazo (solo desarrollo, ver mostrarSimulacion) -->
+        <ng-container *ngIf="mostrarSimulacion && enfoqueActivo() === 'rechazo'">
           <button (click)="simularTrazasRechazo()" class="btn-simular btn-simular-rechazo">
             🎲 Simular Trazas REJET
           </button>

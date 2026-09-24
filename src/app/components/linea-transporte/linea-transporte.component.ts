@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, Input, ViewChildren, QueryList, AfterViewInit, OnDestroy, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input, ViewChildren, QueryList, AfterViewInit, OnDestroy, inject, computed } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ModuloLineaCoordsConfig } from '../../models/modulo-transporte.model';
 import { ModuloTransporteCoordsComponent } from '../modulo-transporte-coords/modulo-transporte-coords.component';
@@ -26,14 +26,36 @@ export class LineaTransporteComponent implements AfterViewInit, OnDestroy {
 
   @Input() titulo: string = 'Línea de Transporte';
 
+  /** Título visible: la máquina y línea enlazadas (ej: "TOP 1 Línea 1") o, sin link, el título de entrada */
+  readonly tituloEnlace = computed(() => {
+    const enlace = this.ws.enlaceTop();
+    return this.ws.linkedTop() && enlace
+      ? `TOP ${enlace.maquina} Línea ${enlace.lineaEntrada}`
+      : null;
+  });
+
   // Referencias a los componentes de módulos
   @ViewChildren(ModuloTransporteCoordsComponent) modulosCoordsComponents!: QueryList<ModuloTransporteCoordsComponent>;
 
   private cambiosModulosSub?: Subscription;
 
+  /** Modelo del formulario de conexión */
+  linkForm = {
+    maquina: '2',
+    sistema: 'IL',
+    lineaEntrada: '1'
+  };
+
   conectar() { this.ws.conectar(); }
   desconectar() { this.ws.desconectar(); }
-  linkarTop() { this.ws.linkarTop("2", "IL", "IL:Linea Entrada1"); } // Solo para pruebas
+
+  linkarTopForm() {
+    this.ws.linkarTop(
+      this.linkForm.maquina,
+      this.linkForm.sistema,
+      this.linkForm.lineaEntrada
+    );
+  }
 
   ngAfterViewInit() {
     if (this.modoCoords) {

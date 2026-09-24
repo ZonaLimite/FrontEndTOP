@@ -3,13 +3,35 @@
    ======================================== */
 
 .linea-container {
+  position: relative;
   background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
   border: 2px solid #333;
   border-radius: 16px;
   padding: 20px;
+  padding-top: 14px;
   box-shadow: 
     0 8px 16px rgba(0, 0, 0, 0.6),
     inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* ========================================
+   TÍTULO FLOTANTE (sobre el borde superior)
+   ======================================== */
+
+.linea-titulo {
+  position: absolute;
+  top: 5px;
+  left: 14px;
+  padding: 0 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #00aaff;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 8px rgba(0, 170, 255, 0.5);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 2;
 }
 
 /* ========================================
@@ -24,6 +46,8 @@
   border-radius: 20px;
   box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3);
   z-index: 1;
+  margin-top: 6px;        /* separación con el título de la línea */
+  flex-shrink: 0;          /* la zona de módulos nunca cede ancho al panel */
 }
 
 .modulos-coords-wrapper .grid-background {
@@ -69,7 +93,197 @@
   box-shadow: 0 0 12px rgba(0, 170, 255, 0.8);
 }
 
-.colConnection{
-  float: right;
+/* ========================================
+   LAYOUT PRINCIPAL (módulos + panel)
+   ======================================== */
+
+.linea-body {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 14px;
+  margin-top: 18px;
 }
 
+/* ========================================
+   PANEL DE CONTROL LATERAL
+   ======================================== */
+
+.ctrl-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* Ocupa el ancho libre a la derecha de los módulos, pero ese ancho lo decide
+     el espacio disponible, nunca su contenido: flex-basis 0 + contain evitan
+     que al cambiar el contenido (textos, formulario...) el panel engorde. */
+  flex: 1 1 0;
+  min-width: 150px;
+  contain: inline-size;
+  box-sizing: border-box;
+  margin-top: 6px;         /* alineado con .modulos-coords-wrapper */
+  overflow-y: auto;        /* por si el contenido no cabe en el alto de la línea */
+  background: linear-gradient(160deg, #141414, #1c1c1c);
+  border: 1px solid #2e2e2e;
+  border-radius: 10px;
+  padding: 12px 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+/* Fila superior: estado, estadísticas y botón conectar en horizontal */
+.ctrl-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+
+.ctrl-top-actions {
+  margin-left: auto;
+  min-width: 0;
+}
+
+/* Estado */
+.ctrl-status {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ctrl-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #555;
+  flex-shrink: 0;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.ctrl-status.connected .ctrl-status-dot {
+  background: #00ff88;
+  box-shadow: 0 0 6px rgba(0,255,136,0.7);
+}
+
+.ctrl-status-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ctrl-status.connected .ctrl-status-text {
+  color: #00ff88;
+}
+
+/* Estadísticas */
+.ctrl-stats {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  font-size: 10px;
+  color: #666;
+}
+
+.ctrl-stats b {
+  color: #999;
+}
+
+.ctrl-divider {
+  border: none;
+  border-top: 1px solid #2a2a2a;
+  margin: 2px 0;
+}
+
+/* Botones */
+.ctrl-btn {
+  width: 100%;
+  padding: 7px 8px;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  transition: filter 0.2s, transform 0.1s;
+}
+
+.ctrl-btn:hover  { filter: brightness(1.2); }
+.ctrl-btn:active { transform: scale(0.97); }
+
+.btn-connect    { background: linear-gradient(135deg, #00aa55, #007a3d); color: #fff; }
+.btn-disconnect { background: linear-gradient(135deg, #cc2200, #991a00); color: #fff; }
+.btn-link       { background: linear-gradient(135deg, #0077cc, #004f99); color: #fff; margin-top: 4px; }
+
+/* Formulario Link TOP */
+.ctrl-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Campos del formulario en rejilla: tantas columnas como quepan en el ancho */
+.ctrl-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 6px 10px;
+  align-items: end;
+}
+
+.ctrl-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ctrl-field-action .btn-link {
+  margin-top: 0;
+}
+
+.ctrl-form-title {
+  margin: 0 0 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #00aaff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.ctrl-label {
+  font-size: 9px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+.ctrl-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: #0d0d0d;
+  border: 1px solid #333;
+  border-radius: 4px;
+  color: #ccc;
+  font-size: 11px;
+  padding: 4px 6px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.ctrl-input:focus { border-color: #0077cc; }
+
+.ctrl-select {
+  cursor: pointer;
+}
+
+/* Badge vinculado */
+.ctrl-linked-badge {
+  font-size: 11px;
+  color: #00ff88;
+  text-align: center;
+  padding: 6px 0;
+}
