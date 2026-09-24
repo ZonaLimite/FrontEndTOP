@@ -4,17 +4,11 @@
        SELECTOR DE ENFOQUE
        ======================================== -->
   <div class="selector-enfoque">
-    <button
-      class="btn-enfoque"
-      [class.activo]="enfoqueActivo() === 'tracking'"
-      (click)="cambiarEnfoque('tracking')"
+    <button class="btn-enfoque" [class.activo]="enfoqueActivo() === 'tracking'" (click)="cambiarEnfoque('tracking')"
       title="Ver estadísticas de Tracking">
       📡 Tracking
     </button>
-    <button
-      class="btn-enfoque"
-      [class.activo]="enfoqueActivo() === 'rechazo'"
-      (click)="cambiarEnfoque('rechazo')"
+    <button class="btn-enfoque" [class.activo]="enfoqueActivo() === 'rechazo'" (click)="cambiarEnfoque('rechazo')"
       title="Ver estadísticas de Rechazos">
       ❌ Rechazo
     </button>
@@ -26,22 +20,16 @@
   <section class="demo-section">
 
     <!-- Enfoque Tracking -->
-    <app-estadisticas-eventos
-      *ngIf="enfoqueActivo() === 'tracking'">
+    <app-estadisticas-eventos *ngIf="enfoqueActivo() === 'tracking'">
     </app-estadisticas-eventos>
 
     <!-- Enfoque Rechazo -->
-    <app-estadisticas-rechazo
-      *ngIf="enfoqueActivo() === 'rechazo'">
+    <app-estadisticas-rechazo *ngIf="enfoqueActivo() === 'rechazo'">
     </app-estadisticas-rechazo>
 
     <!-- Línea de transporte visual (siempre visible) -->
-    <app-linea-transporte
-      [modoCoords]="true"
-      [modulosCoordsConfig]="modulosLineaEntrada"
-      [anchoLinea]="1150"
-      [altoLinea]="300"
-      [titulo]="'LINEA-01'">
+    <app-linea-transporte [modoCoords]="true" [modulosCoordsConfig]="modulosLineaEntrada" [anchoLinea]="1150"
+      [altoLinea]="300" [titulo]="'NO Conectado a maquina'">
     </app-linea-transporte>
 
     <!-- Estadísticas y Controls -->
