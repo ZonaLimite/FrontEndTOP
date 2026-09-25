@@ -280,6 +280,11 @@
   cursor: pointer;
 }
 
+/* Spinner numérico: flechas nativas visibles sobre fondo oscuro */
+.ctrl-spinner {
+  color-scheme: dark;
+}
+
 /* Badge vinculado */
 .ctrl-linked-badge {
   font-size: 11px;

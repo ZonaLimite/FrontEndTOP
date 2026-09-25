@@ -6,33 +6,25 @@
   <div class="linea-body">
 
     <!-- MODO COORDENADAS (Posicionamiento Absoluto) -->
-    <div class="modulos-coords-wrapper"
-         *ngIf="modoCoords"
-         [style.width.px]="anchoLinea"
-         [style.height.px]="altoLinea">
+    <div class="modulos-coords-wrapper" *ngIf="modoCoords" [style.width.px]="anchoLinea" [style.height.px]="altoLinea">
 
       <!-- Renderizar cada módulo en sus coordenadas -->
-      <div *ngFor="let moduloCoords of modulosCoordsConfig; trackBy: trackByModulo"
-           [style.left.px]="moduloCoords.x"
-           [style.top.px]="moduloCoords.y"
-           class="modulo-wrapper">
+      <div *ngFor="let moduloCoords of modulosCoordsConfig; trackBy: trackByModulo" [style.left.px]="moduloCoords.x"
+        [style.top.px]="moduloCoords.y" class="modulo-wrapper">
 
         <!-- Módulo tipo Coords -->
-        <app-modulo-transporte-coords
-          [config]="moduloCoords.config">
+        <app-modulo-transporte-coords [config]="moduloCoords.config">
         </app-modulo-transporte-coords>
 
         <!-- Marcador de posición (opcional, para debugging) -->
-        <div class="position-marker"
-             title="X: {{moduloCoords.x}}px, Y: {{moduloCoords.y}}px">
+        <div class="position-marker" title="X: {{moduloCoords.x}}px, Y: {{moduloCoords.y}}px">
         </div>
       </div>
     </div>
 
     <!-- ══════════════ PANEL DE CONTROL ══════════════ -->
     <!-- Ocupa todo el ancho libre a la derecha; su alto nunca supera al de la zona de módulos -->
-    <aside class="ctrl-panel"
-           [style.max-height.px]="modoCoords ? altoLinea : null">
+    <aside class="ctrl-panel" [style.max-height.px]="modoCoords ? altoLinea : null">
 
       <!-- Fila superior: estado + estadísticas + conectar/desconectar -->
       <div class="ctrl-top">
@@ -47,33 +39,34 @@
         </div>
 
         <div class="ctrl-top-actions">
-          <button id="btn-conectar"    class="ctrl-btn btn-connect"    (click)="conectar()"    *ngIf="!ws.conectado()">⚡ Conectar</button>
-          <button id="btn-desconectar" class="ctrl-btn btn-disconnect" (click)="desconectar()" *ngIf="ws.conectado()">✖ Desconectar</button>
+          <button id="btn-conectar" class="ctrl-btn btn-connect" (click)="conectar()" *ngIf="!ws.conectado()">⚡
+            Conectar</button>
+          <button id="btn-desconectar" class="ctrl-btn btn-disconnect" (click)="desconectar()" *ngIf="ws.conectado()">✖
+            Desconectar</button>
         </div>
       </div>
 
       <!-- Formulario Link TOP -->
       <div class="ctrl-form" *ngIf="ws.conectado() && !ws.linkedTop()">
-        <hr class="ctrl-divider"/>
-        <p class="ctrl-form-title">Link TOP</p>
+        <hr class="ctrl-divider" />
+        <p class="ctrl-form-title">SELECCION LINK TOP</p>
 
         <div class="ctrl-form-grid">
           <div class="ctrl-field">
             <label class="ctrl-label" for="input-maquina">Máquina</label>
-            <input id="input-maquina" class="ctrl-input" type="text"
-                   [(ngModel)]="linkForm.maquina" placeholder="ej: 2"/>
+            <input id="input-maquina" class="ctrl-input ctrl-spinner" type="number" [(ngModel)]="linkForm.maquina"
+              [min]="MAQUINA_MIN" [max]="MAQUINA_MAX" step="1" />
           </div>
 
           <div class="ctrl-field">
             <label class="ctrl-label" for="input-sistema">Sistema</label>
-            <input id="input-sistema" class="ctrl-input" type="text"
-                   [(ngModel)]="linkForm.sistema" placeholder="ej: IL"/>
+            <input id="input-sistema" class="ctrl-input" type="text" [(ngModel)]="linkForm.sistema"
+              placeholder="ej: IL" />
           </div>
 
           <div class="ctrl-field">
             <label class="ctrl-label" for="input-linea">Línea entrada</label>
-            <select id="input-linea" class="ctrl-input ctrl-select"
-                    [(ngModel)]="linkForm.lineaEntrada">
+            <select id="input-linea" class="ctrl-input ctrl-select" [(ngModel)]="linkForm.lineaEntrada">
               <option value="1">1 – Línea de entrada 1</option>
               <option value="2">2 – Línea de entrada 2</option>
             </select>

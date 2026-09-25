@@ -40,8 +40,12 @@ export class LineaTransporteComponent implements AfterViewInit, OnDestroy {
   private cambiosModulosSub?: Subscription;
 
   /** Modelo del formulario de conexión */
+  /** Rango de máquinas TOP por centro (normalmente no más de 2) */
+  readonly MAQUINA_MIN = 1;
+  readonly MAQUINA_MAX = 2;
+
   linkForm = {
-    maquina: '2',
+    maquina: 2,
     sistema: 'IL',
     lineaEntrada: '1'
   };
@@ -50,8 +54,11 @@ export class LineaTransporteComponent implements AfterViewInit, OnDestroy {
   desconectar() { this.ws.desconectar(); }
 
   linkarTopForm() {
+    // El spinner permite teclear valores fuera de rango: se acotan antes de enviar
+    const maquina = Math.min(this.MAQUINA_MAX, Math.max(this.MAQUINA_MIN, Math.round(Number(this.linkForm.maquina) || this.MAQUINA_MIN)));
+    this.linkForm.maquina = maquina;
     this.ws.linkarTop(
-      this.linkForm.maquina,
+      String(maquina),
       this.linkForm.sistema,
       this.linkForm.lineaEntrada
     );
