@@ -194,15 +194,8 @@ export class TrackingWebsocketService implements OnDestroy {
       return;
     }
     this.enviarComando('selectConsulta', [expresion]);
-
-
-
-    /*
-  public void borrarModelFilterDeListenerActivos(String nameModelFilterActivo) {
-    ModelFilter modelFilter = vis.getCatalogoModelFilters().get(nameModelFilterActivo);
-    vis.borrarModelFilterDeListener(modelFilter);
-  }
-    */
+    await this.delay(500);
+    this.habilitarTrackingListener(linea_de_entrada);
   }
 
   /**
@@ -450,11 +443,6 @@ export class TrackingWebsocketService implements OnDestroy {
       case 'ackConectar':
         this.linkedTop.set(true);
         console.log('[WS-Tracking] Link TOP establecido');
-        // Con el link confirmado se habilita el listener de tracking de la línea enlazada
-        const enlace = this.enlaceTop();
-        if (enlace) {
-          this.habilitarTrackingListener(enlace.lineaEntrada);
-        }
         break;
 
       case 'ackDesconectar':
