@@ -162,6 +162,8 @@ export class TrackingWebsocketService implements OnDestroy {
     this.borrarTodosModelFilterDeListener();
     this.enviarComando('desconectar', []); // Asegura que el Engine cierre el link TOP si está activo
     this.client.deactivate();
+    this.trackingService.limpiarEstadisticas();
+    this.rechazosEstadoService.limpiarEstadisticas();
   }
 
   //función de utilidad al final o fuera de la clase
