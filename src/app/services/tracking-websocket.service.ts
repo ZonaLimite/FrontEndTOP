@@ -181,7 +181,7 @@ export class TrackingWebsocketService implements OnDestroy {
     this.enviarComando('adjustnumtop', [maquina]);
     await this.delay(500); // Pausa de medio segundo
     this.enviarComando('selectSistema', [sistema]);
-    await this.delay(500); // Pausa de medio segundo
+    await this.delay(900); // Pausa de medio segundo
     this.enviarComando('conectar', []);
     await this.delay(500); // Pausa de medio segundo
     const consultaMap: Record<string, string> = {
@@ -194,7 +194,7 @@ export class TrackingWebsocketService implements OnDestroy {
       return;
     }
     this.enviarComando('selectConsulta', [expresion]);
-    await this.delay(500);
+    await this.delay(900);
     this.habilitarTrackingListener(linea_de_entrada);
   }
 
