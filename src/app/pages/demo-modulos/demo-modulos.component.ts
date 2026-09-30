@@ -7,6 +7,7 @@ import { EventosTrackingService } from '../../services/eventos-tracking.service'
 // ── NUEVO ──────────────────────────────────────────────────────────────────
 import { RechazoProcessorService } from '../../services/rechazo-processor.service';
 import { RechazosEstadoService } from '../../services/rechazos-estado.service';
+import { EspesorEstadoService } from '../../services/espesor-estado.service';
 // ──────────────────────────────────────────────────────────────────────────
 
 @Component({
@@ -27,6 +28,7 @@ export class DemoModulosComponent implements OnInit {
   // ── NUEVO ──────────────────────────────────────────────────────────────────
   private rechazoProcessor = inject(RechazoProcessorService);
   private rechazosEstadoService = inject(RechazosEstadoService);
+  private espesorEstadoService = inject(EspesorEstadoService);
   // ──────────────────────────────────────────────────────────────────────────
 
   // ─── Signal local: enfoque activo ─────────────────────────────────────────
@@ -39,7 +41,7 @@ export class DemoModulosComponent implements OnInit {
    * Cambiar a true/false para forzarlo.
    */
   // mostrarSimulacion = isDevMode();
-  mostrarSimulacion = false;
+  mostrarSimulacion = true;
 
   // ==========================================
   // EJEMPLOS DE CONFIGURACIÓN Declarativa - PATRÓN COORDS
@@ -120,7 +122,8 @@ export class DemoModulosComponent implements OnInit {
       orientacion: 'vertical',
       fotocelulas: [
         { id: 'FE1', nombre: 'FE1', x: 50, y: 37, tamano: 'pequeno', orientacion: 'row' },
-      ]
+      ],
+      etiquetaEspesor: { x: 50, y: 78 }
     },
     {
       id: 'FED-02',
@@ -130,7 +133,8 @@ export class DemoModulosComponent implements OnInit {
       orientacion: 'vertical',
       fotocelulas: [
         { id: 'FE2', nombre: 'FE2', x: 50, y: 30, tamano: 'pequeno', orientacion: 'row' },
-      ]
+      ],
+      etiquetaEspesor: { x: 50, y: 78 }
     }
   ];
 
@@ -219,6 +223,22 @@ export class DemoModulosComponent implements OnInit {
     ].join('\n');
 
     this.procesarTrazasRechazo(trazasEjemplo);
+  }
+
+  // ==========================================
+  // MÉTODOS DE PRUEBA (ESPESOR)
+  // ==========================================
+
+  /**
+   * Simula una medida de espesor (en micras) en cada feeder,
+   * cubriendo todos los estados: ok, warning (0 y 30–64 mm) y excesivo.
+   */
+  simularEspesor(): void {
+    const muestrasMicras = [0, 350, 4200, 12500, 30000, 41800, 64000, 68500];
+    ['FED-01', 'FED-02'].forEach(moduloId => {
+      const micras = muestrasMicras[Math.floor(Math.random() * muestrasMicras.length)];
+      this.espesorEstadoService.registrarMedida(moduloId, micras);
+    });
   }
 
   // ==========================================

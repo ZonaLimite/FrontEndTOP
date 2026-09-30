@@ -61,6 +61,39 @@ export interface ModuloCoordsConfig {
   alto: number;           // Alto en píxeles
   fotocelulas: FotocelulaCoordsConfig[];
   orientacion?: 'horizontal' | 'vertical';
+  etiquetaEspesor?: EtiquetaEspesorConfig;   // Solo módulos feeder (FED-n)
+}
+
+// ============================================
+// ETIQUETA DE ESPESOR (MÓDULOS FEEDER)
+// ============================================
+
+/**
+ * Posición y formato de la etiqueta de espesor dentro de un módulo feeder
+ */
+export interface EtiquetaEspesorConfig {
+  x: number;              // Posición X en % del módulo
+  y: number;              // Posición Y en % del módulo
+  decimales?: number;     // Decimales mostrados en mm (por defecto 1)
+}
+
+/**
+ * Clasificación de una medida de espesor:
+ * - ok:          0 < espesor <= 30 mm
+ * - warning:     espesor == 0, o 30 mm < espesor <= 64 mm
+ * - excesivo:    espesor > 64 mm
+ * - sin-lectura: no hay medida vigente
+ */
+export type EstadoEspesor = 'ok' | 'warning' | 'excesivo' | 'sin-lectura';
+
+/**
+ * Última medida de espesor recibida para un módulo feeder
+ */
+export interface MedidaEspesor {
+  micras: number;         // Valor tal como llega en la traza (µm)
+  mm: number;             // Valor convertido a milímetros
+  estado: EstadoEspesor;
+  timestamp: number;
 }
 
 // ============================================

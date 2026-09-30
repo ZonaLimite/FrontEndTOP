@@ -1,6 +1,7 @@
-import { Component, ChangeDetectionStrategy, Input, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
-import { ModuloCoordsConfig, FotocelulaCoordsConfig } from '../../models/modulo-transporte.model';
+import { Component, ChangeDetectionStrategy, Input, ViewChildren, QueryList, AfterViewInit, inject, computed } from '@angular/core';
+import { ModuloCoordsConfig, FotocelulaCoordsConfig, MedidaEspesor } from '../../models/modulo-transporte.model';
 import { FotocelulaComponent } from '../fotocelula/fotocelula.component';
+import { EspesorEstadoService } from '../../services/espesor-estado.service';
 
 @Component({
   selector: 'app-modulo-transporte-coords',
@@ -14,6 +15,11 @@ export class ModuloTransporteCoordsComponent implements AfterViewInit {
   
   // Referencia a todas las fotocélulas del módulo
   @ViewChildren(FotocelulaComponent) fotocelulas!: QueryList<FotocelulaComponent>;
+
+  private espesorEstado = inject(EspesorEstadoService);
+
+  /** Última medida de espesor vigente de este módulo (solo feeders) */
+  readonly medidaEspesor = computed<MedidaEspesor | undefined>(() => this.espesorEstado.medidas()[this.config?.id]);
 
   constructor() {}
 

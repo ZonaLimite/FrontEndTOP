@@ -34,7 +34,22 @@
       
       <!-- Marcador de posición (opcional, para debugging) -->
       <div class="position-marker" title="X: {{fotocelulaConfig.x}}%, Y: {{fotocelulaConfig.y}}%"></div>
-      
+
+    </div>
+
+    <!-- Etiqueta de espesor (solo módulos feeder con etiquetaEspesor en su config) -->
+    <div *ngIf="config.etiquetaEspesor as et"
+         class="espesor-bloque"
+         [style.left.%]="et.x"
+         [style.top.%]="et.y">
+      <span class="espesor-titulo">ESPESOR</span>
+      <div class="etiqueta-espesor"
+           [ngClass]="'estado-' + (medidaEspesor()?.estado ?? 'sin-lectura')">
+        <ng-container *ngIf="medidaEspesor() as m; else sinLectura">
+          {{ m.mm | number:'1.' + (et.decimales ?? 1) + '-' + (et.decimales ?? 1) }} mm
+        </ng-container>
+        <ng-template #sinLectura>— mm</ng-template>
+      </div>
     </div>
 
   </div>
