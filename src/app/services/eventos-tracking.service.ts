@@ -1,5 +1,4 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { Subject } from 'rxjs';
 import { TipoEvento } from '../models/modulo-transporte.model';
 
 /**
@@ -49,13 +48,13 @@ export interface EstadisticasModulo {
 /**
  * Servicio para rastrear y contar eventos de fotocélulas.
  * 
- * Arquitectura: Signals para estado + RxJS solo para entrada WebSocket
+ * Arquitectura: estado interno + Signals para renderizado
  * ─────────────────────────────────────────────────────────────────────
- * WebSocket (STOMP/SockJS)
- *       ↓ Observable — se queda con RxJS (es un stream externo)
- *       ↓ eventoEntrante$.subscribe() — único punto de cruce
- *  signal.set() / .update()
- *       ↓ Signals — gestionan el estado interno
+ * WebSocket (STOMP/SockJS) → TrackingWebsocketService
+ *       ↓ inyectarEventoWebSocket() — llamada directa
+ *  procesarEvento() → mapEstadisticas / historial
+ *       ↓ setInterval (2 s) → actualizarRenderizadoEstadisticas()
+ *  signal.set()
  *       ↓ computed() — derivaciones automáticas
  *  Templates sin | async, sin suscripciones manuales
  */
@@ -75,19 +74,11 @@ export class EventosTrackingService {
     this.inicializarMapaOrdenado();
     this.historial = [];
 
-    // Único .subscribe() del servicio: convierte eventos WebSocket en Signals
-    this.eventoEntrante$.subscribe(ev => {
-      this.procesarEvento(
-        ev.fotocelulaId, ev.fotocelulaNombre,
-        ev.tipo
-      );
-    });
-
     setInterval(() => {
       this.actualizarRenderizadoEstadisticas()
     }, 2000); //Refresh renderizado mediante signals
 
-    console.log('EventosTrackingService inicializado (Signals + RxJS WebSocket)');
+    console.log('EventosTrackingService inicializado (Signals)');
   }
 
   /**
@@ -168,18 +159,6 @@ export class EventosTrackingService {
   }
 
 
-  // ─── RxJS: SOLO para la entrada del WebSocket ────────────────────────────
-  /**
-   * Subject interno que actúa como puerta de entrada desde STOMP/SockJS.
-   * Los componentes NO se suscriben a esto — es uso interno del servicio.
-   */
-  private eventoEntrante$ = new Subject<{
-    fotocelulaId: string;
-    fotocelulaNombre: string;
-    tipo: TipoEvento;
-  }>();
-
-
   /**
    * Pre-puebla mapEstadisticas con claves en el orden gráfico fijo.
    * Todos los contadores arrancan a 0.
@@ -202,29 +181,14 @@ export class EventosTrackingService {
 
   /**
    * Inyecta un evento proveniente del WebSocket (STOMP/SockJS).
-   * Entrada al Subject RxJS que cruza al mundo Signals.
+   * Actualiza el estado interno; los Signals se refrescan en el ciclo periódico.
    */
   inyectarEventoWebSocket(
     fotocelulaId: string,
     fotocelulaNombre: string,
     tipo: TipoEvento
   ): void {
-    //Ahora necesitamos acceder a las interfaces : 
-
-    // mediante observables para conducir la llamada al metodo de calculo y actualizacion : procesarEvento()
-    //this.eventoEntrante$.next({
-    //  fotocelulaId, fotocelulaNombre, tipo
-    //});
-
-    // o  
-
-    // Llamada directa al metodo de calculo y actualizacion : procesarEvento()
-    this.procesarEvento(
-      fotocelulaId, fotocelulaNombre,
-      tipo
-    );
-    // ✅ Actualizar Signals — notifica automáticamente a computed() y templates
-    //this.actualizarRenderizado(tipo);
+    this.procesarEvento(fotocelulaId, fotocelulaNombre, tipo);
   }
 
   /**
