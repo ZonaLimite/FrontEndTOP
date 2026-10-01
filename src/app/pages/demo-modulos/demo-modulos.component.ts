@@ -8,6 +8,7 @@ import { EventosTrackingService } from '../../services/eventos-tracking.service'
 import { RechazoProcessorService } from '../../services/rechazo-processor.service';
 import { RechazosEstadoService } from '../../services/rechazos-estado.service';
 import { EspesorEstadoService } from '../../services/espesor-estado.service';
+import { EspesorProcessorService } from '../../services/espesor-processor.service';
 // ──────────────────────────────────────────────────────────────────────────
 
 @Component({
@@ -29,6 +30,7 @@ export class DemoModulosComponent implements OnInit {
   private rechazoProcessor = inject(RechazoProcessorService);
   private rechazosEstadoService = inject(RechazosEstadoService);
   private espesorEstadoService = inject(EspesorEstadoService);
+  private espesorProcessor = inject(EspesorProcessorService);
   // ──────────────────────────────────────────────────────────────────────────
 
   // ─── Signal local: enfoque activo ─────────────────────────────────────────
@@ -41,7 +43,7 @@ export class DemoModulosComponent implements OnInit {
    * Cambiar a true/false para forzarlo.
    */
   // mostrarSimulacion = isDevMode();
-  mostrarSimulacion = true;
+  mostrarSimulacion = false;
 
   // ==========================================
   // EJEMPLOS DE CONFIGURACIÓN Declarativa - PATRÓN COORDS
@@ -230,15 +232,20 @@ export class DemoModulosComponent implements OnInit {
   // ==========================================
 
   /**
-   * Simula una medida de espesor (en micras) en cada feeder,
+   * Simula una traza de medida de espesor (en micras) en cada feeder,
    * cubriendo todos los estados: ok, warning (0 y 30–64 mm) y excesivo.
+   * Pasa por EspesorProcessorService igual que las trazas del WebSocket.
+   * Incluye trazas de la línea 2, que el filtro por línea (línea 1) debe descartar.
    */
   simularEspesor(): void {
     const muestrasMicras = [0, 350, 4200, 12500, 30000, 41800, 64000, 68500];
-    ['FED-01', 'FED-02'].forEach(moduloId => {
+    const trazas = [1, 2].flatMap(feeder => [1, 2].map(linea => {
       const micras = muestrasMicras[Math.floor(Math.random() * muestrasMicras.length)];
-      this.espesorEstadoService.registrarMedida(moduloId, micras);
-    });
+      return `C30100200 18:07:09:232 INF IL${linea}_FE${feeder}_ - rootOnMailPieceReportOutputThickness(), T.Reader:1, MP=4001B256, thickness=${micras}`;
+    })).join('\n');
+
+    this.espesorProcessor.analizarTraza(trazas, '1')
+      ?.forEach(ev => this.espesorEstadoService.registrarMedida(ev.moduloId, ev.micras));
   }
 
   // ==========================================

@@ -1,5 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { EstadoEspesor, MedidaEspesor } from '../models/modulo-transporte.model';
+import { RenderSchedulerService } from './render-scheduler.service';
 
 /**
  * Servicio para gestionar el estado reactivo de las medidas de espesor
@@ -7,7 +8,7 @@ import { EstadoEspesor, MedidaEspesor } from '../models/modulo-transporte.model'
  *
  * Arquitectura
  * ─────────────────────────────────────────────────────────────────────────
- * EspesorProcessorService (fase 2: parseo y matching de trazas WebSocket)
+ * EspesorProcessorService (parseo y matching de trazas WebSocket)
  *       ↓ registrarMedida(moduloId, micras)
  *  signal medidas: Record<moduloId, MedidaEspesor>
  *       ↓ ModuloTransporteCoordsComponent lee su entrada (OnPush + Signals)
@@ -15,6 +16,8 @@ import { EstadoEspesor, MedidaEspesor } from '../models/modulo-transporte.model'
  * A diferencia de EventosTrackingService, el signal se actualiza en cada
  * medida (sin setInterval): la etiqueta debe reflejar cada carta.
  * Cada medida permanece visible TIEMPO_VISIBLE_MS si no llega otra nueva.
+ * La caducidad se programa con RenderSchedulerService.despues(): el timer
+ * corre fuera de la zona y no dispara detección de cambios por su cuenta.
  */
 @Injectable({
   providedIn: 'root'
@@ -33,8 +36,7 @@ export class EspesorEstadoService {
   /** Última medida vigente por id de módulo feeder */
   readonly medidas = signal<Record<string, MedidaEspesor>>({});
 
-  // ─── Timers de caducidad por módulo ───────────────────────────────────────
-  private timers = new Map<string, ReturnType<typeof setTimeout>>();
+  private renderScheduler = inject(RenderSchedulerService);
 
   constructor() {
     console.log('EspesorEstadoService inicializado');
@@ -44,7 +46,7 @@ export class EspesorEstadoService {
 
   /**
    * Registra una medida de espesor para un módulo feeder.
-   * Reinicia su temporizador de caducidad.
+   * Programa su caducidad; una medida posterior la sustituye y anula esa caducidad.
    *
    * @param moduloId - Id del módulo feeder (ej: 'FED-01')
    * @param micras   - Espesor medido en micras, tal como llega en la traza
@@ -63,16 +65,13 @@ export class EspesorEstadoService {
     };
     this.medidas.update(m => ({ ...m, [moduloId]: medida }));
 
-    clearTimeout(this.timers.get(moduloId));
-    this.timers.set(moduloId, setTimeout(() => this.caducar(moduloId), EspesorEstadoService.TIEMPO_VISIBLE_MS));
+    this.renderScheduler.despues(EspesorEstadoService.TIEMPO_VISIBLE_MS, () => this.caducar(moduloId, medida));
   }
 
   /**
-   * Borra todas las medidas vigentes y sus temporizadores.
+   * Borra todas las medidas vigentes (las caducidades pendientes quedan sin efecto).
    */
   reset(): void {
-    this.timers.forEach(t => clearTimeout(t));
-    this.timers.clear();
     this.medidas.set({});
   }
 
@@ -88,9 +87,12 @@ export class EspesorEstadoService {
 
   // ─── Privados ─────────────────────────────────────────────────────────────
 
-  /** Elimina la medida de un módulo al vencer su tiempo de visibilidad */
-  private caducar(moduloId: string): void {
-    this.timers.delete(moduloId);
+  /**
+   * Elimina la medida de un módulo al vencer su tiempo de visibilidad,
+   * solo si sigue siendo la vigente (no ha llegado otra después).
+   */
+  private caducar(moduloId: string, medida: MedidaEspesor): void {
+    if (this.medidas()[moduloId] !== medida) return;
     this.medidas.update(m => {
       const { [moduloId]: _, ...resto } = m;
       return resto;

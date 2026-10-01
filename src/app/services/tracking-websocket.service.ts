@@ -10,6 +10,8 @@ import { ModuloTransporteCoordsComponent } from '../components/modulo-transporte
 import { FotocelulaComponent } from '../components/fotocelula/fotocelula.component';
 import { RechazoProcessorService } from './rechazo-processor.service';
 import { RechazosEstadoService } from './rechazos-estado.service';
+import { EspesorProcessorService } from './espesor-processor.service';
+import { EspesorEstadoService } from './espesor-estado.service';
 import { RenderSchedulerService } from './render-scheduler.service';
 
 declare var configuraciones: any;
@@ -78,6 +80,8 @@ export class TrackingWebsocketService implements OnDestroy {
   private traceProcessorService = inject(TraceProcessorService);
   private rechazoProcessor = inject(RechazoProcessorService);
   private rechazosEstadoService = inject(RechazosEstadoService);
+  private espesorProcessor = inject(EspesorProcessorService);
+  private espesorEstadoService = inject(EspesorEstadoService);
   private ngZone = inject(NgZone);
   private renderScheduler = inject(RenderSchedulerService);
 
@@ -216,12 +220,17 @@ export class TrackingWebsocketService implements OnDestroy {
       return;
     }
 
+    //Incluir Model filters de rechazo y tracking
     this.borrarTodosModelFilterDeListener();
     await this.delay(500); // Pausa de medio segundo
     for (const nameModelFilter of filtros) {
       this.incluirModelFilterAListener(nameModelFilter);
       await this.delay(500); // Pausa de medio segundo
     }
+    //Incluir ModelFilters de medida de espesor
+    this.incluirModelFilterAListener('Medida Espesor');
+    await this.delay(500);
+
     this.setPublicacionActiva(true);
   }
 
@@ -489,6 +498,7 @@ export class TrackingWebsocketService implements OnDestroy {
     if (trace.tipoResult == 'eventTrace') {
       this.handleTracking(trace.data);
       this.procesarTrazasRechazo(trace.data);
+      this.procesarTrazasEspesor(trace.data);
     }
   }
 
@@ -538,6 +548,21 @@ export class TrackingWebsocketService implements OnDestroy {
     }
   }
 
+
+  /**
+   * Analiza un bloque de trazas en busca de medidas de espesor de los
+   * feeders y las registra en el servicio de estado de espesor.
+   * Solo se conservan las de la línea enlazada por el usuario (enlaceTop):
+   * el Engine publica las medidas de espesor de las dos líneas.
+   *
+   * @param trazas - String multilínea con trazas a analizar
+   */
+  procesarTrazasEspesor(trazas: string): void {
+    const linea = this.enlaceTop()?.lineaEntrada;
+    if (!linea) return;
+    const eventos = this.espesorProcessor.analizarTraza(trazas, linea);
+    eventos?.forEach(ev => this.espesorEstadoService.registrarMedida(ev.moduloId, ev.micras));
+  }
 
   /**
    * Traduce el nombre de evento tal como llega del Engine

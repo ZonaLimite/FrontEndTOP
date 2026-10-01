@@ -7,12 +7,12 @@ actualizada con cada carta.
 | Fase | Contenido | Estado |
 |------|-----------|--------|
 | 1 | Visualización: modelo, servicio de estado, etiqueta y su renderizado | **Hecha** (2026-09-30) |
-| 2 | `espesor-processor.service`: detección y matching de trazas WebSocket | Pendiente (falta la máscara de detección) |
+| 2 | `espesor-processor.service`: detección y matching de trazas WebSocket | **Hecha** (2026-10-01) |
 
 ## Requisitos acordados
 
-- **Origen:** mensajes WebSocket. La traza identifica el feeder y trae el espesor medido.
-  La máscara de detección se define en la fase 2.
+- **Origen:** mensajes WebSocket. La traza identifica el feeder y trae el espesor medido
+  (formato en la fase 2).
 - **Unidad:** la traza trae **micras** (µm). Se muestra en **mm** (1 decimal por defecto,
   configurable con `etiquetaEspesor.decimales`).
 - **Clasificación (en el frontend):**
@@ -27,7 +27,8 @@ actualizada con cada carta.
 
   Valores negativos o no numéricos se descartan (log `console.warn`).
 - **Persistencia:** cada medida permanece visible **3 s** (`TIEMPO_VISIBLE_MS`) si no llega otra;
-  una medida nueva reinicia el temporizador. Al caducar, la etiqueta vuelve a `sin-lectura`.
+  una medida nueva la sustituye y anula su caducidad. Al caducar, la etiqueta vuelve a `sin-lectura`.
+  La caducidad usa `RenderSchedulerService.despues()` (timer fuera de la zona).
 
 ## Fase 1 (hecha)
 
@@ -44,15 +45,32 @@ actualizada con cada carta.
 - **Demo** (`demo-modulos`): `etiquetaEspesor` en FED-01 y FED-02, y botón
   **🎲 Simular Espesor** (visible con `mostrarSimulacion = true`).
 
-## Fase 2 (pendiente): `espesor-processor.service`
+## Fase 2 (hecha): `espesor-processor.service`
 
-Seguir el patrón de `rechazo-processor.service` + `rechazos-estado.service`:
+Formato de traza:
 
-1. `EspesorProcessorService.analizarTraza(trace: string): EventoEspesor[] | null`, con
-   `EventoEspesor { moduloId: string; micras: number }`. Aquí va la máscara de detección y el
-   matching del identificador de feeder de la traza con el id de módulo (`FED-01`…).
-2. En `TrackingWebsocketService._handleTrace()`, junto a `handleTracking()` y
-   `procesarTrazasRechazo()`, llamar a un `procesarTrazasEspesor(trace.data)` que haga
-   `espesorEstado.registrarMedida(ev.moduloId, ev.micras)` por cada evento.
+```
+C30100200 18:07:09:232 INF IL1_FE2_ - rootOnMailPieceReportOutputThickness(), T.Reader:1, MP=4001B256, thickness=1280
+```
 
-Pendiente de definir: formato de la traza (máscara) y cómo se identifica el feeder en ella.
+| Campo | Significado | Uso |
+|-------|-------------|-----|
+| `rootOnMailPieceReportOutputThickness()` | Marca del evento de medida de espesor en el feeder | Matching |
+| `IL<n>` | Línea | Filtro: solo se conserva la línea enlazada por el usuario |
+| `FE<m>` | Feeder | Módulo `FED-0<m>` (siempre se corresponde) |
+| `T.Reader` | Lector de espesor | Se ignora: el feeder tiene un solo lector |
+| `MP` | Identificador del envío | Se descarta (enfoque de diagnóstico del lector) |
+| `thickness` | Espesor en micras | Valor registrado |
+
+- `EspesorProcessorService.analizarTraza(trace, linea)` → `EventoEspesor[] | null`
+  (`{ moduloId, micras }`). El model filter `Medida Espesor` del Engine no distingue línea
+  (llegan trazas de IL1 e IL2): se descartan las de `IL<n>` distinto de `linea`. Regex sobre la marca: no colisiona con `BeltConveyor FE …`
+  del `trace-processor` (allí FE es *front edge*).
+- `TrackingWebsocketService._handleTrace()` llama a `procesarTrazasEspesor(trace.data)`,
+  que toma la línea de `enlaceTop().lineaEntrada` (elección del usuario en `linkarTop()`; sin
+  enlace no se procesa) y hace `espesorEstado.registrarMedida(ev.moduloId, ev.micras)` por cada evento.
+- El botón **🎲 Simular Espesor** de la demo genera trazas con este formato y las pasa por el processor.
+
+## Pendiente
+
+- Lectores de espesor en otros tipos de módulo (no feeder).
