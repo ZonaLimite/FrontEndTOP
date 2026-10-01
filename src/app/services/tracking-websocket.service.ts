@@ -12,6 +12,8 @@ import { RechazoProcessorService } from './rechazo-processor.service';
 import { RechazosEstadoService } from './rechazos-estado.service';
 import { EspesorProcessorService } from './espesor-processor.service';
 import { EspesorEstadoService } from './espesor-estado.service';
+import { OcrProcessorService } from './ocr-processor.service';
+import { LecturaDestinoEstadoService } from './lectura-destino-estado.service';
 import { RenderSchedulerService } from './render-scheduler.service';
 
 declare var configuraciones: any;
@@ -82,6 +84,8 @@ export class TrackingWebsocketService implements OnDestroy {
   private rechazosEstadoService = inject(RechazosEstadoService);
   private espesorProcessor = inject(EspesorProcessorService);
   private espesorEstadoService = inject(EspesorEstadoService);
+  private ocrProcessor = inject(OcrProcessorService);
+  private lecturaDestinoEstado = inject(LecturaDestinoEstadoService);
   private ngZone = inject(NgZone);
   private renderScheduler = inject(RenderSchedulerService);
 
@@ -168,6 +172,7 @@ export class TrackingWebsocketService implements OnDestroy {
     this.client.deactivate();
     this.trackingService.limpiarEstadisticas();
     this.rechazosEstadoService.limpiarEstadisticas();
+    this.lecturaDestinoEstado.reset();
   }
 
   //función de utilidad al final o fuera de la clase
@@ -499,6 +504,7 @@ export class TrackingWebsocketService implements OnDestroy {
       this.handleTracking(trace.data);
       this.procesarTrazasRechazo(trace.data);
       this.procesarTrazasEspesor(trace.data);
+      this.procesarTrazasOcr(trace.data);
     }
   }
 
@@ -562,6 +568,19 @@ export class TrackingWebsocketService implements OnDestroy {
     if (!linea) return;
     const eventos = this.espesorProcessor.analizarTraza(trazas, linea);
     eventos?.forEach(ev => this.espesorEstadoService.registrarMedida(ev.moduloId, ev.micras));
+  }
+
+  /**
+   * Analiza un bloque de trazas en busca de lecturas de destino del OCR
+   * (proceso URA) de la línea enlazada y las registra como última lectura.
+   *
+   * @param trazas - String multilínea con trazas a analizar
+   */
+  procesarTrazasOcr(trazas: string): void {
+    const linea = this.enlaceTop()?.lineaEntrada;
+    if (!linea) return;
+    const lecturas = this.ocrProcessor.analizarTraza(trazas, linea);
+    lecturas?.forEach(l => this.lecturaDestinoEstado.registrarLectura(l));
   }
 
   /**

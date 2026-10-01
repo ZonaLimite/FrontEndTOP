@@ -9,6 +9,8 @@ import { RechazoProcessorService } from '../../services/rechazo-processor.servic
 import { RechazosEstadoService } from '../../services/rechazos-estado.service';
 import { EspesorEstadoService } from '../../services/espesor-estado.service';
 import { EspesorProcessorService } from '../../services/espesor-processor.service';
+import { OcrProcessorService } from '../../services/ocr-processor.service';
+import { LecturaDestinoEstadoService } from '../../services/lectura-destino-estado.service';
 // ──────────────────────────────────────────────────────────────────────────
 
 @Component({
@@ -31,6 +33,8 @@ export class DemoModulosComponent implements OnInit {
   private rechazosEstadoService = inject(RechazosEstadoService);
   private espesorEstadoService = inject(EspesorEstadoService);
   private espesorProcessor = inject(EspesorProcessorService);
+  private ocrProcessor = inject(OcrProcessorService);
+  private lecturaDestinoEstado = inject(LecturaDestinoEstadoService);
   // ──────────────────────────────────────────────────────────────────────────
 
   // ─── Signal local: enfoque activo ─────────────────────────────────────────
@@ -93,7 +97,8 @@ export class DemoModulosComponent implements OnInit {
       orientacion: 'horizontal',
       fotocelulas: [
         { id: 'ACQ-B1', nombre: 'ACQ-B1', x: 83, y: 60, tamano: 'pequeno', orientacion: 'row' }
-      ]
+      ],
+      etiquetaLectura: { x: 38, y: 50 }
     },
     {
       id: 'MER-01',
@@ -246,6 +251,24 @@ export class DemoModulosComponent implements OnInit {
 
     this.espesorProcessor.analizarTraza(trazas, '1')
       ?.forEach(ev => this.espesorEstadoService.registrarMedida(ev.moduloId, ev.micras));
+  }
+
+  /**
+   * Simula una traza OCR de la línea 1 elegida al azar entre trazas reales
+   * (encaminamiento, distribución y no reconocido).
+   * Pasa por OcrProcessorService igual que las trazas del WebSocket.
+   */
+  simularLecturaOcr(): void {
+    const trazas = [
+      'IL:1 #N38854254;C30100100 22:23:57:498 INF IL1_URA_ -                    texte                  DACTHN 50012            S:ES50012_________ NC:2 NS:3 IS:0a ZARAGOZA',
+      'IL:1 #N38855128;C30100100 22:23:58:156 INF IL1_URA_ -                    texte                  DACTVI 42140            S:ES42140_________ NC:2 NS:3 IS:0a SAN LEONARD',
+      'IL:1 #N38936892;C30100100 22:27:30:039 INF IL1_URA_ -                    texte                  DACTHN 01006 104001     S:ES01006104001___ NC:6 NS:5 IS:0a VITORIA GAS  ',
+      'IL:1 #N38872279;C30100100 22:24:08:254 INF IL1_URA_ -                    texte                  MANUHN R_REC            S:________________ NC:0 NS:0 IS:00          ',
+    ];
+    const traza = trazas[Math.floor(Math.random() * trazas.length)];
+
+    this.ocrProcessor.analizarTraza(traza, '1')
+      ?.forEach(l => this.lecturaDestinoEstado.registrarLectura(l));
   }
 
   // ==========================================

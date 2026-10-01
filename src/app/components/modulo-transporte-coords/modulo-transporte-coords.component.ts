@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, Input, ViewChildren, QueryList, Aft
 import { ModuloCoordsConfig, FotocelulaCoordsConfig, MedidaEspesor } from '../../models/modulo-transporte.model';
 import { FotocelulaComponent } from '../fotocelula/fotocelula.component';
 import { EspesorEstadoService } from '../../services/espesor-estado.service';
+import { LecturaDestinoEstadoService } from '../../services/lectura-destino-estado.service';
 
 @Component({
   selector: 'app-modulo-transporte-coords',
@@ -20,6 +21,9 @@ export class ModuloTransporteCoordsComponent implements AfterViewInit {
 
   /** Última medida de espesor vigente de este módulo (solo feeders) */
   readonly medidaEspesor = computed<MedidaEspesor | undefined>(() => this.espesorEstado.medidas()[this.config?.id]);
+
+  /** Última lectura de destino OCR / restitución de la línea (solo módulos ACQ) */
+  readonly lecturaDestino = inject(LecturaDestinoEstadoService).ultimaLectura;
 
   constructor() {}
 

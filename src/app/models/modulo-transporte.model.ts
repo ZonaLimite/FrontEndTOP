@@ -62,6 +62,7 @@ export interface ModuloCoordsConfig {
   fotocelulas: FotocelulaCoordsConfig[];
   orientacion?: 'horizontal' | 'vertical';
   etiquetaEspesor?: EtiquetaEspesorConfig;   // Solo módulos feeder (FED-n)
+  etiquetaLectura?: EtiquetaLecturaConfig;   // Solo módulos de adquisición (ACQ-n)
 }
 
 // ============================================
@@ -93,6 +94,45 @@ export interface MedidaEspesor {
   micras: number;         // Valor tal como llega en la traza (µm)
   mm: number;             // Valor convertido a milímetros
   estado: EstadoEspesor;
+  timestamp: number;
+}
+
+// ============================================
+// ETIQUETA DE LECTURA DE DESTINO (MÓDULOS ACQ)
+// ============================================
+
+/**
+ * Posición de la etiqueta de lectura de destino (OCR / restitución)
+ * dentro de un módulo de adquisición
+ */
+export interface EtiquetaLecturaConfig {
+  x: number;              // Posición X en % del módulo
+  y: number;              // Posición Y en % del módulo
+}
+
+/**
+ * Sistema que obtuvo el destino del envío. Cada envío lo resuelve uno u otro:
+ * si se detecta cronomarca se usa la restitución y no se trata con OCR.
+ */
+export type OrigenLectura = 'ocr' | 'restitucion';
+
+/**
+ * Resultado de una lectura de destino:
+ * - encaminamiento: CP de 5 dígitos
+ * - distribucion:   CP + 6 dígitos de distribución
+ * - no-reconocido:  no se obtuvo destino (ej: OCR 'R_REC')
+ */
+export type EstadoLectura = 'encaminamiento' | 'distribucion' | 'no-reconocido';
+
+/**
+ * Última lectura de destino recibida
+ */
+export interface LecturaDestino {
+  origen: OrigenLectura;
+  estado: EstadoLectura;
+  cp: string | null;            // Código postal (5 dígitos)
+  distribucion: string | null;  // 6 dígitos de distribución, si se leyó a ese nivel
+  texto: string;                // Destino en texto (solo OCR; '' si no hay)
   timestamp: number;
 }
 

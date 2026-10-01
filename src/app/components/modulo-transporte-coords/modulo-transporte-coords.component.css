@@ -184,6 +184,77 @@
 }
 
 /* ========================================
+   ETIQUETA DE LECTURA DE DESTINO (MÓDULOS ACQ)
+   ======================================== */
+
+/* Bloque título (OCR / RESTITUCIÓN) + recuadro, posicionado por binding (left/top en %) */
+.lectura-bloque {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.lectura-titulo {
+  font: 500 8px 'Segoe UI', Tahoma, sans-serif;
+  color: #999;
+  white-space: nowrap;
+}
+
+/* Ancho fijo: cabe "01006 104001" (CP + distribución), no varía con el contenido */
+.etiqueta-lectura {
+  box-sizing: border-box;
+  width: 84px;
+  padding: 1px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font: 600 10px 'Segoe UI', Tahoma, sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: #e0e0e0;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid #555;
+  border-radius: 4px;
+  pointer-events: auto;   /* tooltip con el texto completo */
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.lectura-cp,
+.lectura-texto {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lectura-texto {
+  font-weight: 400;
+  font-size: 9px;
+  color: #ccc;
+}
+
+.etiqueta-lectura.estado-encaminamiento,
+.etiqueta-lectura.estado-distribucion {
+  color: #00ff88;
+  border-color: #00aa5a;
+}
+
+.etiqueta-lectura.estado-no-reconocido {
+  color: #ffc107;
+  border-color: #b38600;
+  background: rgba(60, 45, 0, 0.7);
+}
+
+.etiqueta-lectura.estado-sin-lectura {
+  color: #777;
+  border-color: #444;
+}
+
+/* ========================================
    FOOTER DEL MÓDULO
    ======================================== */
 
