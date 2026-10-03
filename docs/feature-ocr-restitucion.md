@@ -5,8 +5,9 @@ tratado en la línea enlazada, indicando qué sistema la obtuvo:
 
 - **OCR:** análisis de la imagen de la carta (bloque de dirección). Da el código postal,
   la distribución si está configurada, y el destino en texto.
-- **Restitución:** lectura de la cronomarca impresa en la carta en un tratamiento previo.
-  Da solo el código postal de clasificación.
+- **Restitución:** lectura de la cronomarca impresa en la carta en un tratamiento previo. El ACQ
+  pide al servidor ITLS (cronomarca → destino) la información registrada para esa cronomarca
+  (por un OCR anterior o por videocodificación). Da solo el código de clasificación, sin texto.
 
 Cada envío lo resuelve **uno u otro**: si se detecta cronomarca se usa la restitución y la imagen
 no se trata con OCR.
@@ -14,7 +15,7 @@ no se trata con OCR.
 | Fase | Contenido | Estado |
 |------|-----------|--------|
 | 1 | OCR: modelo, `ocr-processor`, estado de última lectura y etiqueta en ACQ | **Hecha** (2026-10-01) |
-| 2 | Restitución: `restitucion-processor` sobre el mismo estado | Pendiente (faltan las trazas) |
+| 2 | Restitución: `restitucion-processor`, registro mpId → línea y etiqueta inferior en ACQ | **Hecha** (2026-10-03) |
 
 ## Requisitos acordados
 
@@ -22,10 +23,11 @@ no se trata con OCR.
 - **Filtro por línea:** la línea va en la cabecera tras el nivel (`INF IL<n>_URA_` → línea n, proceso URA).
   Se conserva solo la línea enlazada por el usuario (`enlaceTop().lineaEntrada`), como en
   [feature-espesor](feature-espesor.md). El prefijo `IL:1 #N…;` lo añade el Engine y no se usa.
-- **Sin identificador de envío:** no se correlacionan lecturas entre sistemas; basta la última lectura,
-  que permanece hasta que llega otra (sin caducidad). Se borra al desconectar.
-- **Un ACQ por línea:** las trazas no identifican el módulo; todos los módulos con `etiquetaLectura`
-  muestran la última lectura de la línea.
+- **Última lectura:** se muestra solo la del **último envío tratado**, sea por OCR o por restitución:
+  al llegar una lectura se borra la del otro sistema (su recuadro vuelve a `—`), para no confundirla con
+  el destino de un envío anterior. Permanece hasta que llega otra (sin caducidad). Se borra al desconectar.
+- **Un ACQ por línea:** las trazas no identifican el módulo; todos los módulos con `etiquetaOcr` /
+  `etiquetaRestitucion` muestran la última lectura de la línea.
 
 ## Fase 1 (hecha): OCR
 
@@ -47,31 +49,82 @@ IL:1 #N38872279;C30100100 22:24:08:254 INF IL2_URA_ -    texte    MANUHN R_REC  
 | `DACTHN`, `NC`, `NS`, `IS` | Sin definir | No se usan |
 
 - **Modelo** (`modulo-transporte.model.ts`): `EtiquetaLecturaConfig` (`x`, `y` en %), `OrigenLectura`,
-  `EstadoLectura`, `LecturaDestino` y el campo opcional `etiquetaLectura?` en `ModuloCoordsConfig`.
+  `EstadoLectura`, `LecturaDestino` y el campo opcional `etiquetaOcr?` en `ModuloCoordsConfig`.
 - **`OcrProcessorService.analizarTraza(trace, linea)`** → `LecturaDestino[] | null`.
-- **`LecturaDestinoEstadoService`:** signal `ultimaLectura`, compartido por OCR y restitución.
+- **`LecturaDestinoEstadoService`:** signals `ultimas` (última lectura, con la sola entrada de su origen) y `contadores`
+  (lecturas registradas por origen), compartido por OCR y restitución.
 - **`TrackingWebsocketService`:** `_handleTrace()` llama a `procesarTrazasOcr(trace.data)`.
-- **Vista** (`modulo-transporte-coords`): título `OCR` / `RESTITUCIÓN` (`DESTINO` sin lectura) sobre un
-  recuadro de ancho fijo (84 px, cabe "01006 104001") con el CP (+ distribución) y el texto (tooltip con el
-  texto completo).
+- **Vista** (`modulo-transporte-coords`): en la parte superior del ACQ, título `DESTINO (OCR)` con un LED
+  sobre un recuadro de tamaño fijo (84 px, cabe "01006 104001"; dos líneas) con el CP (+ distribución) y el
+  texto (tooltip con el texto completo).
+- **Indicación de cada lectura:** el LED destella (400 ms, color según estado) y el contenido del recuadro
+  parpadea (250 ms) con cada lectura, aunque se repita el mismo destino. El contador del origen alterna
+  las clases `pulso-a` / `pulso-b`, dos animaciones idénticas: cambiar de nombre reinicia la animación.
 
   | Estado | Color | Muestra |
   |--------|-------|---------|
   | `encaminamiento` / `distribucion` | verde | CP [+ distribución] y texto |
   | `no-reconocido` | ámbar | `NO RECONOCIDO` |
   | sin lectura | gris | `—` |
-- **Demo:** `etiquetaLectura` en `ACQ-01` y botón **🎲 Simular OCR** con las trazas reales
+- **Demo:** `etiquetaOcr` en `ACQ-01` (`x: 40, y: 16`, alineada con la de restitución) y botón **🎲 Simular OCR** con las trazas reales
   (visible con `mostrarSimulacion = true`).
 
-## Fase 2 (pendiente): restitución
+## Fase 2 (hecha): restitución
 
-`RestitucionProcessorService.analizarTraza(trace, linea)` que devuelva `LecturaDestino` con
-`origen: 'restitucion'`, `texto: ''` y `distribucion: null`, registrada en el mismo
-`LecturaDestinoEstadoService`. La vista ya distingue el origen.
+Formato de traza (módulo de traza `TLS`: coloquios con el servidor ITLS):
 
-Pendiente de definir: formato de la traza de restitución (y de cronomarca no leída / sin datos).
+```
+IL:1 #N44548575;C30100000 19:02:26:378 INF TLS      - processSanction: addressRead on mpId=400CE551 : code=20280
+IL:1 #N44572539;C30100000 19:02:44:379 INF TLS      - processSanction: addressRead on mpId=400CE5D5 : code=01013177001
+```
 
-## Pendiente en el Engine
+| Campo | Significado | Uso |
+|-------|-------------|-----|
+| `TLS - processSanction: addressRead` | Destino restituido por el ITLS | Matching |
+| `mpId` | Identificador del envío (el `MP=` de las trazas de espesor) | Resolver la línea |
+| `code` 5 dígitos | **Encaminamiento** (CP) | Estado `encaminamiento` |
+| `code` 11 dígitos | **Distribución**: CP + calle (3) + sección (3) | Estado `distribucion` |
+| `code` con otro formato | Sin destino | Estado `no-reconocido` (+ `console.warn`) |
 
-`habilitarTrackingListener()` incluye los model filters de cada línea más `Medida Espesor`.
-Falta el model filter que publique las trazas `URA_ - texte` (y después las de restitución).
+### Resolución de la línea
+
+El ITLS es **común a todas las líneas** y la traza TLS no dice qué línea hizo la petición (sí la máquina:
+solo se trata una a la vez). El `mpId` es un número de secuencia de control y no codifica la línea.
+
+Se resuelve con la traza de espesor del feeder, que trae línea y envío y llega antes (el envío pasa por el
+feeder antes que por el ACQ): `INF IL1_FE2_ - rootOnMailPieceReportOutputThickness(), …, MP=4001B256, …`.
+
+- **`EnvioLineaService`:** registro `mpId → línea` acotado a los últimos 2000 envíos. Lo alimenta
+  `EspesorProcessorService` con las trazas de espesor de **todas** las líneas (antes de filtrar por la enlazada).
+- **`RestitucionProcessorService.analizarTraza(trace, linea)`** → `LecturaDestino[] | null`
+  (`origen: 'restitucion'`, `texto: ''`). Solo conserva las restituciones cuyo `mpId` es de la línea enlazada;
+  se descartan las de otra línea y las de **línea desconocida** (traza de espesor perdida, o envío alimentado
+  antes de enlazar).
+- **`TrackingWebsocketService`:** `_handleTrace()` llama a `procesarTrazasRestitucion(trace.data, true)`;
+  al desconectar se vacía el registro.
+- **Vista:** recuadro `RESTITUCIÓN` en la parte inferior del ACQ (`etiquetaRestitucion`), con la misma
+  plantilla, LED y parpadeo que el OCR; muestra el CP (+ calle y sección), sin línea de texto.
+- **Demo:** `etiquetaRestitucion` en `ACQ-01` (`x: 40, y: 81`) y botón **🎲 Simular Restitución**
+  (traza de espesor + traza TLS; incluye un envío de la línea 2 que debe descartarse).
+
+Pendiente de definir: trazas de fallo (cronomarca sin datos, ITLS sin respuesta).
+
+## Model filters del Engine
+
+`habilitarTrackingListener()` incluye, además de los de cada línea:
+
+| Model filter | Trazas |
+|--------------|--------|
+| `Medida Espesor` | Espesor en feeders (también resuelve la línea de cada restitución) |
+| `Lectura OCR` | `URA_ - texte` de las dos líneas; se filtran en el frontend |
+| `Restitucion ITLS y VideoCodif` | `TLS - processSanction: addressRead` (restitución) e `ILS - …` (videocodificación), comunes a todas las líneas |
+
+## Pendiente: videocodificación
+
+El model filter `Restitucion ITLS y VideoCodif` publica también las resoluciones de destino de los
+videocodificadores. Solo cambia el módulo de la cabecera: `INF TLS` → restitución (ITLS),
+`INF ILS` → sanción de videocodificación. Hoy las trazas `ILS` se ignoran (la regex exige `TLS`).
+
+Decidido: se mostrará **separada** de la restitución (recuadro propio, no en el de `RESTITUCIÓN`).
+Por definir: formato exacto de la traza `ILS`, ubicación del recuadro y si el registro `mpId → línea`
+(2000 envíos) cubre el tiempo que tarda una videocodificación.

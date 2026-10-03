@@ -62,7 +62,8 @@ export interface ModuloCoordsConfig {
   fotocelulas: FotocelulaCoordsConfig[];
   orientacion?: 'horizontal' | 'vertical';
   etiquetaEspesor?: EtiquetaEspesorConfig;   // Solo módulos feeder (FED-n)
-  etiquetaLectura?: EtiquetaLecturaConfig;   // Solo módulos de adquisición (ACQ-n)
+  etiquetaOcr?: EtiquetaLecturaConfig;         // Solo módulos de adquisición (ACQ-n): parte superior
+  etiquetaRestitucion?: EtiquetaLecturaConfig; // Solo módulos de adquisición (ACQ-n): parte inferior
 }
 
 // ============================================
@@ -102,8 +103,8 @@ export interface MedidaEspesor {
 // ============================================
 
 /**
- * Posición de la etiqueta de lectura de destino (OCR / restitución)
- * dentro de un módulo de adquisición
+ * Posición de una etiqueta de lectura de destino dentro de un módulo de
+ * adquisición (OCR arriba, restitución abajo)
  */
 export interface EtiquetaLecturaConfig {
   x: number;              // Posición X en % del módulo
@@ -131,7 +132,7 @@ export interface LecturaDestino {
   origen: OrigenLectura;
   estado: EstadoLectura;
   cp: string | null;            // Código postal (5 dígitos)
-  distribucion: string | null;  // 6 dígitos de distribución, si se leyó a ese nivel
+  distribucion: string | null;  // 6 dígitos de distribución (calle + sección), si se leyó a ese nivel
   texto: string;                // Destino en texto (solo OCR; '' si no hay)
   timestamp: number;
 }

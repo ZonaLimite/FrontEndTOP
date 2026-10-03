@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, Input, ViewChildren, QueryList, AfterViewInit, inject, computed } from '@angular/core';
-import { ModuloCoordsConfig, FotocelulaCoordsConfig, MedidaEspesor } from '../../models/modulo-transporte.model';
+import { ModuloCoordsConfig, FotocelulaCoordsConfig, MedidaEspesor, LecturaDestino } from '../../models/modulo-transporte.model';
 import { FotocelulaComponent } from '../fotocelula/fotocelula.component';
 import { EspesorEstadoService } from '../../services/espesor-estado.service';
 import { LecturaDestinoEstadoService } from '../../services/lectura-destino-estado.service';
@@ -22,8 +22,23 @@ export class ModuloTransporteCoordsComponent implements AfterViewInit {
   /** Última medida de espesor vigente de este módulo (solo feeders) */
   readonly medidaEspesor = computed<MedidaEspesor | undefined>(() => this.espesorEstado.medidas()[this.config?.id]);
 
-  /** Última lectura de destino OCR / restitución de la línea (solo módulos ACQ) */
-  readonly lecturaDestino = inject(LecturaDestinoEstadoService).ultimaLectura;
+  private lecturaDestinoEstado = inject(LecturaDestinoEstadoService);
+
+  /** Última lectura de destino de la línea (solo módulos ACQ): solo una de las dos está definida */
+  readonly lecturaOcr = computed<LecturaDestino | undefined>(() => this.lecturaDestinoEstado.ultimas().ocr);
+  readonly lecturaRestitucion = computed<LecturaDestino | undefined>(() => this.lecturaDestinoEstado.ultimas().restitucion);
+
+  /**
+   * Pulso de cada lectura: alterna 'a' / 'b' con cada lectura registrada.
+   * Cambiar de clase cambia el nombre de la animación CSS y la reinicia,
+   * aunque llegue el mismo destino que en la carta anterior.
+   */
+  readonly pulsoOcr = computed(() => this.pulso(this.lecturaDestinoEstado.contadores().ocr));
+  readonly pulsoRestitucion = computed(() => this.pulso(this.lecturaDestinoEstado.contadores().restitucion));
+
+  private pulso(n: number): 'a' | 'b' | null {
+    return n === 0 ? null : n % 2 ? 'a' : 'b';
+  }
 
   constructor() {}
 

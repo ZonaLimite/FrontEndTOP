@@ -59,7 +59,7 @@ C30100200 18:07:09:232 INF IL1_FE2_ - rootOnMailPieceReportOutputThickness(), T.
 | `IL<n>` | Línea | Filtro: solo se conserva la línea enlazada por el usuario |
 | `FE<m>` | Feeder | Módulo `FED-0<m>` (siempre se corresponde) |
 | `T.Reader` | Lector de espesor | Se ignora: el feeder tiene un solo lector |
-| `MP` | Identificador del envío | Se descarta (enfoque de diagnóstico del lector) |
+| `MP` | Identificador del envío | No se muestra; se anota `MP → línea` en `EnvioLineaService` para la [restitución](feature-ocr-restitucion.md) |
 | `thickness` | Espesor en micras | Valor registrado |
 
 - `EspesorProcessorService.analizarTraza(trace, linea)` → `EventoEspesor[] | null`

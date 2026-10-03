@@ -52,26 +52,44 @@
       </div>
     </div>
 
-    <!-- Etiqueta de lectura de destino OCR / restitución (solo módulos ACQ con etiquetaLectura) -->
-    <div *ngIf="config.etiquetaLectura as el"
-         class="lectura-bloque"
-         [style.left.%]="el.x"
-         [style.top.%]="el.y">
-      <span class="lectura-titulo">
-        {{ lecturaDestino()?.origen === 'restitucion' ? 'RESTITUCIÓN' : lecturaDestino()?.origen === 'ocr' ? 'OCR' : 'DESTINO' }}
-      </span>
-      <div class="etiqueta-lectura"
-           [ngClass]="'estado-' + (lecturaDestino()?.estado ?? 'sin-lectura')">
-        <ng-container *ngIf="lecturaDestino() as l; else sinLecturaDestino">
-          <ng-container *ngIf="l.cp; else noReconocido">
-            <span class="lectura-cp">{{ l.cp }}<ng-container *ngIf="l.distribucion"> {{ l.distribucion }}</ng-container></span>
-            <span class="lectura-texto" [title]="l.texto">{{ l.texto || '—' }}</span>
+    <!-- Etiquetas de destino (solo módulos ACQ): OCR arriba y restitución abajo; solo la del último envío tiene lectura -->
+    <ng-container *ngIf="config.etiquetaOcr as eo"
+                  [ngTemplateOutlet]="etiquetaDestino"
+                  [ngTemplateOutletContext]="{ pos: eo, titulo: 'DESTINO (OCR)', lectura: lecturaOcr(), pulso: pulsoOcr() }">
+    </ng-container>
+    <ng-container *ngIf="config.etiquetaRestitucion as er"
+                  [ngTemplateOutlet]="etiquetaDestino"
+                  [ngTemplateOutletContext]="{ pos: er, titulo: 'RESTITUCIÓN', lectura: lecturaRestitucion(), pulso: pulsoRestitucion() }">
+    </ng-container>
+
+    <!-- Título con LED + recuadro: el LED destella y el contenido parpadea en cada lectura (no al vaciarse) -->
+    <ng-template #etiquetaDestino let-pos="pos" let-titulo="titulo" let-lectura="lectura" let-pulso="pulso">
+      <div class="lectura-bloque"
+           [style.left.%]="pos.x"
+           [style.top.%]="pos.y">
+        <span class="lectura-titulo">
+          <span class="lectura-led"
+                [ngClass]="'estado-' + (lectura?.estado ?? 'sin-lectura')"
+                [class.pulso-a]="lectura && pulso === 'a'"
+                [class.pulso-b]="lectura && pulso === 'b'"></span>
+          {{ titulo }}
+        </span>
+        <div class="etiqueta-lectura"
+             [ngClass]="'estado-' + (lectura?.estado ?? 'sin-lectura')"
+             [class.pulso-a]="lectura && pulso === 'a'"
+             [class.pulso-b]="lectura && pulso === 'b'">
+          <ng-container *ngIf="lectura; else sinLecturaDestino">
+            <ng-container *ngIf="lectura.cp; else noReconocido">
+              <span class="lectura-cp">{{ lectura.cp }}<ng-container *ngIf="lectura.distribucion"> {{ lectura.distribucion }}</ng-container></span>
+              <!-- Solo el OCR da el destino en texto -->
+              <span *ngIf="lectura.origen === 'ocr'" class="lectura-texto" [title]="lectura.texto">{{ lectura.texto || '—' }}</span>
+            </ng-container>
+            <ng-template #noReconocido><span class="lectura-aviso">NO RECONOCIDO</span></ng-template>
           </ng-container>
-          <ng-template #noReconocido><span class="lectura-cp">NO RECONOCIDO</span></ng-template>
-        </ng-container>
-        <ng-template #sinLecturaDestino><span class="lectura-cp">—</span></ng-template>
+          <ng-template #sinLecturaDestino><span class="lectura-cp">—</span></ng-template>
+        </div>
       </div>
-    </div>
+    </ng-template>
 
   </div>
 

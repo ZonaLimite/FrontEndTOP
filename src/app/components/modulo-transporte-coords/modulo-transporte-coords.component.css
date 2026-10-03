@@ -187,7 +187,7 @@
    ETIQUETA DE LECTURA DE DESTINO (MÓDULOS ACQ)
    ======================================== */
 
-/* Bloque título (OCR / RESTITUCIÓN) + recuadro, posicionado por binding (left/top en %) */
+/* Bloque título + recuadro, posicionado por binding (left/top en %): OCR arriba, restitución abajo */
 .lectura-bloque {
   position: absolute;
   transform: translate(-50%, -50%);
@@ -200,19 +200,63 @@
 }
 
 .lectura-titulo {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   font: 500 8px 'Segoe UI', Tahoma, sans-serif;
   color: #999;
   white-space: nowrap;
 }
 
-/* Ancho fijo: cabe "01006 104001" (CP + distribución), no varía con el contenido */
+/* LED de lectura: apagado en reposo, destello con cada lectura (color según estado) */
+.lectura-led {
+  --led-color: #555;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #333;
+  border: 1px solid #555;
+}
+
+.lectura-led.estado-encaminamiento,.lectura-led.estado-distribucion { --led-color: #00ff88; }
+.lectura-led.estado-no-reconocido { --led-color: #ffc107; }
+
+/* Dos animaciones idénticas: alternar de clase reinicia la animación en cada lectura */
+.lectura-led.pulso-a { animation: led-destello-a 180ms ease-out; }
+.lectura-led.pulso-b { animation: led-destello-b 180ms ease-out; }
+
+@keyframes led-destello-a {
+  0%, 30% { background: var(--led-color); border-color: var(--led-color); box-shadow: 0 0 6px var(--led-color); }
+  100%    { background: #333; border-color: #555; box-shadow: none; }
+}
+@keyframes led-destello-b {
+  0%, 30% { background: var(--led-color); border-color: var(--led-color); box-shadow: 0 0 6px var(--led-color); }
+  100%    { background: #333; border-color: #555; box-shadow: none; }
+}
+
+/* Parpadeo breve del contenido del recuadro con cada lectura */
+.etiqueta-lectura.pulso-a > * { animation: lectura-flick-a 180ms ease-out; }
+.etiqueta-lectura.pulso-b > * { animation: lectura-flick-b 180ms ease-out; }
+
+@keyframes lectura-flick-a {
+  0%   { opacity: 0.2; }
+  100% { opacity: 1; }
+}
+@keyframes lectura-flick-b {
+  0%   { opacity: 0.2; }
+  100% { opacity: 1; }
+}
+
+/* Tamaño fijo: cabe "01006 104001" (CP + distribución) y dos líneas, no varía con el contenido */
 .etiqueta-lectura {
   box-sizing: border-box;
   width: 84px;
+  min-height: 30px;
   padding: 1px 4px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   font: 600 10px 'Segoe UI', Tahoma, sans-serif;
   font-variant-numeric: tabular-nums;
   color: #e0e0e0;
@@ -229,6 +273,13 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* "NO RECONOCIDO" no cabe en una línea del recuadro: se parte en dos */
+.lectura-aviso {
+  font-size: 9px;
+  line-height: 1.2;
+  text-align: center;
 }
 
 .lectura-texto {

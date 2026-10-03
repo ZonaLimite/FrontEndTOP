@@ -14,6 +14,8 @@ import { EspesorProcessorService } from './espesor-processor.service';
 import { EspesorEstadoService } from './espesor-estado.service';
 import { OcrProcessorService } from './ocr-processor.service';
 import { LecturaDestinoEstadoService } from './lectura-destino-estado.service';
+import { RestitucionProcessorService } from './restitucion-processor.service';
+import { EnvioLineaService } from './envio-linea.service';
 import { RenderSchedulerService } from './render-scheduler.service';
 
 declare var configuraciones: any;
@@ -86,6 +88,8 @@ export class TrackingWebsocketService implements OnDestroy {
   private espesorEstadoService = inject(EspesorEstadoService);
   private ocrProcessor = inject(OcrProcessorService);
   private lecturaDestinoEstado = inject(LecturaDestinoEstadoService);
+  private restitucionProcessor = inject(RestitucionProcessorService);
+  private envioLinea = inject(EnvioLineaService);
   private ngZone = inject(NgZone);
   private renderScheduler = inject(RenderSchedulerService);
 
@@ -173,6 +177,7 @@ export class TrackingWebsocketService implements OnDestroy {
     this.trackingService.limpiarEstadisticas();
     this.rechazosEstadoService.limpiarEstadisticas();
     this.lecturaDestinoEstado.reset();
+    this.envioLinea.reset();
   }
 
   //función de utilidad al final o fuera de la clase
@@ -234,6 +239,12 @@ export class TrackingWebsocketService implements OnDestroy {
     }
     //Incluir ModelFilters de medida de espesor
     this.incluirModelFilterAListener('Medida Espesor');
+    await this.delay(500);
+    //Incluir ModelFilters de lectura OCR (proceso URA)
+    this.incluirModelFilterAListener('Lectura OCR');
+    await this.delay(500);
+    //Incluir ModelFilters de restitución (módulo TLS, servidor ITLS)
+    this.incluirModelFilterAListener('Restitucion ITLS y VideoCodif');
     await this.delay(500);
 
     this.setPublicacionActiva(true);
@@ -499,21 +510,33 @@ export class TrackingWebsocketService implements OnDestroy {
   private _handleTrace(trace: Traces): void {
     this.mensajesRecibidos.update(n => n + 1);
 
-    // Filtrar trazas que sean de tracking
+    // Filtrar trazas de tracking (fotocélulas, rechazos, espesor, OCR)
     if (trace.tipoResult == 'eventTrace') {
-      this.handleTracking(trace.data);
-      this.procesarTrazasRechazo(trace.data);
-      this.procesarTrazasEspesor(trace.data);
-      this.procesarTrazasOcr(trace.data);
+      // Secuencia de procesamientos: se corta en cuanto uno con exclusiveProcessment
+      // trata la traza (devuelve true), sin analizarla en los siguientes.
+      // Es seguro porque cada mensaje trae una sola traza: el backend tokeniza el
+      // buffer del socket por salto de línea antes de publicar.
+      // Orden: primero los exclusivos de detección barata (un includes), para que
+      // sus trazas no pasen por las regex de handleTracking (ninguna las reconoce).
+      // handleTracking no es exclusivo: las trazas REJET CONVOYAGE también llevan
+      // "LE_PLI_EST_EN_DEHORS_DE_SON_PAS sur <fotocélula>" y deben llegar a rechazos.
+      if (this.procesarTrazasEspesor(trace.data, true)) return;
+      if (this.procesarTrazasOcr(trace.data, true)) return;
+      if (this.procesarTrazasRestitucion(trace.data, true)) return;
+      if (this.handleTracking(trace.data, false)) return;
+      this.procesarTrazasRechazo(trace.data, true);
     }
   }
 
   /**
-   * 
-   * @param trace 
-   * @returns 
+   * Analiza un bloque de trazas en busca de eventos de fotocélula, los
+   * renderiza y los inyecta en la capa de estadísticas.
+   *
+   * @param trace                - String multilínea con trazas a analizar
+   * @param exclusiveProcessment - true si la traza tratada aquí no interesa a otros procesamientos
+   * @returns true si se ha tratado la traza y es exclusiva (corta la secuencia de _handleTrace)
    */
-  private handleTracking(trace: string) {
+  private handleTracking(trace: string, exclusiveProcessment: boolean): boolean {
     try {
       const eventosFotocelulas: EventoFotocelula[] | null = this.traceProcessorService.analizarTraza(trace);
 
@@ -533,25 +556,28 @@ export class TrackingWebsocketService implements OnDestroy {
       }
 
       this.trackingRecibidos.update(n => n + 1);
+      return exclusiveProcessment && eventosFotocelulas !== null;
 
     } catch (e) {
       console.error('[WS-Tracking] Error parseando payload de tracking:', trace, e);
+      return false;
     }
 
   }
 
   /**
- * Analiza un bloque de trazas en busca de eventos REJET y los
- * registra en el servicio de estado de rechazos.
- *
- * @param trazas - String multilínea con trazas a analizar
- */
-  procesarTrazasRechazo(trazas: string): void {
+   * Analiza un bloque de trazas en busca de eventos REJET y los
+   * registra en el servicio de estado de rechazos.
+   *
+   * @param trazas               - String multilínea con trazas a analizar
+   * @param exclusiveProcessment - true si la traza tratada aquí no interesa a otros procesamientos
+   * @returns true si se ha tratado la traza y es exclusiva (corta la secuencia de _handleTrace)
+   */
+  procesarTrazasRechazo(trazas: string, exclusiveProcessment: boolean): boolean {
     const eventos = this.rechazoProcessor.analizarTraza(trazas);
-    if (eventos && eventos.length > 0) {
-      this.rechazosEstadoService.registrarRechazos(eventos);
-      //console.log(`DemoModulosComponent: ${eventos.length} rechazo(s) registrado(s)`);
-    }
+    if (!eventos) return false;
+    this.rechazosEstadoService.registrarRechazos(eventos);
+    return exclusiveProcessment;
   }
 
 
@@ -561,26 +587,53 @@ export class TrackingWebsocketService implements OnDestroy {
    * Solo se conservan las de la línea enlazada por el usuario (enlaceTop):
    * el Engine publica las medidas de espesor de las dos líneas.
    *
-   * @param trazas - String multilínea con trazas a analizar
+   * @param trazas               - String multilínea con trazas a analizar
+   * @param exclusiveProcessment - true si la traza tratada aquí no interesa a otros procesamientos
+   * @returns true si se ha tratado la traza y es exclusiva (corta la secuencia de _handleTrace)
    */
-  procesarTrazasEspesor(trazas: string): void {
+  procesarTrazasEspesor(trazas: string, exclusiveProcessment: boolean): boolean {
     const linea = this.enlaceTop()?.lineaEntrada;
-    if (!linea) return;
+    if (!linea) return false;
     const eventos = this.espesorProcessor.analizarTraza(trazas, linea);
-    eventos?.forEach(ev => this.espesorEstadoService.registrarMedida(ev.moduloId, ev.micras));
+    if (!eventos) return false;
+    eventos.forEach(ev => this.espesorEstadoService.registrarMedida(ev.moduloId, ev.micras));
+    return exclusiveProcessment;
   }
 
   /**
    * Analiza un bloque de trazas en busca de lecturas de destino del OCR
    * (proceso URA) de la línea enlazada y las registra como última lectura.
    *
-   * @param trazas - String multilínea con trazas a analizar
+   * @param trazas               - String multilínea con trazas a analizar
+   * @param exclusiveProcessment - true si la traza tratada aquí no interesa a otros procesamientos
+   * @returns true si se ha tratado la traza y es exclusiva (corta la secuencia de _handleTrace)
    */
-  procesarTrazasOcr(trazas: string): void {
+  procesarTrazasOcr(trazas: string, exclusiveProcessment: boolean): boolean {
     const linea = this.enlaceTop()?.lineaEntrada;
-    if (!linea) return;
+    if (!linea) return false;
     const lecturas = this.ocrProcessor.analizarTraza(trazas, linea);
-    lecturas?.forEach(l => this.lecturaDestinoEstado.registrarLectura(l));
+    if (!lecturas) return false;
+    lecturas.forEach(l => this.lecturaDestinoEstado.registrarLectura(l));
+    return exclusiveProcessment;
+  }
+
+  /**
+   * Analiza un bloque de trazas en busca de destinos obtenidos por restitución
+   * (módulo TLS, común a todas las líneas) y registra como última lectura los
+   * de envíos de la línea enlazada. La línea de cada envío se resuelve por su
+   * mpId, anotado al pasar por el feeder (ver procesarTrazasEspesor).
+   *
+   * @param trazas               - String multilínea con trazas a analizar
+   * @param exclusiveProcessment - true si la traza tratada aquí no interesa a otros procesamientos
+   * @returns true si se ha tratado la traza y es exclusiva (corta la secuencia de _handleTrace)
+   */
+  procesarTrazasRestitucion(trazas: string, exclusiveProcessment: boolean): boolean {
+    const linea = this.enlaceTop()?.lineaEntrada;
+    if (!linea) return false;
+    const lecturas = this.restitucionProcessor.analizarTraza(trazas, linea);
+    if (!lecturas) return false;
+    lecturas.forEach(l => this.lecturaDestinoEstado.registrarLectura(l));
+    return exclusiveProcessment;
   }
 
   /**

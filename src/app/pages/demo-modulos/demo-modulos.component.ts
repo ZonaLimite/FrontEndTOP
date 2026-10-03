@@ -11,6 +11,7 @@ import { EspesorEstadoService } from '../../services/espesor-estado.service';
 import { EspesorProcessorService } from '../../services/espesor-processor.service';
 import { OcrProcessorService } from '../../services/ocr-processor.service';
 import { LecturaDestinoEstadoService } from '../../services/lectura-destino-estado.service';
+import { RestitucionProcessorService } from '../../services/restitucion-processor.service';
 // ──────────────────────────────────────────────────────────────────────────
 
 @Component({
@@ -35,6 +36,7 @@ export class DemoModulosComponent implements OnInit {
   private espesorProcessor = inject(EspesorProcessorService);
   private ocrProcessor = inject(OcrProcessorService);
   private lecturaDestinoEstado = inject(LecturaDestinoEstadoService);
+  private restitucionProcessor = inject(RestitucionProcessorService);
   // ──────────────────────────────────────────────────────────────────────────
 
   // ─── Signal local: enfoque activo ─────────────────────────────────────────
@@ -98,7 +100,8 @@ export class DemoModulosComponent implements OnInit {
       fotocelulas: [
         { id: 'ACQ-B1', nombre: 'ACQ-B1', x: 83, y: 60, tamano: 'pequeno', orientacion: 'row' }
       ],
-      etiquetaLectura: { x: 38, y: 50 }
+      etiquetaOcr: { x: 40, y: 16 },
+      etiquetaRestitucion: { x: 40, y: 81 }
     },
     {
       id: 'MER-01',
@@ -269,6 +272,31 @@ export class DemoModulosComponent implements OnInit {
 
     this.ocrProcessor.analizarTraza(traza, '1')
       ?.forEach(l => this.lecturaDestinoEstado.registrarLectura(l));
+  }
+
+  /**
+   * Simula la restitución de un envío de la línea 1: primero su traza de espesor
+   * en el feeder (anota mpId → línea) y después la traza TLS con el destino
+   * (encaminamiento o distribución). Incluye una restitución de un envío de la
+   * línea 2, que debe descartarse.
+   */
+  simularRestitucion(): void {
+    const codes = ['20280', '01013177001', '28045', '50012104001'];
+    const code = codes[Math.floor(Math.random() * codes.length)];
+    const trazas = [
+      'C30100200 19:02:20:101 INF IL1_FE1_ - rootOnMailPieceReportOutputThickness(), T.Reader:1, MP=400CE551, thickness=1280',
+      'C30100200 19:02:20:140 INF IL2_FE1_ - rootOnMailPieceReportOutputThickness(), T.Reader:1, MP=400CE5D5, thickness=900',
+      'IL:1 #N44572539;C30100000 19:02:26:300 INF TLS      - processSanction: addressRead on mpId=400CE5D5 : code=99999',
+      `IL:1 #N44548575;C30100000 19:02:26:378 INF TLS      - processSanction: addressRead on mpId=400CE551 : code=${code}`,
+    ];
+
+    // Cada mensaje del WebSocket trae una sola traza
+    trazas.forEach(traza => {
+      this.espesorProcessor.analizarTraza(traza, '1')
+        ?.forEach(ev => this.espesorEstadoService.registrarMedida(ev.moduloId, ev.micras));
+      this.restitucionProcessor.analizarTraza(traza, '1')
+        ?.forEach(l => this.lecturaDestinoEstado.registrarLectura(l));
+    });
   }
 
   // ==========================================
