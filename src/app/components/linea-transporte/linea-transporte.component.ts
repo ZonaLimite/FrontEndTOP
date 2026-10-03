@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, Input, ViewChildren, QueryList, AfterViewInit, OnDestroy, inject, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input, ViewChild, ViewChildren, QueryList, ElementRef, NgZone, AfterViewInit, OnDestroy, inject, computed, signal, effect } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ModuloLineaCoordsConfig } from '../../models/modulo-transporte.model';
 import { ModuloTransporteCoordsComponent } from '../modulo-transporte-coords/modulo-transporte-coords.component';
@@ -14,6 +14,7 @@ import { TrackingWebsocketService } from '../../services/tracking-websocket.serv
 export class LineaTransporteComponent implements AfterViewInit, OnDestroy {
 
   ws = inject(TrackingWebsocketService);
+  private zone = inject(NgZone);
 
 
   // ==========================================
@@ -39,6 +40,23 @@ export class LineaTransporteComponent implements AfterViewInit, OnDestroy {
 
   private cambiosModulosSub?: Subscription;
 
+  /** Zona que contiene los módulos: su ancho es el disponible para la línea */
+  @ViewChild('lineaBody', { static: true }) lineaBody!: ElementRef<HTMLElement>;
+
+  /** Factor de zoom del lienzo de módulos: ancho disponible / anchoLinea (misma proporción en vertical) */
+  readonly escala = signal(1);
+
+  private observadorAncho?: ResizeObserver;
+
+  /** Borde del wrapper de módulos (1px por lado) que no forma parte del lienzo */
+  private readonly BORDE_WRAPPER = 2;
+
+  private ajustarEscala() {
+    const disponible = this.lineaBody.nativeElement.clientWidth - this.BORDE_WRAPPER;
+    if (disponible <= 0 || this.anchoLinea <= 0) return;   // oculto o sin medir todavía
+    this.escala.set(disponible / this.anchoLinea);
+  }
+
   /** Modelo del formulario de conexión */
   /** Rango de máquinas TOP por centro (normalmente no más de 2) */
   readonly MAQUINA_MIN = 1;
@@ -50,8 +68,22 @@ export class LineaTransporteComponent implements AfterViewInit, OnDestroy {
     lineaEntrada: '1'
   };
 
+  /** Panel de conexión retraíble: en reposo solo se ve su botón junto al título */
+  readonly panelAbierto = signal(false);
+
+  /** Al establecerse el link TOP el panel ya no hace falta: se repliega solo */
+  private readonly replegarAlEnlazar = effect(() => {
+    if (this.ws.linkedTop()) this.panelAbierto.set(false);
+  }, { allowSignalWrites: true });
+
+  alternarPanel() { this.panelAbierto.update(abierto => !abierto); }
+  cerrarPanel() { this.panelAbierto.set(false); }
+
   conectar() { this.ws.conectar(); }
-  desconectar() { this.ws.desconectar(); }
+  desconectar() {
+    this.ws.desconectar();
+    this.cerrarPanel();
+  }
 
   linkarTopForm() {
     // El spinner permite teclear valores fuera de rango: se acotan antes de enviar
@@ -66,6 +98,9 @@ export class LineaTransporteComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     if (this.modoCoords) {
+      // Recalcula el zoom cada vez que cambia el ancho disponible (el callback llega fuera de la zona de Angular)
+      this.observadorAncho = new ResizeObserver(() => this.zone.run(() => this.ajustarEscala()));
+      this.observadorAncho.observe(this.lineaBody.nativeElement);
       //Una vez renderizados todos los modulos los registramos en el servicio para que pueda enrutar los eventos a sus fotocélulas
       this.ws.registrarLinea(this.modulosCoordsComponents);
       // Si cambia la lista de módulos se reindexan las fotocélulas
@@ -78,6 +113,7 @@ export class LineaTransporteComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     this.cambiosModulosSub?.unsubscribe();
+    this.observadorAncho?.disconnect();
     if (this.modulosCoordsComponents) {
       this.ws.desregistrarLinea(this.modulosCoordsComponents);
     }

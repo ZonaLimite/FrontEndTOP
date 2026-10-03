@@ -1,30 +1,51 @@
 <div class="linea-container">
 
-  <!-- Título flotante sobre el borde superior -->
-  <span class="linea-titulo">{{ tituloEnlace() ?? titulo }}</span>
+  <!-- Cabecera flotante sobre el borde superior: título + botón del panel de conexión -->
+  <div class="linea-cabecera">
+    <span class="linea-titulo">{{ tituloEnlace() ?? titulo }}</span>
 
-  <div class="linea-body">
+    <!-- Botón multi-estado: en reposo es lo único visible del panel de control -->
+    <button id="btn-panel-conexion" type="button" class="ctrl-toggle" [class.linked]="ws.linkedTop()"
+      [class.connected]="ws.conectado()" [class.abierto]="panelAbierto()" [title]="ws.estadoTexto()"
+      (click)="alternarPanel()">
+      <span class="ctrl-status-dot"></span>
+      {{ ws.linkedTop() ? 'Desconectar' : 'Enlace y Conexión' }}
+    </button>
+  </div>
+
+  <div class="linea-body" #lineaBody>
 
     <!-- MODO COORDENADAS (Posicionamiento Absoluto) -->
-    <div class="modulos-coords-wrapper" *ngIf="modoCoords" [style.width.px]="anchoLinea" [style.height.px]="altoLinea">
+    <!-- El wrapper ocupa el tamaño ya escalado; el lienzo interior conserva las coordenadas de diseño
+         (anchoLinea x altoLinea) y se amplía/reduce en bloque para llenar el ancho disponible -->
+    <div class="modulos-coords-wrapper" *ngIf="modoCoords" [style.width.px]="anchoLinea * escala()"
+      [style.height.px]="altoLinea * escala()">
 
-      <!-- Renderizar cada módulo en sus coordenadas -->
-      <div *ngFor="let moduloCoords of modulosCoordsConfig; trackBy: trackByModulo" [style.left.px]="moduloCoords.x"
-        [style.top.px]="moduloCoords.y" class="modulo-wrapper">
+      <div class="modulos-coords-lienzo" [style.width.px]="anchoLinea" [style.height.px]="altoLinea"
+        [style.transform]="'scale(' + escala() + ')'">
 
-        <!-- Módulo tipo Coords -->
-        <app-modulo-transporte-coords [config]="moduloCoords.config">
-        </app-modulo-transporte-coords>
+        <!-- Renderizar cada módulo en sus coordenadas -->
+        <div *ngFor="let moduloCoords of modulosCoordsConfig; trackBy: trackByModulo" [style.left.px]="moduloCoords.x"
+          [style.top.px]="moduloCoords.y" class="modulo-wrapper">
 
-        <!-- Marcador de posición (opcional, para debugging) -->
-        <div class="position-marker" title="X: {{moduloCoords.x}}px, Y: {{moduloCoords.y}}px">
+          <!-- Módulo tipo Coords -->
+          <app-modulo-transporte-coords [config]="moduloCoords.config">
+          </app-modulo-transporte-coords>
+
+          <!-- Marcador de posición (opcional, para debugging) -->
+          <div class="position-marker" title="X: {{moduloCoords.x}}px, Y: {{moduloCoords.y}}px">
+          </div>
         </div>
       </div>
     </div>
 
+  </div><!-- /linea-body -->
+
+  <ng-container *ngIf="panelAbierto()">
     <!-- ══════════════ PANEL DE CONTROL ══════════════ -->
-    <!-- Ocupa todo el ancho libre a la derecha; su alto nunca supera al de la zona de módulos -->
-    <aside class="ctrl-panel" [style.max-height.px]="modoCoords ? altoLinea : null">
+    <!-- Retraíble: flota centrado sobre la línea y solo existe mientras está abierto -->
+    <div class="ctrl-backdrop" (click)="cerrarPanel()"></div>
+    <aside class="ctrl-panel">
 
       <!-- Fila superior: estado + estadísticas + conectar/desconectar -->
       <div class="ctrl-top">
@@ -43,6 +64,7 @@
             Conectar</button>
           <button id="btn-desconectar" class="ctrl-btn btn-disconnect" (click)="desconectar()" *ngIf="ws.conectado()">✖
             Desconectar</button>
+          <button id="btn-cerrar-panel" type="button" class="ctrl-close" title="Cerrar" (click)="cerrarPanel()">✕</button>
         </div>
       </div>
 
@@ -85,7 +107,6 @@
 
     </aside>
     <!-- ══════════════════════════════════════════════ -->
-
-  </div><!-- /linea-body -->
+  </ng-container>
 
 </div>

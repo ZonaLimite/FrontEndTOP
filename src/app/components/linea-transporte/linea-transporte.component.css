@@ -18,10 +18,17 @@
    TÍTULO FLOTANTE (sobre el borde superior)
    ======================================== */
 
-.linea-titulo {
+.linea-cabecera {
   position: absolute;
   top: 5px;
   left: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 2;
+}
+
+.linea-titulo {
   padding: 0 6px;
   font-size: 10px;
   font-weight: 700;
@@ -31,7 +38,49 @@
   text-shadow: 0 0 8px rgba(0, 170, 255, 0.5);
   white-space: nowrap;
   pointer-events: none;
-  z-index: 2;
+}
+
+/* Botón multi-estado que despliega el panel de conexión */
+.ctrl-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border: 1px solid #2e6b4a;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0f2a1c, #0b1f15);
+  color: #6fe0a4;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 14px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: filter 0.2s, transform 0.1s, box-shadow 0.2s;
+}
+
+.ctrl-toggle:hover  { filter: brightness(1.3); }
+.ctrl-toggle:active { transform: scale(0.97); }
+
+.ctrl-toggle.linked {
+  border-color: #7a2a1a;
+  background: linear-gradient(135deg, #2a110b, #1f0c08);
+  color: #ff8a70;
+}
+
+.ctrl-toggle.abierto {
+  box-shadow: 0 0 8px rgba(0, 170, 255, 0.5);
+}
+
+.ctrl-toggle .ctrl-status-dot {
+  width: 6px;
+  height: 6px;
+}
+
+.ctrl-toggle.connected .ctrl-status-dot {
+  background: #00ff88;
+  box-shadow: 0 0 6px rgba(0,255,136,0.7);
 }
 
 /* ========================================
@@ -42,12 +91,20 @@
   position: relative;
   border: 1px solid #ccc;
   background: #0e0d0d;
-  overflow: auto;
+  overflow: hidden;        /* el lienzo escalado nunca desborda: su tamaño visual es el del wrapper */
   border-radius: 20px;
   box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3);
   z-index: 1;
   margin-top: 6px;        /* separación con el título de la línea */
   flex-shrink: 0;          /* la zona de módulos nunca cede ancho al panel */
+}
+
+/* Lienzo en coordenadas de diseño, escalado en bloque desde la esquina superior izquierda */
+.modulos-coords-lienzo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
 }
 
 .modulos-coords-wrapper .grid-background {
@@ -106,27 +163,42 @@
 }
 
 /* ========================================
-   PANEL DE CONTROL LATERAL
+   PANEL DE CONTROL (retraíble, flotante)
    ======================================== */
 
+/* Velo sobre la línea: un clic fuera del panel lo repliega */
+.ctrl-backdrop {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 10;
+}
+
 .ctrl-panel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 11;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  /* Ocupa el ancho libre a la derecha de los módulos, pero ese ancho lo decide
-     el espacio disponible, nunca su contenido: flex-basis 0 + contain evitan
-     que al cambiar el contenido (textos, formulario...) el panel engorde. */
-  flex: 1 1 0;
-  min-width: 150px;
-  contain: inline-size;
+  width: min(460px, calc(100% - 40px));
+  max-height: calc(100% - 20px);
   box-sizing: border-box;
-  margin-top: 6px;         /* alineado con .modulos-coords-wrapper */
   overflow-y: auto;        /* por si el contenido no cabe en el alto de la línea */
   background: linear-gradient(160deg, #141414, #1c1c1c);
   border: 1px solid #2e2e2e;
   border-radius: 10px;
   padding: 12px 14px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+  animation: ctrl-panel-in 0.15s ease-out;
+}
+
+@keyframes ctrl-panel-in {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
 /* Fila superior: estado, estadísticas y botón conectar en horizontal */
@@ -140,7 +212,25 @@
 .ctrl-top-actions {
   margin-left: auto;
   min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
+
+.ctrl-close {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background: transparent;
+  color: #888;
+  font-size: 11px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.ctrl-close:hover { color: #fff; border-color: #666; }
 
 /* Estado */
 .ctrl-status {

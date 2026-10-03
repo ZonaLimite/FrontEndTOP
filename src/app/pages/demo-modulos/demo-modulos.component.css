@@ -5,7 +5,7 @@
 .demo-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%);
-  padding: 40px 20px;
+  padding: 6px 20px 40px;   /* arriba mínimo: pegado al querier */
 }
 
 /* ========================================
@@ -46,7 +46,7 @@
 .demo-section {
   margin-bottom: 60px;
   background: rgba(30, 30, 30, 0.5);
-  padding: 30px;
+  padding: 10px 30px 30px;
   border-radius: 12px;
   border: 1px solid #333;
 }
@@ -262,7 +262,7 @@
 
 @media (max-width: 768px) {
   .demo-container {
-    padding: 20px 10px;
+    padding: 6px 10px 20px;
   }
 
   .demo-title {
@@ -278,7 +278,7 @@
   }
 
   .demo-section {
-    padding: 20px;
+    padding: 10px 20px 20px;
   }
 
   .advantages-grid,
