@@ -64,6 +64,7 @@ export interface ModuloCoordsConfig {
   etiquetaEspesor?: EtiquetaEspesorConfig;   // Solo módulos feeder (FED-n)
   etiquetaOcr?: EtiquetaLecturaConfig;         // Solo módulos de adquisición (ACQ-n): parte superior
   etiquetaRestitucion?: EtiquetaLecturaConfig; // Solo módulos de adquisición (ACQ-n): parte inferior
+  etiquetaVideocodificacion?: EtiquetaLecturaConfig; // Solo módulo de videocodificación (VCS-n)
   listaRechazos?: ListaRechazosConfig;         // Solo módulos de culling (CUL-n)
 }
 
@@ -128,7 +129,7 @@ export interface MedidaEspesor {
 
 /**
  * Posición de una etiqueta de lectura de destino dentro de un módulo de
- * adquisición (OCR arriba, restitución abajo)
+ * adquisición (OCR arriba, restitución abajo) o del de videocodificación
  */
 export interface EtiquetaLecturaConfig {
   x: number;              // Posición X en % del módulo
@@ -138,8 +139,10 @@ export interface EtiquetaLecturaConfig {
 /**
  * Sistema que obtuvo el destino del envío. Cada envío lo resuelve uno u otro:
  * si se detecta cronomarca se usa la restitución y no se trata con OCR.
+ * La videocodificación es un sistema aparte: resuelve más tarde, en línea,
+ * envíos que ya pasaron por el ACQ.
  */
-export type OrigenLectura = 'ocr' | 'restitucion';
+export type OrigenLectura = 'ocr' | 'restitucion' | 'videocodificacion';
 
 /**
  * Resultado de una lectura de destino:

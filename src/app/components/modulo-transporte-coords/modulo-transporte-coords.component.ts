@@ -28,6 +28,9 @@ export class ModuloTransporteCoordsComponent implements AfterViewInit {
   readonly lecturaOcr = computed<LecturaDestino | undefined>(() => this.lecturaDestinoEstado.ultimas().ocr);
   readonly lecturaRestitucion = computed<LecturaDestino | undefined>(() => this.lecturaDestinoEstado.ultimas().restitucion);
 
+  /** Último resultado de videocodificación de la línea (solo módulo VCS): independiente de las anteriores */
+  readonly lecturaVideocodificacion = computed<LecturaDestino | undefined>(() => this.lecturaDestinoEstado.ultimas().videocodificacion);
+
   /**
    * Pulso de cada lectura: alterna 'a' / 'b' con cada lectura registrada.
    * Cambiar de clase cambia el nombre de la animación CSS y la reinicia,
@@ -35,6 +38,7 @@ export class ModuloTransporteCoordsComponent implements AfterViewInit {
    */
   readonly pulsoOcr = computed(() => this.pulso(this.lecturaDestinoEstado.contadores().ocr));
   readonly pulsoRestitucion = computed(() => this.pulso(this.lecturaDestinoEstado.contadores().restitucion));
+  readonly pulsoVideocodificacion = computed(() => this.pulso(this.lecturaDestinoEstado.contadores().videocodificacion));
 
   private pulso(n: number): 'a' | 'b' | null {
     return n === 0 ? null : n % 2 ? 'a' : 'b';

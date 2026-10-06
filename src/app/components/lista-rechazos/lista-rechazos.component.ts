@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, Input, inject } from '@angular/core
 import { RechazoReciente } from '../../models/modulo-transporte.model';
 import { RechazosEstadoService } from '../../services/rechazos-estado.service';
 
+
 /**
  * Lista de los últimos rechazos de la línea, sobre los módulos de culling (CUL-n).
  *

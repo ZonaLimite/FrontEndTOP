@@ -12,6 +12,7 @@ import { EspesorProcessorService } from '../../services/espesor-processor.servic
 import { OcrProcessorService } from '../../services/ocr-processor.service';
 import { LecturaDestinoEstadoService } from '../../services/lectura-destino-estado.service';
 import { RestitucionProcessorService } from '../../services/restitucion-processor.service';
+import { VideocodificacionProcessorService } from '../../services/videocodificacion-processor.service';
 // ──────────────────────────────────────────────────────────────────────────
 
 @Component({
@@ -37,6 +38,7 @@ export class DemoModulosComponent implements OnInit {
   private ocrProcessor = inject(OcrProcessorService);
   private lecturaDestinoEstado = inject(LecturaDestinoEstadoService);
   private restitucionProcessor = inject(RestitucionProcessorService);
+  private videocodificacionProcessor = inject(VideocodificacionProcessorService);
   // ──────────────────────────────────────────────────────────────────────────
 
   // ─── Signal local: enfoque activo ─────────────────────────────────────────
@@ -49,7 +51,7 @@ export class DemoModulosComponent implements OnInit {
    * Cambiar a true/false para forzarlo.
    */
   // mostrarSimulacion = isDevMode();
-  mostrarSimulacion = false;
+  mostrarSimulacion = true;
 
   // ==========================================
   // EJEMPLOS DE CONFIGURACIÓN Declarativa - PATRÓN COORDS
@@ -103,6 +105,16 @@ export class DemoModulosComponent implements OnInit {
       ],
       etiquetaOcr: { x: 40, y: 16 },
       etiquetaRestitucion: { x: 40, y: 81 }
+    },
+    {
+      // Sistema de videocodificación: no es un módulo de transporte (sin fotocélulas)
+      id: 'VCS-01',
+      nombre: 'VideoOnLine',
+      ancho: 140,
+      alto: 56,
+      orientacion: 'horizontal',
+      fotocelulas: [],
+      etiquetaVideocodificacion: { x: 40, y: 50 }   // misma x que las etiquetas del ACQ-01: quedan en vertical
     },
     {
       id: 'MER-01',
@@ -173,6 +185,11 @@ export class DemoModulosComponent implements OnInit {
     const modulo4 = this.modulosCoordsEjemplo.find(m => m.id === "ACQ-01");
     if (modulo4) {
       this.modulosLineaEntrada.push({ config: modulo4, x: 534 + 2, y: 50 });
+    }
+    // Separado de la línea: por debajo del ACQ-01, con su mismo ancho y alineado con él
+    const modulo9 = this.modulosCoordsEjemplo.find(m => m.id === "VCS-01");
+    if (modulo9) {
+      this.modulosLineaEntrada.push({ config: modulo9, x: 534 + 2, y: 240 });
     }
     const modulo5 = this.modulosCoordsEjemplo.find(m => m.id === "MER-01");
     if (modulo5) {
@@ -296,6 +313,34 @@ export class DemoModulosComponent implements OnInit {
       this.espesorProcessor.analizarTraza(traza, '1')
         ?.forEach(ev => this.espesorEstadoService.registrarMedida(ev.moduloId, ev.micras));
       this.restitucionProcessor.analizarTraza(traza, '1')
+        ?.forEach(l => this.lecturaDestinoEstado.registrarLectura(l));
+    });
+  }
+
+  /**
+   * Simula el resultado de videocodificación de un envío de la línea 1: primero
+   * su traza de espesor en el feeder (anota mpId → línea) y después la traza ILS
+   * con el destino (encaminamiento o distribución). Incluye el resultado de un
+   * envío de la línea 2, que debe descartarse. Las trazas pasan también por el
+   * procesador de restitución, que debe ignorarlas (exige TLS).
+   */
+  simularVideocodificacion(): void {
+    const codes = ['20280', '01013177001', '28045', '50012104001'];
+    const code = codes[Math.floor(Math.random() * codes.length)];
+    const trazas = [
+      'C30100200 19:02:20:101 INF IL1_FE1_ - rootOnMailPieceReportOutputThickness(), T.Reader:1, MP=400CE551, thickness=1280',
+      'C30100200 19:02:20:140 INF IL2_FE1_ - rootOnMailPieceReportOutputThickness(), T.Reader:1, MP=400CE5D5, thickness=900',
+      'IL:1 #N44572539;C30100000 19:02:26:300 INF ILS      - processSanction: addressRead on mpId=400CE5D5 : code=99999',
+      `IL:1 #N44548575;C30100000 19:02:26:378 INF ILS      - processSanction: addressRead on mpId=400CE551 : code=${code}`,
+    ];
+
+    // Cada mensaje del WebSocket trae una sola traza
+    trazas.forEach(traza => {
+      this.espesorProcessor.analizarTraza(traza, '1')
+        ?.forEach(ev => this.espesorEstadoService.registrarMedida(ev.moduloId, ev.micras));
+      this.restitucionProcessor.analizarTraza(traza, '1')
+        ?.forEach(l => this.lecturaDestinoEstado.registrarLectura(l));
+      this.videocodificacionProcessor.analizarTraza(traza, '1')
         ?.forEach(l => this.lecturaDestinoEstado.registrarLectura(l));
     });
   }

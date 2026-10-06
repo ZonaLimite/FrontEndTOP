@@ -30,7 +30,7 @@
 
     <!-- Línea de transporte visual (siempre visible) -->
     <app-linea-transporte [modoCoords]="true" [modulosCoordsConfig]="modulosLineaEntrada" [anchoLinea]="1150"
-      [altoLinea]="300" [titulo]="'Top ... Linea ...'">
+      [altoLinea]="335" [titulo]="'Top ... Linea ...'">
     </app-linea-transporte>
 
     <!-- Estadísticas y Controls -->
@@ -53,6 +53,9 @@
           </button>
           <button (click)="simularRestitucion()" class="btn-simular">
             🎲 Simular Restitución
+          </button>
+          <button (click)="simularVideocodificacion()" class="btn-simular">
+            🎲 Simular Videocodificación
           </button>
         </ng-container>
 

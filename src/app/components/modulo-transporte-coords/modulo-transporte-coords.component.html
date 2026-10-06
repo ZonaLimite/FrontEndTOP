@@ -61,6 +61,11 @@
                   [ngTemplateOutlet]="etiquetaDestino"
                   [ngTemplateOutletContext]="{ pos: er, titulo: 'RESTITUCIÓN', lectura: lecturaRestitucion(), pulso: pulsoRestitucion() }">
     </ng-container>
+    <!-- Etiqueta de destino del módulo de videocodificación (VCS): independiente de las del ACQ -->
+    <ng-container *ngIf="config.etiquetaVideocodificacion as ev"
+                  [ngTemplateOutlet]="etiquetaDestino"
+                  [ngTemplateOutletContext]="{ pos: ev, titulo: 'VIDEO ON LINE', lectura: lecturaVideocodificacion(), pulso: pulsoVideocodificacion() }">
+    </ng-container>
 
     <!-- Título con LED + recuadro: el LED destella y el contenido parpadea en cada lectura (no al vaciarse) -->
     <ng-template #etiquetaDestino let-pos="pos" let-titulo="titulo" let-lectura="lectura" let-pulso="pulso">

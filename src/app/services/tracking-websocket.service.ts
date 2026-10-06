@@ -15,6 +15,7 @@ import { EspesorEstadoService } from './espesor-estado.service';
 import { OcrProcessorService } from './ocr-processor.service';
 import { LecturaDestinoEstadoService } from './lectura-destino-estado.service';
 import { RestitucionProcessorService } from './restitucion-processor.service';
+import { VideocodificacionProcessorService } from './videocodificacion-processor.service';
 import { EnvioLineaService } from './envio-linea.service';
 import { RenderSchedulerService } from './render-scheduler.service';
 
@@ -89,6 +90,7 @@ export class TrackingWebsocketService implements OnDestroy {
   private ocrProcessor = inject(OcrProcessorService);
   private lecturaDestinoEstado = inject(LecturaDestinoEstadoService);
   private restitucionProcessor = inject(RestitucionProcessorService);
+  private videocodificacionProcessor = inject(VideocodificacionProcessorService);
   private envioLinea = inject(EnvioLineaService);
   private ngZone = inject(NgZone);
   private renderScheduler = inject(RenderSchedulerService);
@@ -243,7 +245,7 @@ export class TrackingWebsocketService implements OnDestroy {
     //Incluir ModelFilters de lectura OCR (proceso URA)
     this.incluirModelFilterAListener('Lectura OCR');
     await this.delay(500);
-    //Incluir ModelFilters de restitución (módulo TLS, servidor ITLS)
+    //Incluir ModelFilters de restitución (módulo TLS, servidor ITLS) y videocodificación (módulo ILS)
     this.incluirModelFilterAListener('Restitucion ITLS y VideoCodif');
     await this.delay(500);
 
@@ -523,6 +525,7 @@ export class TrackingWebsocketService implements OnDestroy {
       if (this.procesarTrazasEspesor(trace.data, true)) return;
       if (this.procesarTrazasOcr(trace.data, true)) return;
       if (this.procesarTrazasRestitucion(trace.data, true)) return;
+      if (this.procesarTrazasVideocodificacion(trace.data, true)) return;
       if (this.handleTracking(trace.data, false)) return;
       this.procesarTrazasRechazo(trace.data, true);
     }
@@ -631,6 +634,25 @@ export class TrackingWebsocketService implements OnDestroy {
     const linea = this.enlaceTop()?.lineaEntrada;
     if (!linea) return false;
     const lecturas = this.restitucionProcessor.analizarTraza(trazas, linea);
+    if (!lecturas) return false;
+    lecturas.forEach(l => this.lecturaDestinoEstado.registrarLectura(l));
+    return exclusiveProcessment;
+  }
+
+  /**
+   * Analiza un bloque de trazas en busca de destinos obtenidos por
+   * videocodificación (módulo ILS, común a todas las líneas) y registra como
+   * último resultado los de envíos de la línea enlazada. La línea de cada envío
+   * se resuelve por su mpId, igual que en procesarTrazasRestitucion.
+   *
+   * @param trazas               - String multilínea con trazas a analizar
+   * @param exclusiveProcessment - true si la traza tratada aquí no interesa a otros procesamientos
+   * @returns true si se ha tratado la traza y es exclusiva (corta la secuencia de _handleTrace)
+   */
+  procesarTrazasVideocodificacion(trazas: string, exclusiveProcessment: boolean): boolean {
+    const linea = this.enlaceTop()?.lineaEntrada;
+    if (!linea) return false;
+    const lecturas = this.videocodificacionProcessor.analizarTraza(trazas, linea);
     if (!lecturas) return false;
     lecturas.forEach(l => this.lecturaDestinoEstado.registrarLectura(l));
     return exclusiveProcessment;

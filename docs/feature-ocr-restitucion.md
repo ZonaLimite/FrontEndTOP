@@ -16,6 +16,8 @@ no se trata con OCR.
 |------|-----------|--------|
 | 1 | OCR: modelo, `ocr-processor`, estado de última lectura y etiqueta en ACQ | **Hecha** (2026-10-01) |
 | 2 | Restitución: `restitucion-processor`, registro mpId → línea y etiqueta inferior en ACQ | **Hecha** (2026-10-03) |
+| 3 | Videocodificación, presentación: módulo `VCS-01` bajo el ACQ y estado independiente | **Hecha** (2026-10-06) |
+| 4 | Videocodificación, lógica de servicio: `videocodificacion-processor` y enganche al WebSocket | **Hecha** (2026-10-06) |
 
 ## Requisitos acordados
 
@@ -23,7 +25,8 @@ no se trata con OCR.
 - **Filtro por línea:** la línea va en la cabecera tras el nivel (`INF IL<n>_URA_` → línea n, proceso URA).
   Se conserva solo la línea enlazada por el usuario (`enlaceTop().lineaEntrada`), como en
   [feature-espesor](feature-espesor.md). El prefijo `IL:1 #N…;` lo añade el Engine y no se usa.
-- **Última lectura:** se muestra solo la del **último envío tratado**, sea por OCR o por restitución:
+- **Última lectura:** en el ACQ se muestra solo la del **último envío tratado**, sea por OCR o por restitución
+  (la videocodificación va aparte, ver fases 3 y 4):
   al llegar una lectura se borra la del otro sistema (su recuadro vuelve a `—`), para no confundirla con
   el destino de un envío anterior. Permanece hasta que llega otra (sin caducidad). Se borra al desconectar.
 - **Un ACQ por línea:** las trazas no identifican el módulo; todos los módulos con `etiquetaOcr` /
@@ -119,12 +122,43 @@ Pendiente de definir: trazas de fallo (cronomarca sin datos, ITLS sin respuesta)
 | `Lectura OCR` | `URA_ - texte` de las dos líneas; se filtran en el frontend |
 | `Restitucion ITLS y VideoCodif` | `TLS - processSanction: addressRead` (restitución) e `ILS - …` (videocodificación), comunes a todas las líneas |
 
-## Pendiente: videocodificación
+## Fases 3 y 4 (hechas): videocodificación en línea
 
 El model filter `Restitucion ITLS y VideoCodif` publica también las resoluciones de destino de los
-videocodificadores. Solo cambia el módulo de la cabecera: `INF TLS` → restitución (ITLS),
-`INF ILS` → sanción de videocodificación. Hoy las trazas `ILS` se ignoran (la regex exige `TLS`).
+videocodificadores. La traza es igual que la de restitución salvo que lleva la cadena `ILS`
+(en cualquier lugar) en vez de `TLS`:
 
-Decidido: se mostrará **separada** de la restitución (recuadro propio, no en el de `RESTITUCIÓN`).
-Por definir: formato exacto de la traza `ILS`, ubicación del recuadro y si el registro `mpId → línea`
-(2000 envíos) cubre el tiempo que tarda una videocodificación.
+```
+IL:1 #N44548575;C30100000 19:02:26:378 INF ILS      - processSanction: addressRead on mpId=400CE551 : code=20280
+```
+
+`code`: 5 dígitos → encaminamiento; 11 → distribución (CP + sección (3) + calle (3)).
+
+La videocodificación se representa como un **sistema aparte**: un módulo propio, separado de la línea.
+
+### Fase 3: presentación
+
+- **Modelo:** `OrigenLectura` incluye `'videocodificacion'`; campo opcional `etiquetaVideocodificacion?`
+  en `ModuloCoordsConfig`.
+- **Módulo `VCS-01`** (demo): sin fotocélulas, 140 × 56 (mismo ancho que el `ACQ-01`), situado por debajo de él
+  y alineado con sus bordes (`x: 536, y: 240`). El lienzo de la línea pasa de 300 a 335 px de alto para darle sitio.
+- **Vista:** recuadro `VIDEOCODIFICACIÓN` con la misma plantilla, LED y parpadeo que OCR / restitución;
+  muestra el CP (+ distribución), sin línea de texto.
+- **Estado independiente** (`LecturaDestinoEstadoService`): el resultado de videocodificación llega más
+  tarde y es de un envío anterior al que está en el ACQ, así que **no borra** la lectura de OCR /
+  restitución **ni es borrado** por ellas. Solo lo sustituye otro resultado de videocodificación
+  (o la desconexión).
+
+### Fase 4: lógica de servicio
+
+- **`VideocodificacionProcessorService.analizarTraza(trace, linea)`** → `LecturaDestino[] | null`
+  (`origen: 'videocodificacion'`, `texto: ''`). Exige la marca `processSanction: addressRead` y la cadena
+  `ILS` en la línea de traza. Resuelve la línea por `mpId` con `EnvioLineaService`, como la restitución:
+  se descartan los de otra línea y los de línea desconocida.
+- **`TrackingWebsocketService`:** `_handleTrace()` llama a `procesarTrazasVideocodificacion(trace.data, true)`
+  tras la restitución (cuya regex exige `TLS` e ignora las trazas `ILS`).
+- **Demo:** botón **🎲 Simular Videocodificación** (traza de espesor + traza ILS; incluye un envío de la
+  línea 2 que debe descartarse).
+
+Por confirmar con trazas reales: formato exacto de la traza `ILS` (se ha supuesto idéntico al de `TLS`)
+y si el registro `mpId → línea` (2000 envíos) cubre el tiempo que tarda una videocodificación.
