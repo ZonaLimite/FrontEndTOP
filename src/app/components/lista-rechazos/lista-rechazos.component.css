@@ -1,0 +1,63 @@
+/* Bloque título + lista; el módulo lo posiciona por binding (left/top en %).
+   contain: el destello y los cambios de texto no recalculan el resto del módulo */
+:host {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
+  contain: content;
+}
+
+.rechazos-titulo {
+  font: 500 8px 'Segoe UI', Tahoma, sans-serif;
+  color: #999;
+  white-space: nowrap;
+}
+
+/* Tamaño fijo: cabe "ANNULATION_SC" y --rechazos-items líneas; se llena desde abajo */
+.rechazos-lista {
+  box-sizing: border-box;
+  width: 92px;
+  min-height: calc((var(--rechazos-items) - 1) * 11px + 20px);
+  padding: 1px 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid #555;
+  border-radius: 4px;
+}
+
+/* Rechazos anteriores: atenuados */
+.rechazo-item {
+  font: 400 8px/11px 'Segoe UI', Tahoma, sans-serif;
+  color: #8a8a8a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: auto;   /* tooltip con hora e info */
+}
+
+/* El más reciente: abajo, separado y destacado; destella al llegar (elemento nuevo en el DOM) */
+.rechazo-item.rechazo-ultimo {
+  margin-top: 1px;
+  padding-top: 1px;
+  border-top: 1px solid #444;
+  font-weight: 700;
+  font-size: 9px;
+  line-height: 12px;
+  color: #ff5252;
+  animation: rechazo-destello 500ms ease-out;
+}
+
+.rechazo-item.rechazo-ultimo:first-child {
+  border-top: none;
+}
+
+@keyframes rechazo-destello {
+  0%, 30% { color: #fff; background: rgba(255, 82, 82, 0.55); }
+  100%    { color: #ff5252; background: transparent; }
+}

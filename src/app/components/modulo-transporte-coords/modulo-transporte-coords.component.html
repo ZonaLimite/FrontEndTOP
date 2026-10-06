@@ -91,6 +91,13 @@
       </div>
     </ng-template>
 
+    <!-- Lista de últimos rechazos (solo módulos CUL con listaRechazos) -->
+    <app-lista-rechazos *ngIf="config.listaRechazos as lr"
+                        [style.left.%]="lr.x"
+                        [style.top.%]="lr.y"
+                        [items]="lr.items ?? 3">
+    </app-lista-rechazos>
+
   </div>
 
   <!-- Footer con información -->

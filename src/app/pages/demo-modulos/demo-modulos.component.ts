@@ -79,7 +79,8 @@ export class DemoModulosComponent implements OnInit {
         { id: 'CUL-B3', nombre: 'CUL-B3', x: 35, y: 30, tamano: 'pequeno', orientacion: 'row' },
         { id: 'CUL-B2', nombre: 'CUL-B2', x: 55, y: 60, tamano: 'pequeno', orientacion: 'row' },
         { id: 'CUL-B1', nombre: 'CUL-B1', x: 86, y: 60, tamano: 'pequeno', orientacion: 'row' },
-      ]
+      ],
+      listaRechazos: { x: 75, y: 21 }
     },
     {
       id: 'MRK-01',

@@ -64,6 +64,30 @@ export interface ModuloCoordsConfig {
   etiquetaEspesor?: EtiquetaEspesorConfig;   // Solo módulos feeder (FED-n)
   etiquetaOcr?: EtiquetaLecturaConfig;         // Solo módulos de adquisición (ACQ-n): parte superior
   etiquetaRestitucion?: EtiquetaLecturaConfig; // Solo módulos de adquisición (ACQ-n): parte inferior
+  listaRechazos?: ListaRechazosConfig;         // Solo módulos de culling (CUL-n)
+}
+
+// ============================================
+// LISTA DE ÚLTIMOS RECHAZOS (MÓDULOS CUL)
+// ============================================
+
+/**
+ * Posición y tamaño de la lista de últimos rechazos dentro de un módulo de culling
+ */
+export interface ListaRechazosConfig {
+  x: number;              // Posición X en % del módulo
+  y: number;              // Posición Y en % del módulo
+  items?: number;         // Rechazos visibles (por defecto 3)
+}
+
+/**
+ * Rechazo mostrado en la lista de últimos rechazos
+ */
+export interface RechazoReciente {
+  id: number;             // Identifica el rechazo en la lista (trackBy)
+  denominacion: string;   // Tipo de rechazo (ej: 'ANNULATION_SC')
+  info: string;           // Información complementaria de la traza
+  timestamp: Date;
 }
 
 // ============================================

@@ -31,6 +31,7 @@ import { FotocelulaComponent } from './components/fotocelula/fotocelula.componen
 //Componentes de Módulos de Transporte
 import { ModuloTransporteGridComponent } from './components/modulo-transporte-grid/modulo-transporte-grid.component';
 import { ModuloTransporteCoordsComponent } from './components/modulo-transporte-coords/modulo-transporte-coords.component';
+import { ListaRechazosComponent } from './components/lista-rechazos/lista-rechazos.component';
 import { LineaTransporteComponent } from './components/linea-transporte/linea-transporte.component';
 
 //Componentes as Pages
@@ -71,6 +72,7 @@ import { EstadisticasRechazoComponent } from './components/estadisticas-rechazo/
     FotocelulaComponent,
     ModuloTransporteGridComponent,
     ModuloTransporteCoordsComponent,
+    ListaRechazosComponent,
     LineaTransporteComponent,
     DemoModulosComponent,
     EstadisticasEventosComponent,

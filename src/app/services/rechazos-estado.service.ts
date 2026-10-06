@@ -1,5 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { EventoRechazo } from './rechazo-processor.service';
+import { RechazoReciente } from '../models/modulo-transporte.model';
 
 /**
  * Entrada individual en el historial de rechazos.
@@ -35,6 +36,9 @@ export interface RegistroRechazo {
  * - Map<denominacion, RegistroRechazo>  →  fuente de verdad interna
  * - Signals  →  estado observable para los templates (sin | async)
  * - setInterval de 2000ms  →  refresco periódico del renderizado
+ *   (resumen e historial: basta un refresco mínimo para la vista de estadísticas)
+ * - signal ultimos  →  se actualiza al registrar cada rechazo, sin esperar al
+ *   intervalo: la lista de los módulos CUL debe señalar cada rechazo al llegar
  *
  * Los rechazos NO están restringidos a un catálogo fijo: cualquier
  * DENOMINACION nueva se registra automáticamente al detectarse.
@@ -49,6 +53,12 @@ export class RechazosEstadoService {
   private historialInterno: EntradaHistorialRechazo[] = [];
 
   private static readonly MAX_HISTORIAL = 500;
+
+  /** Rechazos que conserva el signal ultimos (cada módulo CUL muestra los que quepan) */
+  static readonly MAX_ULTIMOS = 5;
+
+  /** Identificador incremental de cada rechazo de ultimos */
+  private ultimoId = 0;
 
   constructor() {
     // Refresco periódico de signals, igual que en EventosTrackingService
@@ -73,6 +83,12 @@ export class RechazosEstadoService {
   readonly signal_historial = signal<EntradaHistorialRechazo[]>([]);
 
   /**
+   * Signal con los últimos rechazos registrados, del más antiguo al más reciente.
+   * A diferencia de resumen y signal_historial, se actualiza en cada registro.
+   */
+  readonly ultimos = signal<RechazoReciente[]>([]);
+
+  /**
    * computed(): total acumulado de todos los rechazos registrados.
    */
   readonly totalRechazos = computed(() =>
@@ -95,16 +111,16 @@ export class RechazosEstadoService {
    * Si la denominación aún no existe, se crea un registro nuevo automáticamente.
    */
   registrarRechazo(evento: EventoRechazo): void {
-    this.procesarEvento(evento);
+    this.registrarRechazos([evento]);
   }
 
   /**
    * Registra un array de EventoRechazo (resultado del análisis de un bloque de trazas).
    */
   registrarRechazos(eventos: EventoRechazo[]): void {
-    for (const evento of eventos) {
-      this.procesarEvento(evento);
-    }
+    if (eventos.length === 0) return;
+    const nuevos = eventos.map(evento => this.procesarEvento(evento));
+    this.ultimos.update(u => [...u, ...nuevos].slice(-RechazosEstadoService.MAX_ULTIMOS));
   }
 
   /**
@@ -122,6 +138,7 @@ export class RechazosEstadoService {
     this.historialInterno = [];
     this.resumen.set([]);
     this.signal_historial.set([]);
+    this.ultimos.set([]);
     console.log('RechazosEstadoService: estadísticas limpiadas');
   }
 
@@ -168,8 +185,9 @@ export class RechazosEstadoService {
 
   /**
    * Lógica de procesamiento: actualiza el Map interno con el nuevo evento.
+   * @returns el rechazo, identificado, para el signal ultimos
    */
-  private procesarEvento(evento: EventoRechazo): void {
+  private procesarEvento(evento: EventoRechazo): RechazoReciente {
     const { key, denominacion, info } = evento;
 
     let registro = this.mapaRechazos.get(denominacion);
@@ -203,6 +221,8 @@ export class RechazosEstadoService {
     if (this.historialInterno.length > RechazosEstadoService.MAX_HISTORIAL) {
       this.historialInterno.pop();
     }
+
+    return { id: ++this.ultimoId, denominacion, info, timestamp: entrada.timestamp };
   }
 
   /**
