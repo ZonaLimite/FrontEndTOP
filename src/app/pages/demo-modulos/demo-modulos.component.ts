@@ -318,20 +318,18 @@ export class DemoModulosComponent implements OnInit {
   }
 
   /**
-   * Simula el resultado de videocodificación de un envío de la línea 1: primero
-   * su traza de espesor en el feeder (anota mpId → línea) y después la traza ILS
-   * con el destino (encaminamiento o distribución). Incluye el resultado de un
-   * envío de la línea 2, que debe descartarse. Las trazas pasan también por el
-   * procesador de restitución, que debe ignorarlas (exige TLS).
+   * Simula el resultado de videocodificación de un envío de la línea 1: traza
+   * IL1_ILS_ con el destino (encaminamiento o distribución). La línea va en la
+   * propia traza: no hace falta la traza de espesor previa. Incluye el resultado
+   * de un envío de la línea 2, que debe descartarse. Las trazas pasan también
+   * por el procesador de restitución, que debe ignorarlas (exige TLS).
    */
   simularVideocodificacion(): void {
     const codes = ['20280', '01013177001', '28045', '50012104001'];
     const code = codes[Math.floor(Math.random() * codes.length)];
     const trazas = [
-      'C30100200 19:02:20:101 INF IL1_FE1_ - rootOnMailPieceReportOutputThickness(), T.Reader:1, MP=400CE551, thickness=1280',
-      'C30100200 19:02:20:140 INF IL2_FE1_ - rootOnMailPieceReportOutputThickness(), T.Reader:1, MP=400CE5D5, thickness=900',
-      'IL:1 #N44572539;C30100000 19:02:26:300 INF ILS      - processSanction: addressRead on mpId=400CE5D5 : code=99999',
-      `IL:1 #N44548575;C30100000 19:02:26:378 INF ILS      - processSanction: addressRead on mpId=400CE551 : code=${code}`,
+      'IL:1 #N11649050;C30100000 21:10:59:200 INF IL2_ILS_ - processSanction: addressRead on mpId=40011D6A : code=99999',
+      `IL:1 #N11649052;C30100000 21:10:59:282 INF IL1_ILS_ - processSanction: addressRead on mpId=40011D6C : code=${code}`,
     ];
 
     // Cada mensaje del WebSocket trae una sola traza

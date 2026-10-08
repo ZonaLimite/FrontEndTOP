@@ -120,16 +120,16 @@ Pendiente de definir: trazas de fallo (cronomarca sin datos, ITLS sin respuesta)
 |--------------|--------|
 | `Medida Espesor` | Espesor en feeders (también resuelve la línea de cada restitución) |
 | `Lectura OCR` | `URA_ - texte` de las dos líneas; se filtran en el frontend |
-| `Restitucion ITLS y VideoCodif` | `TLS - processSanction: addressRead` (restitución) e `ILS - …` (videocodificación), comunes a todas las líneas |
+| `Restitucion ITLS y VideoCodif` | `TLS - processSanction: addressRead` (restitución, común a todas las líneas) e `IL<n>_ILS_ - …` (videocodificación, con la línea en la cabecera) |
 
 ## Fases 3 y 4 (hechas): videocodificación en línea
 
 El model filter `Restitucion ITLS y VideoCodif` publica también las resoluciones de destino de los
-videocodificadores. La traza es igual que la de restitución salvo que lleva la cadena `ILS`
-(en cualquier lugar) en vez de `TLS`:
+videocodificadores. La traza es como la de restitución, pero el módulo de la cabecera es
+`IL<n>_ILS_` en vez de `TLS`, e **incluye la línea** de la que procede el envío:
 
 ```
-IL:1 #N44548575;C30100000 19:02:26:378 INF ILS      - processSanction: addressRead on mpId=400CE551 : code=20280
+IL:1 #N11649052;C30100000 21:10:59:282 INF IL1_ILS_ - processSanction: addressRead on mpId=40011D6C : code=36202
 ```
 
 `code`: 5 dígitos → encaminamiento; 11 → distribución (CP + sección (3) + calle (3)).
@@ -152,13 +152,13 @@ La videocodificación se representa como un **sistema aparte**: un módulo propi
 ### Fase 4: lógica de servicio
 
 - **`VideocodificacionProcessorService.analizarTraza(trace, linea)`** → `LecturaDestino[] | null`
-  (`origen: 'videocodificacion'`, `texto: ''`). Exige la marca `processSanction: addressRead` y la cadena
-  `ILS` en la línea de traza. Resuelve la línea por `mpId` con `EnvioLineaService`, como la restitución:
-  se descartan los de otra línea y los de línea desconocida.
+  (`origen: 'videocodificacion'`, `texto: ''`). Exige `IL<n>_ILS_ - processSanction: addressRead`.
+  **La línea se toma de la cabecera de la traza** (`IL<n>_ILS_`), no del registro `mpId → línea` de
+  `EnvioLineaService`: una videocodificación puede tardar hasta 22 s y para entonces el envío puede haber
+  salido ya del registro (200 envíos). Así se capturan todos los resultados; se descartan los de otra línea.
 - **`TrackingWebsocketService`:** `_handleTrace()` llama a `procesarTrazasVideocodificacion(trace.data, true)`
   tras la restitución (cuya regex exige `TLS` e ignora las trazas `ILS`).
-- **Demo:** botón **🎲 Simular Videocodificación** (traza de espesor + traza ILS; incluye un envío de la
+- **Demo:** botón **🎲 Simular Videocodificación** (traza `IL1_ILS_`; incluye un resultado de la
   línea 2 que debe descartarse).
 
-Por confirmar con trazas reales: formato exacto de la traza `ILS` (se ha supuesto idéntico al de `TLS`)
-y si el registro `mpId → línea` (2000 envíos) cubre el tiempo que tarda una videocodificación.
+Formato confirmado con una traza real (2026-10-08).

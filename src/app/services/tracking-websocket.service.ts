@@ -641,9 +641,8 @@ export class TrackingWebsocketService implements OnDestroy {
 
   /**
    * Analiza un bloque de trazas en busca de destinos obtenidos por
-   * videocodificación (módulo ILS, común a todas las líneas) y registra como
-   * último resultado los de envíos de la línea enlazada. La línea de cada envío
-   * se resuelve por su mpId, igual que en procesarTrazasRestitucion.
+   * videocodificación (módulo IL<n>_ILS_) y registra como último resultado los
+   * de envíos de la línea enlazada. La línea va en la cabecera de la traza.
    *
    * @param trazas               - String multilínea con trazas a analizar
    * @param exclusiveProcessment - true si la traza tratada aquí no interesa a otros procesamientos
