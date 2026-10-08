@@ -17,10 +17,10 @@
   white-space: nowrap;
 }
 
-/* Tamaño fijo: cabe "ANNULATION_SC" y --rechazos-items líneas; se llena desde abajo */
+/* Tamaño fijo: cabe "ANNULATION_SC" + feeder y --rechazos-items líneas; se llena desde abajo */
 .rechazos-lista {
   box-sizing: border-box;
-  width: 92px;
+  width: 116px;
   min-height: calc((var(--rechazos-items) - 1) * 11px + 20px);
   padding: 1px 4px;
   display: flex;
@@ -31,14 +31,27 @@
   border-radius: 4px;
 }
 
-/* Rechazos anteriores: atenuados */
+/* Rechazos anteriores: atenuados. Denominación a la izquierda, feeder de origen a la derecha */
 .rechazo-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 3px;
   font: 400 8px/11px 'Segoe UI', Tahoma, sans-serif;
   color: #8a8a8a;
   white-space: nowrap;
+  pointer-events: auto;   /* tooltip con hora, feeder e info */
+}
+
+.rechazo-denominacion {
   overflow: hidden;
   text-overflow: ellipsis;
-  pointer-events: auto;   /* tooltip con hora e info */
+}
+
+/* Feeder de origen: mismo color que el ítem, sin negrita y en tamaño fijo */
+.rechazo-feeder {
+  flex: none;
+  font-weight: 400;
+  font-size: 8px;
 }
 
 /* El más reciente: abajo, separado y destacado; destella al llegar (elemento nuevo en el DOM) */

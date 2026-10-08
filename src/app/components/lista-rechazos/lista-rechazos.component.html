@@ -4,7 +4,9 @@
   <div *ngFor="let r of ultimos() | slice:-items; trackBy: trackByRechazo; last as ultimo"
        class="rechazo-item"
        [class.rechazo-ultimo]="ultimo"
-       [title]="(r.timestamp | date:'HH:mm:ss') + ' · ' + r.denominacion + (r.info ? ' · ' + r.info : '')">
-    {{ r.denominacion }}
+       [title]="(r.timestamp | date:'HH:mm:ss') + ' · ' + r.denominacion + (r.feeder ? ' · Feeder ' + r.feeder : '') + (r.info ? ' · ' + r.info : '')">
+    <span class="rechazo-denominacion">{{ r.denominacion }}</span>
+    <!-- Feeder del que se singularizó el envío rechazado (si se conoce) -->
+    <span *ngIf="r.feeder" class="rechazo-feeder">FE{{ r.feeder }}</span>
   </div>
 </div>

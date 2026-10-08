@@ -188,7 +188,7 @@ export class RechazosEstadoService {
    * @returns el rechazo, identificado, para el signal ultimos
    */
   private procesarEvento(evento: EventoRechazo): RechazoReciente {
-    const { key, denominacion, info } = evento;
+    const { key, denominacion, info, feeder } = evento;
 
     let registro = this.mapaRechazos.get(denominacion);
 
@@ -222,7 +222,7 @@ export class RechazosEstadoService {
       this.historialInterno.pop();
     }
 
-    return { id: ++this.ultimoId, denominacion, info, timestamp: entrada.timestamp };
+    return { id: ++this.ultimoId, denominacion, info, feeder, timestamp: entrada.timestamp };
   }
 
   /**

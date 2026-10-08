@@ -88,6 +88,7 @@ export interface RechazoReciente {
   id: number;             // Identifica el rechazo en la lista (trackBy)
   denominacion: string;   // Tipo de rechazo (ej: 'ANNULATION_SC')
   info: string;           // Información complementaria de la traza
+  feeder: string | null;  // Feeder de origen del envío (ej: '2'); null si no se conoce
   timestamp: Date;
 }
 

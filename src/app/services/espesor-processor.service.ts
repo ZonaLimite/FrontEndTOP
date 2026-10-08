@@ -20,8 +20,9 @@ export interface EventoEspesor {
  *
  *   IL<n>_FE<m>  → línea n, feeder m → módulo 'FED-0m'
  *   T.Reader     → lector de espesor (uno por feeder: se ignora)
- *   MP           → identificador del envío: se anota su línea en EnvioLineaService
- *                  (de cualquier línea) para resolver después la de su restitución
+ *   MP           → identificador del envío: se anotan su línea y su feeder en
+ *                  EnvioLineaService (de cualquier línea) para resolver después la
+ *                  línea de su restitución y el feeder de origen de un rechazo
  *   thickness    → espesor medido en micras
  *
  * El model filter 'Medida Espesor' del Engine no distingue línea: llegan
@@ -51,7 +52,7 @@ export class EspesorProcessorService {
   /**
    * Analiza un string de traza multilínea y devuelve las medidas de espesor
    * detectadas en la línea indicada, o `null` si no se detecta ninguna.
-   * Anota además la línea de cada envío (MP), sea de la línea que sea.
+   * Anota además la línea y el feeder de cada envío (MP), sea de la línea que sea.
    *
    * @param trace - Cadena con el contenido de traza a analizar (una o varias líneas)
    * @param linea - Línea de entrada a conservar ('1', '2'); el resto se descarta
@@ -72,7 +73,7 @@ export class EspesorProcessorService {
     for (const lineaTraza of trace.split('\n')) {
       const match = lineaTraza.match(EspesorProcessorService.REGEX_ESPESOR);
       if (!match) continue;
-      if (match[3]) this.envioLinea.registrar(match[3], match[1]);
+      if (match[3]) this.envioLinea.registrar(match[3], match[1], match[2]);
       if (match[1] === linea) {
         eventos.push({
           moduloId: `FED-${match[2].padStart(2, '0')}`,

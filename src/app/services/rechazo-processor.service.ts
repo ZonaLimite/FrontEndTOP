@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { EnvioLineaService } from './envio-linea.service';
 
 /**
  * Resultado individual del análisis de una traza de tipo Rechazo.
@@ -17,6 +18,12 @@ export interface EventoRechazo {
   denominacion: string;
   /** Token 3: información complementaria (puede contener comas internas) */
   info: string;
+  /**
+   * Número del feeder del que se singularizó el envío rechazado (ej: '2'),
+   * resuelto por el identificador "pli <id>" de INFO con EnvioLineaService.
+   * null si la traza no trae el envío o no se conoce su feeder.
+   */
+  feeder: string | null;
 }
 
 /**
@@ -36,9 +43,14 @@ export interface EventoRechazo {
 })
 export class RechazoProcessorService {
 
+  private envioLinea = inject(EnvioLineaService);
+
   // ─── Constante de detección ──────────────────────────────────────────────
 
   private static readonly MARCA_REJET = '- REJET';
+
+  /** Identificador del envío rechazado dentro de INFO: "pli 400218A1" (el MP de otras trazas) */
+  private static readonly REGEX_PLI = /\bpli\s+(\w+)/;
 
   // ─── API pública ─────────────────────────────────────────────────────────
 
@@ -105,6 +117,9 @@ export class RechazoProcessorService {
       return null;
     }
 
-    return { key, denominacion, info };
+    const mp = info.match(RechazoProcessorService.REGEX_PLI)?.[1];
+    const feeder = (mp && this.envioLinea.feederDe(mp)) || null;
+
+    return { key, denominacion, info, feeder };
   }
 }
