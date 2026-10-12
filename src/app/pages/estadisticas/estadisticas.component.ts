@@ -35,13 +35,14 @@ export class EstadisticasComponent {
   
   //Modelo de Column tablas utilizado
   modelColInputLineItems: string[]= ["iinputLineId","injectedItems","cullingRejectOld","mailpieceAppeared","outOfSlotTooLate","slotTooEarly","injectableCollision","unInjectableCollision","tooThick","tooHigh","tooLong","tooShort","unavailableBucket","tooCloseToCulledItem","cullingReject"];
+  modelColConveyorItems: string[]= ["unloadedItems","mailPieceAppeared","mailPieceDisappeared","mailPieceRecycled","outOfSortPlan"];
 
   modelCol :string[]=[]
 
   //Inicializador Combo de conceptos a manejar
   public listItemsConcepto:ApiFaults[]=
             [new ApiFaults('INPUT LINE ITEMS','api/querys/ilItems',this.modelColInputLineItems), 
-            // new ApiFaults('CONVEYOR ITEMS','api/faults/etifGroupBy'),
+            new ApiFaults('CONVEYOR ITEMS','api/querys/conveyorItems',this.modelColConveyorItems)
             // new ApiFaults('FEEDER ITEMS','api/faults/etifGroupBy'),
              //new ApiFaults('MACHIME ITEMS','api/faults/etifGroupBy'),
              //new ApiFaults('OUTPUT ITEMS','api/faults/etifGroupBy'),             
