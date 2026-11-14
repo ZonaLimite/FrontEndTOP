@@ -102,6 +102,7 @@
       <div *ngFor="let entrada of historial().slice(0, 50)" class="historial-item">
         <span class="hist-timestamp">{{ entrada.timestamp | date: 'HH:mm:ss' }}</span>
         <span class="hist-denominacion">{{ entrada.denominacion }}</span>
+        <span *ngIf="entrada.feeder">FE{{ entrada.feeder }}</span>
         <span class="hist-info" [title]="entrada.info">{{ entrada.info }}</span>
       </div>
 
