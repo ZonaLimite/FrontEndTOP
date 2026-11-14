@@ -9,6 +9,8 @@ export interface EntradaHistorialRechazo {
   key: string;
   denominacion: string;
   info: string;
+  /** Número del feeder de origen, o null si no se pudo determinar. */
+  feeder: string | null;
   timestamp: Date;
 }
 
@@ -211,6 +213,7 @@ export class RechazosEstadoService {
       key,
       denominacion,
       info,
+      feeder,
       timestamp: new Date()
     };
 
