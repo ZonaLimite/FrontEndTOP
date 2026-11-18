@@ -55,7 +55,7 @@ export class TraceProcessorService {
    * → activación (ocultación)
    */
   private static readonly REGEX_ON_TAKE =
-    /MAIN - BeltConveyor onTakeMailPiece\s*.*?\s+sur\s+(\S+)/;
+    /- BeltConveyor onTakeMailPiece\s*.*?\s+sur\s+(\S+)/;
 
   /**
    * Detecta trazas con "clearTrackingPoint ... sur <fotocelula>"
@@ -155,7 +155,7 @@ export class TraceProcessorService {
       return null;
     }
 
-    // 1. Caso especial: TakeMailPiece() from <fotocelula>
+    // 1. Caso especial: TakeMailPiece() from <fotocelula>(Para Feeders)
     const matchTakeFrom = linea.match(TraceProcessorService.REGEX_TAKE_FROM);
     if (matchTakeFrom) {
       return {
@@ -167,12 +167,18 @@ export class TraceProcessorService {
     // 2. onTakeMailPiece ... sur <fotocelula> → activación
     const matchOnTake = linea.match(TraceProcessorService.REGEX_ON_TAKE);
     if (matchOnTake) {
-      if (matchOnTake[1].includes("Input_1")) {
+      if (matchOnTake[1].includes("Input_1") && linea.includes("_MAIN ")) {
         return {
           fotocelula: this.limpiarNombreFotocelula("ACQ-B1"),
           evento: 'activacion'
         };
       }
+      if (matchOnTake[1].includes("Input_1") && linea.includes("_MERG ")) {
+        return {
+          fotocelula: this.limpiarNombreFotocelula("MER-B1"),
+          evento: 'activacion'
+        };
+      }  
       return {
         fotocelula: this.limpiarNombreFotocelula(matchOnTake[1]),
         evento: 'activacion'

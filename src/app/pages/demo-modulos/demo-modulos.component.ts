@@ -124,7 +124,8 @@ export class DemoModulosComponent implements OnInit {
       orientacion: 'horizontal',
       fotocelulas: [
         { id: 'MER-B2', nombre: 'MER-B2', x: 83, y: 23, tamano: 'pequeno', orientacion: 'row' },
-        { id: 'MER-B3', nombre: 'MER-B3', x: 83, y: 88, tamano: 'pequeno', orientacion: 'row' },
+        { id: 'MER-B1', nombre: 'MER-B1', x: 83, y: 88, tamano: 'pequeno', orientacion: 'row' },
+        { id: 'MER-B3', nombre: 'MER-B3', x: 40, y: 60, tamano: 'pequeno', orientacion: 'row' },
       ]
     },
     {
