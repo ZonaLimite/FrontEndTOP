@@ -107,12 +107,13 @@ export interface EtiquetaEspesorConfig {
 
 /**
  * Clasificación de una medida de espesor:
- * - ok:          0 < espesor <= 30 mm
- * - warning:     espesor == 0, o 30 mm < espesor <= 64 mm
- * - excesivo:    espesor > 64 mm
- * - sin-lectura: no hay medida vigente
+ * - normal:        0 < espesor <= 30 mm      → tonos verdes
+ * - warning:       30 mm < espesor <= 40 mm  → tonos amarillos
+ * - excesivo:      40 mm < espesor <= 64 mm  → tonos rojos
+ * - sin-deteccion: espesor > 64 mm           → tonos blancos
+ * - sin-lectura:   no hay medida vigente
  */
-export type EstadoEspesor = 'ok' | 'warning' | 'excesivo' | 'sin-lectura';
+export type EstadoEspesor = 'normal' | 'warning' | 'excesivo' | 'sin-deteccion' | 'sin-lectura';
 
 /**
  * Última medida de espesor recibida para un módulo feeder

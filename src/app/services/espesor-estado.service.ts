@@ -25,8 +25,9 @@ import { RenderSchedulerService } from './render-scheduler.service';
 export class EspesorEstadoService {
 
   /** Umbrales de clasificación en micras (µm) */
-  static readonly UMBRAL_WARNING_MICRAS = 30_000;    // > 30 mm → warning
-  static readonly UMBRAL_EXCESIVO_MICRAS = 64_000;   // > 64 mm → excesivo
+  static readonly UMBRAL_WARNING_MICRAS = 30_000;   // > 30 mm → warning
+  static readonly UMBRAL_EXCESIVO_MICRAS = 40_000;   // > 40 mm → excesivo
+  static readonly UMBRAL_SIN_DETECCION_MICRAS = 64_000;// > 64 mm → sin-deteccion
 
   /** Tiempo mínimo que una medida permanece visible sin llegar otra (ms) */
   static readonly TIEMPO_VISIBLE_MS = 3000;
@@ -77,12 +78,17 @@ export class EspesorEstadoService {
 
   /**
    * Clasifica un espesor en micras según los umbrales definidos.
+   *
+   * - normal:        0 < espesor ≤ 30 mm
+   * - warning:       30 mm < espesor ≤ 40 mm
+   * - excesivo:      40 mm < espesor ≤ 64 mm
+   * - sin-deteccion: espesor > 64 mm
    */
   static clasificar(micras: number): EstadoEspesor {
-    if (micras === 0) return 'warning';
+    if (micras > EspesorEstadoService.UMBRAL_SIN_DETECCION_MICRAS) return 'sin-deteccion';
     if (micras > EspesorEstadoService.UMBRAL_EXCESIVO_MICRAS) return 'excesivo';
     if (micras > EspesorEstadoService.UMBRAL_WARNING_MICRAS) return 'warning';
-    return 'ok';
+    return 'normal';
   }
 
   // ─── Privados ─────────────────────────────────────────────────────────────

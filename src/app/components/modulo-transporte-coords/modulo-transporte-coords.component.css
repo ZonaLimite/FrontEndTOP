@@ -161,23 +161,35 @@
   transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
-.etiqueta-espesor.estado-ok {
+/* ≤ 30 mm: normal → tonos verdes */
+.etiqueta-espesor.estado-normal {
   color: #00ff88;
   border-color: #00aa5a;
+  background: rgba(0, 50, 25, 0.7);
 }
 
+/* 30–40 mm: warning → tonos amarillos */
 .etiqueta-espesor.estado-warning {
-  color: #ffc107;
-  border-color: #b38600;
+  color: #ffd740;
+  border-color: #c8a000;
   background: rgba(60, 45, 0, 0.7);
 }
 
+/* 40–64 mm: excesivo → tonos rojos */
 .etiqueta-espesor.estado-excesivo {
   color: #ff5252;
   border-color: #b32424;
   background: rgba(70, 0, 0, 0.7);
 }
 
+/* > 64 mm: sin detección → tonos blancos */
+.etiqueta-espesor.estado-sin-deteccion {
+  color: #f5f5f5;
+  border-color: #bdbdbd;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* sin medida vigente */
 .etiqueta-espesor.estado-sin-lectura {
   color: #777;
   border-color: #444;
